@@ -46,7 +46,61 @@ public class BishopPiece implements Piece {
 
     @Override
     public void generateTilesToMoveTo() {
+        int x = currentTile.getX();
+        int y = currentTile.getY();
 
+        // TODO: use 1 loop in each iteration, maybe use a local variable outside of loop and zero it right before each one executes
+
+        // "going right and down diagonally"
+        for (int r = x + 1; r < board.getBoard().length; r++) {
+            for (int c = y + 1; c < board.getBoard().length; c++) {
+                if (board.getBoard()[r][c].isEmpty()) {
+                    tilesToMoveTo.add(board.getBoard()[r][c]);
+                    break;
+                } else if (board.getBoard()[r][c].getPiece().getPieceColor() != pieceColor) {
+                    tilesToMoveTo.add(board.getBoard()[r][c]);
+                    break;
+                } else break;
+            }
+        }
+        // "going left and up diagonally"
+        for (int r = x - 1; r >= 0; r--) {
+            for (int c = y - 1; c >= 0; c--) {
+                if (board.getBoard()[r][c].isEmpty()) {
+                    tilesToMoveTo.add(board.getBoard()[r][c]);
+                    break;
+                } else if (board.getBoard()[r][c].getPiece().getPieceColor() != pieceColor) {
+                    tilesToMoveTo.add(board.getBoard()[r][c]);
+                    break;
+                } else break;
+            }
+        }
+
+        // "going right and up diagonally"
+        for (int r = x + 1; r < board.getBoard().length; r++) {
+            for (int c = y - 1; c >= 0; c--) {
+                if (board.getBoard()[r][c].isEmpty()) {
+                    tilesToMoveTo.add(board.getBoard()[r][c]);
+                    break;
+                } else if (board.getBoard()[r][c].getPiece().getPieceColor() != pieceColor) {
+                    tilesToMoveTo.add(board.getBoard()[r][c]);
+                    break;
+                } else break;
+            }
+        }
+
+        // "going left and down diagonally"
+        for (int r = x - 1; r >= 0; r--) {
+            for (int c = y + 1; c < board.getBoard().length; c++) {
+                if (board.getBoard()[r][c].isEmpty()) {
+                    tilesToMoveTo.add(board.getBoard()[r][c]);
+                    break;
+                } else if (board.getBoard()[r][c].getPiece().getPieceColor() != pieceColor) {
+                    tilesToMoveTo.add(board.getBoard()[r][c]);
+                    break;
+                } else break;
+            }
+        }
     }
 
     @Override
@@ -106,4 +160,15 @@ public class BishopPiece implements Piece {
         }
         return false;
     }
+
+    /*
+    @Override
+    public void checkAvailabilityAtTile(Tile tile) {
+        if (tile.isEmpty()) {
+            tilesToMoveTo.add(tile);
+        } else if (tile.getPiece().getPieceColor() != pieceColor) {
+            tilesToMoveTo.add(tile);
+            break;
+        } else break;
+    } */
 }

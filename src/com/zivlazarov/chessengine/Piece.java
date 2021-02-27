@@ -26,4 +26,6 @@ public interface Piece {
     void generateTilesToMoveTo();
 
     boolean isThreatenedAtTile(Tile tile);
+
+//    void checkAvailabilityAtTile(Tile tile);
 }
