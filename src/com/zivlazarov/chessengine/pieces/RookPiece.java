@@ -25,7 +25,6 @@ public class RookPiece implements Piece {
         tilesToMoveTo = new ArrayList<Tile>();
 
         currentTile = initTile;
-
         board.getAlivePieces().add(this);
         currentTile.setPiece(this);
         generateTilesToMoveTo();
