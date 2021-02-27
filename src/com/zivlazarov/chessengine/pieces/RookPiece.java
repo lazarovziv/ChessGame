@@ -50,6 +50,8 @@ public class RookPiece implements Piece {
         int x = currentTile.getX();
         int y = currentTile.getY();
 
+        // checking the board for threats before adding moves to tilesToMoveTo
+        // TODO: checking the board after every turn instead of every generation of moves to each piece to save memory
         board.checkBoard();
 
 
