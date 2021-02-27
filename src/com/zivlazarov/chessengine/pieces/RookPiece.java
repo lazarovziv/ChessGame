@@ -62,44 +62,53 @@ public class RookPiece implements Piece {
 
         // TODO: add possible moves at "Check" situation
 
-        // checking one side of possible direction in row (not column!!)
-        for (int r = y; r >= 0; r--) {
-            // checking if Rook is at position 0, need to check only one direction instead of 2
-            if (r == 0) {
-                checkRowToRightFromIndex(y, currentRow);
-                // checking other way around, instead of position 0, last position 7
-            } else if (r == board.getBoard().length - 1) {
-                checkRowToLeftFromIndex(y, currentRow);
-                // checking if Rook is not on edge of any of board's rows
-            } else {
-                // "going right"
-                checkRowToRightFromIndex(y, currentRow);
-                // "going left"
-                checkRowToLeftFromIndex(y, currentRow);
-            }
+        // CHECKING ROW
+        // checking if Rook is at position 0, need to check only one direction instead of 2
+        if (y == 0) {
+            checkTilesTowardsEndFromIndex(y, currentRow);
+            // checking other way around, instead of position 0, last position 7
+        } else if (y == board.getBoard().length - 1) {
+            checkTilesTowardsStartFromIndex(y, currentRow);
+            // checking if Rook is not on edge of any of board's rows
+        } else {
+            // "going right"
+            checkTilesTowardsEndFromIndex(y, currentRow);
+            // "going left"
+            checkTilesTowardsStartFromIndex(y, currentRow);
+        }
+
+
+        // CHECKING COLUMN
+        if (x == 0) {
+            checkTilesTowardsEndFromIndex(x, currentCol);
+        } else if (x == board.getBoard().length - 1) {
+            checkTilesTowardsStartFromIndex(x, currentCol);
+        } else {
+            checkTilesTowardsEndFromIndex(x, currentCol);
+            checkTilesTowardsStartFromIndex(x, currentCol);
         }
     }
 
-    private void checkRowToRightFromIndex(int index, Tile[] row) {
-        for (int i = index+1; index < board.getBoard().length; i++) {
-            if (row[i].isEmpty()) {
-                tilesToMoveTo.add(row[i]);
+    private void checkTilesTowardsEndFromIndex(int index, Tile[] tiles) {
+        for (int i = index + 1; i < board.getBoard().length; i++) {
+            if (tiles[i].isEmpty()) {
+                tilesToMoveTo.add(tiles[i]);
                 // if not empty but contains opponent's piece, can be added to tilesToMoveTo but after that need to break loop
-            } else if (row[i].getPiece().getPieceColor() != pieceColor) {
-                tilesToMoveTo.add(row[i]);
+            } else if (tiles[i].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(tiles[i]);
                 break;
                 // if not empty but contains same piece color, can't be moved there and must break loop
             } else break;
         }
     }
 
-    private void checkRowToLeftFromIndex(int index, Tile[] row) {
-        for (int i = index-1; i >= 0; i--) {
-            if (row[i].isEmpty()) {
-                tilesToMoveTo.add(row[i]);
+    private void checkTilesTowardsStartFromIndex(int index, Tile[] tiles) {
+        for (int i = index - 1; i >= 0; i--) {
+            if (tiles[i].isEmpty()) {
+                tilesToMoveTo.add(tiles[i]);
                 // if not empty but contains opponent's piece, can be added to tilesToMoveTo but after that need to break loop
-            } else if (row[i].getPiece().getPieceColor() != pieceColor) {
-                tilesToMoveTo.add(row[i]);
+            } else if (tiles[i].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(tiles[i]);
                 break;
                 // if not empty but contains same piece color, can't be moved there and must break loop
             } else break;
@@ -112,13 +121,28 @@ public class RookPiece implements Piece {
     }
 
     @Override
+    public void setName(char name) {
+        this.name = name;
+    }
+
+    @Override
     public boolean getIsAlive() {
         return isAlive;
     }
 
     @Override
+    public void setIsAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
+
+    @Override
     public boolean getIsInDanger() {
         return isInDanger;
+    }
+
+    @Override
+    public void setIsInDanger(boolean isInDanger) {
+        this.isInDanger = isInDanger;
     }
 
     @Override
@@ -129,21 +153,6 @@ public class RookPiece implements Piece {
     @Override
     public PieceColor getPieceColor() {
         return pieceColor;
-    }
-
-    @Override
-    public void setName(char name) {
-        this.name = name;
-    }
-
-    @Override
-    public void setIsAlive(boolean isAlive) {
-        this.isAlive = isAlive;
-    }
-
-    @Override
-    public void setIsInDanger(boolean isInDanger) {
-        this.isInDanger = isInDanger;
     }
 
     @Override
