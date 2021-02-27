@@ -22,6 +22,7 @@ public class Board {
     }
 
     // thorough check on every tile to see if it's threatened by black and/or white, which pieces are alive etc.
+    // TODO: check for "Check" and/or "Checkmate" and/or "Draw" situation
     public void checkBoard() {
         for (int r = 0; r < board.length; r++) {
             for (int c = 0; c < board.length; c++) {

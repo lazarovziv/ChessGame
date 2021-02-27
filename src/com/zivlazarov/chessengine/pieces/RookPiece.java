@@ -62,43 +62,47 @@ public class RookPiece implements Piece {
 
         // TODO: add possible moves at "Check" situation
 
-        ArrayList<Tile> unoccupiedSquaresInCurrentRow = new ArrayList<Tile>();
-        ArrayList<Tile> unoccupiedSquaresInCurrentCol = new ArrayList<Tile>();
-
         // checking one side of possible direction in row (not column!!)
         for (int r = y; r >= 0; r--) {
-            // checking if Rook is at position 0, need to check one direction instead of 2
+            // checking if Rook is at position 0, need to check only one direction instead of 2
             if (r == 0) {
-                for (int i = y+1; i < board.getBoard().length; i++) {
-                    if (currentRow[i].isEmpty()) {
-                        unoccupiedSquaresInCurrentRow.add(currentRow[i]);
-                        tilesToMoveTo.add(currentRow[i]);
-                        // if not empty but contains opponent's piece, can be add to tilesToMoveTo but after that need to break
-                    } else if (currentRow[i].getPiece().getPieceColor() != pieceColor) {
-                        tilesToMoveTo.add(currentRow[i]);
-                        break;
-                        // if not empty but contains same piece color, can't be moved there and break
-                    } else break;
-                }
+                checkRowToRightFromIndex(y, currentRow);
                 // checking other way around, instead of position 0, last position 7
-            } else if (r == board.getBoard().length) {
-                for (int i = y-1; i >= 0; i--) {
-                    if (currentRow[i].isEmpty()) {
-                        unoccupiedSquaresInCurrentRow.add(currentRow[i]);
-                        tilesToMoveTo.add(currentRow[i]);
-                        // if not empty but contains opponent's piece, can be add to tilesToMoveTo but after that need to break
-                    } else if (currentRow[i].getPiece().getPieceColor() != pieceColor) {
-                        tilesToMoveTo.add(currentRow[i]);
-                        break;
-                        // if not empty but contains same piece color, can't be moved there and break
-                    } else break;
-                }
+            } else if (r == board.getBoard().length - 1) {
+                checkRowToLeftFromIndex(y, currentRow);
                 // checking if Rook is not on edge of any of board's rows
             } else {
-                for (int i = y+1; y < board.getBoard().length; i++) {
-
-                }
+                // "going right"
+                checkRowToRightFromIndex(y, currentRow);
+                // "going left"
+                checkRowToLeftFromIndex(y, currentRow);
             }
+        }
+    }
+
+    private void checkRowToRightFromIndex(int index, Tile[] row) {
+        for (int i = index+1; index < board.getBoard().length; i++) {
+            if (row[i].isEmpty()) {
+                tilesToMoveTo.add(row[i]);
+                // if not empty but contains opponent's piece, can be added to tilesToMoveTo but after that need to break loop
+            } else if (row[i].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(row[i]);
+                break;
+                // if not empty but contains same piece color, can't be moved there and must break loop
+            } else break;
+        }
+    }
+
+    private void checkRowToLeftFromIndex(int index, Tile[] row) {
+        for (int i = index-1; i >= 0; i--) {
+            if (row[i].isEmpty()) {
+                tilesToMoveTo.add(row[i]);
+                // if not empty but contains opponent's piece, can be added to tilesToMoveTo but after that need to break loop
+            } else if (row[i].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(row[i]);
+                break;
+                // if not empty but contains same piece color, can't be moved there and must break loop
+            } else break;
         }
     }
 
