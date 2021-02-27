@@ -161,6 +161,14 @@ public class RookPiece implements Piece {
 
     @Override
     public boolean isThreatenedAtTile(Tile tile) {
+        if (pieceColor == PieceColor.WHITE) {
+            if (tile.isThreatenedByBlack()) return true;
+            else return false;
+        }
+        if (pieceColor == PieceColor.BLACK) {
+            if (tile.isThreatenedByWhite()) return true;
+            else return false;
+        }
         return false;
     }
 }
