@@ -7,7 +7,7 @@ import com.zivlazarov.chessengine.Tile;
 
 import java.util.ArrayList;
 
-public class RookPiece implements Piece {
+public class QueenPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final Board board;
@@ -17,10 +17,10 @@ public class RookPiece implements Piece {
     private Tile currentTile;
     private PieceColor pieceColor;
 
-    public RookPiece(Board board, PieceColor pc, Tile initTile) {
+    public QueenPiece(Board board, PieceColor pc, Tile initTile) {
         this.board = board;
 
-        name = 'R';
+        name = 'Q';
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
 
@@ -32,9 +32,49 @@ public class RookPiece implements Piece {
 
     @Override
     public void generateTilesToMoveTo() {
+        // queen's moves are bishop's and rook's moves, together
+        // diagonal moves
         int x = currentTile.getX();
         int y = currentTile.getY();
 
+        // TODO: use 1 loop in each iteration, maybe use a local variable outside of loop and zero it right before each one executes
+
+        // "going right and down diagonally"
+        for (int i = x + 1, j = y + 1; i < board.getBoard().length && j < board.getBoard().length; i++, j++) {
+            if (board.getBoard()[i][j].isEmpty()) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else break;
+        }
+        // "going left and up diagonally"
+        for (int i = x - 1, j = y - 1; i >= 0 && j >=0; i--, j--) {
+            if (board.getBoard()[i][j].isEmpty()) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else break;
+        }
+
+        // "going right and up diagonally"
+        for (int i = x + 1, j = y - 1; i < board.getBoard().length && j >= 0; i++, j--) {
+            if (board.getBoard()[i][j].isEmpty()) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else break;
+        }
+
+        // "going left and down diagonally"
+        for (int i = x - 1, j = y + 1; i >= 0 && j < board.getBoard().length; i--, j++) {
+            if (board.getBoard()[i][j].isEmpty()) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else break;
+        }
+
+        // straight line moves
         // checking the board for threats before adding moves to tilesToMoveTo
         // TODO: checking the board after every turn instead of every generation of moves to each piece to save memory
         board.checkBoard();
@@ -106,28 +146,13 @@ public class RookPiece implements Piece {
     }
 
     @Override
-    public void setName(char name) {
-        this.name = name;
-    }
-
-    @Override
     public boolean getIsAlive() {
         return isAlive;
     }
 
     @Override
-    public void setIsAlive(boolean isAlive) {
-        this.isAlive = isAlive;
-    }
-
-    @Override
     public boolean getIsInDanger() {
         return isInDanger;
-    }
-
-    @Override
-    public void setIsInDanger(boolean isInDanger) {
-        this.isInDanger = isInDanger;
     }
 
     @Override
@@ -138,6 +163,21 @@ public class RookPiece implements Piece {
     @Override
     public PieceColor getPieceColor() {
         return pieceColor;
+    }
+
+    @Override
+    public void setName(char name) {
+        this.name = name;
+    }
+
+    @Override
+    public void setIsAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
+
+    @Override
+    public void setIsInDanger(boolean isInDanger) {
+        this.isInDanger = isInDanger;
     }
 
     @Override

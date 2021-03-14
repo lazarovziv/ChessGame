@@ -31,20 +31,6 @@ public class BishopPiece implements Piece {
     }
 
     @Override
-    public void moveToTile(Tile tile) {
-        if (tilesToMoveTo.contains(tile)) {
-            // clear current tile
-            currentTile.setPiece(null);
-            // change to selected tile
-            currentTile = tile;
-            // set the piece at selected tile
-            currentTile.setPiece(this);
-            tilesToMoveTo.clear();
-            generateTilesToMoveTo();
-        }
-    }
-
-    @Override
     public void generateTilesToMoveTo() {
         int x = currentTile.getX();
         int y = currentTile.getY();
@@ -143,6 +129,20 @@ public class BishopPiece implements Piece {
             else return false;
         }
         return false;
+    }
+
+    @Override
+    public void moveToTile(Tile tile) {
+        if (tilesToMoveTo.contains(tile)) {
+            // clear current tile
+            currentTile.setPiece(null);
+            // change to selected tile
+            currentTile = tile;
+            // set the piece at selected tile
+            currentTile.setPiece(this);
+            tilesToMoveTo.clear();
+            generateTilesToMoveTo();
+        }
     }
 
     /*
