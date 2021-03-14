@@ -145,14 +145,11 @@ public class BishopPiece implements Piece {
         }
     }
 
-    /*
+
     @Override
-    public void checkAvailabilityAtTile(Tile tile) {
+    public boolean isTileAvailable(Tile tile) {
         if (tile.isEmpty()) {
-            tilesToMoveTo.add(tile);
-        } else if (tile.getPiece().getPieceColor() != pieceColor) {
-            tilesToMoveTo.add(tile);
-            break;
-        } else break;
-    } */
+            return true;
+        } else return tile.getPiece().getPieceColor() != pieceColor;
+    }
 }

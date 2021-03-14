@@ -27,5 +27,5 @@ public interface Piece {
 
     boolean isThreatenedAtTile(Tile tile);
 
-//    void checkAvailabilityAtTile(Tile tile);
+    boolean isTileAvailable(Tile tile);
 }

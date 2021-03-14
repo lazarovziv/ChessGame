@@ -211,4 +211,11 @@ public class QueenPiece implements Piece {
             generateTilesToMoveTo();
         }
     }
+
+    @Override
+    public boolean isTileAvailable(Tile tile) {
+        if (tile.isEmpty()) {
+            return true;
+        } else return tile.getPiece().getPieceColor() != pieceColor;
+    }
 }
