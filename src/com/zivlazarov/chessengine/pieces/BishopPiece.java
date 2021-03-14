@@ -52,54 +52,38 @@ public class BishopPiece implements Piece {
         // TODO: use 1 loop in each iteration, maybe use a local variable outside of loop and zero it right before each one executes
 
         // "going right and down diagonally"
-        for (int r = x + 1; r < board.getBoard().length; r++) {
-            for (int c = y + 1; c < board.getBoard().length; c++) {
-                if (board.getBoard()[r][c].isEmpty()) {
-                    tilesToMoveTo.add(board.getBoard()[r][c]);
-                    break;
-                } else if (board.getBoard()[r][c].getPiece().getPieceColor() != pieceColor) {
-                    tilesToMoveTo.add(board.getBoard()[r][c]);
-                    break;
-                } else break;
-            }
+        for (int i = x + 1, j = y + 1; i < board.getBoard().length && j < board.getBoard().length; i++, j++) {
+            if (board.getBoard()[i][j].isEmpty()) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else break;
         }
         // "going left and up diagonally"
-        for (int r = x - 1; r >= 0; r--) {
-            for (int c = y - 1; c >= 0; c--) {
-                if (board.getBoard()[r][c].isEmpty()) {
-                    tilesToMoveTo.add(board.getBoard()[r][c]);
-                    break;
-                } else if (board.getBoard()[r][c].getPiece().getPieceColor() != pieceColor) {
-                    tilesToMoveTo.add(board.getBoard()[r][c]);
-                    break;
-                } else break;
-            }
+        for (int i = x - 1, j = y - 1; i >= 0 && j >=0; i--, j--) {
+            if (board.getBoard()[i][j].isEmpty()) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else break;
         }
 
         // "going right and up diagonally"
-        for (int r = x + 1; r < board.getBoard().length; r++) {
-            for (int c = y - 1; c >= 0; c--) {
-                if (board.getBoard()[r][c].isEmpty()) {
-                    tilesToMoveTo.add(board.getBoard()[r][c]);
-                    break;
-                } else if (board.getBoard()[r][c].getPiece().getPieceColor() != pieceColor) {
-                    tilesToMoveTo.add(board.getBoard()[r][c]);
-                    break;
-                } else break;
-            }
+        for (int i = x + 1, j = y - 1; i < board.getBoard().length && j >= 0; i++, j--) {
+            if (board.getBoard()[i][j].isEmpty()) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else break;
         }
 
         // "going left and down diagonally"
-        for (int r = x - 1; r >= 0; r--) {
-            for (int c = y + 1; c < board.getBoard().length; c++) {
-                if (board.getBoard()[r][c].isEmpty()) {
-                    tilesToMoveTo.add(board.getBoard()[r][c]);
-                    break;
-                } else if (board.getBoard()[r][c].getPiece().getPieceColor() != pieceColor) {
-                    tilesToMoveTo.add(board.getBoard()[r][c]);
-                    break;
-                } else break;
-            }
+        for (int i = x - 1, j = y + 1; i >= 0 && j < board.getBoard().length; i--, j++) {
+            if (board.getBoard()[i][j].isEmpty()) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[i][j]);
+            } else break;
         }
     }
 

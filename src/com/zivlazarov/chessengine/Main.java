@@ -10,7 +10,7 @@ class Main {
 		Board board = new Board();
 
 		RookPiece whiteRook = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][7]);
-		BishopPiece blackBishop = new BishopPiece(board, PieceColor.BLACK, board.getBoard()[7][2]);
+		BishopPiece blackBishop = new BishopPiece(board, PieceColor.BLACK, board.getBoard()[0][0]);
 		/*
 		board.printBoard();
 		for (Tile tile : whiteRook.getTilesToMoveTo()) {
