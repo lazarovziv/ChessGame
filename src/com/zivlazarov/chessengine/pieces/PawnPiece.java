@@ -139,6 +139,7 @@ public class PawnPiece implements Piece {
             // set the piece at selected tile
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
+            hasMoved = true;
             generateTilesToMoveTo();
         }
     }
