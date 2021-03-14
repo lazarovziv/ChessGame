@@ -27,7 +27,13 @@ class Main {
 		for (Tile tile : whiteRook.getTilesToMoveTo()) {
 			System.out.println("(" + tile.getX() + ", " + tile.getY() + ")");
 		} */
-		System.out.println("Bishop: ");
+		System.out.println("Pawn: ");
+		for (Tile tile : whitePawn.getTilesToMoveTo()) {
+			System.out.println("(" + tile.getX() + ", " + tile.getY() + ")");
+		}
+		whitePawn.moveToTile(board.getBoard()[4][3]);
+		board.printBoard();
+		System.out.println("Pawn: ");
 		for (Tile tile : whitePawn.getTilesToMoveTo()) {
 			System.out.println("(" + tile.getX() + ", " + tile.getY() + ")");
 		}
