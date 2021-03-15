@@ -4,6 +4,7 @@ import com.zivlazarov.chessengine.utils.Board;
 import com.zivlazarov.chessengine.utils.Piece;
 import com.zivlazarov.chessengine.utils.PieceColor;
 import com.zivlazarov.chessengine.utils.Tile;
+import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
@@ -17,6 +18,7 @@ public class PawnPiece implements Piece {
     private Tile currentTile;
     private PieceColor pieceColor;
     private boolean hasMoved = false;
+    private ImageView imageIcon;
 
     public PawnPiece(Board board, PieceColor pc, Tile initTile) {
         this.board = board;
@@ -97,6 +99,11 @@ public class PawnPiece implements Piece {
     }
 
     @Override
+    public ImageView getImageIcon() {
+        return imageIcon;
+    }
+
+    @Override
     public void setName(char name) {
         this.name = name;
     }
@@ -114,6 +121,11 @@ public class PawnPiece implements Piece {
     @Override
     public void setPieceColor(PieceColor pieceColor) {
         this.pieceColor = pieceColor;
+    }
+
+    @Override
+    public void setImageIcon(ImageView imageIcon) {
+        this.imageIcon = imageIcon;
     }
 
     @Override

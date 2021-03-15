@@ -1,8 +1,9 @@
 package com.zivlazarov.chessengine.ui;
 
+import com.zivlazarov.chessengine.utils.Board;
+import com.zivlazarov.chessengine.utils.Tile;
 import javafx.application.Application;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,6 +15,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class Game extends Application {
+
+    private Board board;
+
+    public Game() {
+        board = new Board();
+    }
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -50,6 +57,8 @@ public class Game extends Application {
             colCount++;
         }
 
+        // TODO: make icons bigger and adjust dimensions accordingly.
+
         Group root = new Group();
 
         boardImageView.fitWidthProperty().bind(stage.widthProperty());
@@ -59,7 +68,16 @@ public class Game extends Application {
         Scene scene = new Scene(root, 472, 472);
         stage.setTitle("Chess");
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
+
+        // TODO: assign every tile in board to tile in boardImageView.
+        for (int r = 0; r < board.getBoard().length; r++) {
+            for (int c = 0; c < board.getBoard().length; c++) {
+                Tile tile = board.getBoard()[r][c];
+
+            }
+        }
     }
 
     private ImageView createImageView(String fileName, double x, double y) throws FileNotFoundException {

@@ -1,5 +1,7 @@
 package com.zivlazarov.chessengine.utils;
 
+import javafx.scene.image.ImageView;
+
 import java.util.ArrayList;
 
 public interface Piece {
@@ -9,17 +11,20 @@ public interface Piece {
     boolean isInDanger = false;
     final ArrayList<Tile> tilesToMoveTo = new ArrayList<>();
     PieceColor pieceColor = PieceColor.WHITE;
+    ImageView imageIcon = null;
 
     char getName();
     boolean getIsAlive();
     boolean getIsInDanger();
     ArrayList<Tile> getTilesToMoveTo();
     PieceColor getPieceColor();
+    ImageView getImageIcon();
 
     void setName(char name);
     void setIsAlive(boolean isAlive);
     void setIsInDanger(boolean isInDanger);
     void setPieceColor(PieceColor pieceColor);
+    void setImageIcon(ImageView imageView);
 
     void moveToTile(Tile tile);
 

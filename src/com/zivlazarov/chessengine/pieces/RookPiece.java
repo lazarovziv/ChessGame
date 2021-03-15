@@ -4,6 +4,7 @@ import com.zivlazarov.chessengine.utils.Board;
 import com.zivlazarov.chessengine.utils.Piece;
 import com.zivlazarov.chessengine.utils.PieceColor;
 import com.zivlazarov.chessengine.utils.Tile;
+import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
@@ -16,6 +17,7 @@ public class RookPiece implements Piece {
     private boolean isInDanger = false;
     private Tile currentTile;
     private PieceColor pieceColor;
+    private ImageView imageIcon;
 
     public RookPiece(Board board, PieceColor pc, Tile initTile) {
         this.board = board;
@@ -126,6 +128,11 @@ public class RookPiece implements Piece {
     }
 
     @Override
+    public ImageView getImageIcon() {
+        return imageIcon;
+    }
+
+    @Override
     public void setIsInDanger(boolean isInDanger) {
         this.isInDanger = isInDanger;
     }
@@ -143,6 +150,11 @@ public class RookPiece implements Piece {
     @Override
     public void setPieceColor(PieceColor pieceColor) {
         this.pieceColor = pieceColor;
+    }
+
+    @Override
+    public void setImageIcon(ImageView imageView) {
+        this.imageIcon = imageView;
     }
 
     @Override

@@ -7,6 +7,7 @@ public class Board {
     private Tile[][] board;
 
     private ArrayList<Piece> alivePieces;
+    private GameSituation gameSituation;
 
     public Board() {
         board = new Tile[8][8];
@@ -19,6 +20,7 @@ public class Board {
                 board[r][c] = new Tile(r, c, colors[(r+c) % colors.length]);
             }
         }
+        gameSituation = GameSituation.NORMAL;
     }
 
     // thorough check on every tile to see if it's threatened by black and/or white, which pieces are alive etc.
@@ -33,6 +35,16 @@ public class Board {
                         if (piece.getPieceColor() == PieceColor.WHITE) current.setThreatenedByWhite(true);
                         if (piece.getPieceColor() == PieceColor.BLACK) current.setThreatenedByBlack(true);
                     }
+                }
+            }
+        }
+        // TODO: make improvement to linear search (maybe hash table?)
+        for (Piece piece : alivePieces) {
+            if (piece.getName() == 'K') {
+                if (piece.getIsInDanger()) {
+                    // TODO: add (perhaps new method for Piece interface?) if other pieces of same pieceColor can change the game situation
+                    if (piece.getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
+                    gameSituation = GameSituation.CHECK;
                 }
             }
         }
@@ -57,4 +69,6 @@ public class Board {
     public ArrayList<Piece> getAlivePieces() {
         return alivePieces;
     }
+
+    public GameSituation getGameSituation() { return gameSituation; }
 }
