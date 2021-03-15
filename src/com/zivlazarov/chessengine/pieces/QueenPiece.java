@@ -215,6 +215,11 @@ public class QueenPiece implements Piece {
         if (tilesToMoveTo.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
+            // check if tile has opponent's piece and if so, mark as not alive
+            if (!tile.isEmpty()) {
+                tile.getPiece().setIsAlive(false);
+                board.getAlivePieces().remove(tile.getPiece());
+            }
             // change to selected tile
             currentTile = tile;
             // set the piece at selected tile
