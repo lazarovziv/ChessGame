@@ -1,4 +1,4 @@
-package com.zivlazarov.chessengine;
+package com.zivlazarov.chessengine.utils;
 
 public enum PieceColor {
 

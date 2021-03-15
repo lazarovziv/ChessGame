@@ -1,9 +1,9 @@
 package com.zivlazarov.chessengine.pieces;
 
-import com.zivlazarov.chessengine.Board;
-import com.zivlazarov.chessengine.Piece;
-import com.zivlazarov.chessengine.PieceColor;
-import com.zivlazarov.chessengine.Tile;
+import com.zivlazarov.chessengine.utils.Board;
+import com.zivlazarov.chessengine.utils.Piece;
+import com.zivlazarov.chessengine.utils.PieceColor;
+import com.zivlazarov.chessengine.utils.Tile;
 
 import java.util.ArrayList;
 

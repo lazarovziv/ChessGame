@@ -1,4 +1,4 @@
-package com.zivlazarov.chessengine;
+package com.zivlazarov.chessengine.utils;
 
 import java.util.ArrayList;
 
@@ -38,7 +38,7 @@ public class Board {
         }
     }
 
-    void printBoard() {
+    public void printBoard() {
         for (int r = 0; r < board.length; r++) {
             System.out.println();
             for (int c = 0; c < board.length; c++) {
