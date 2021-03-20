@@ -1,6 +1,7 @@
 package com.zivlazarov.chessengine.utils;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Board {
 
@@ -39,6 +40,17 @@ public class Board {
             }
         }
         // TODO: make improvement to linear search (maybe hash table?)
+        // TODO: check how to use streams to omit for loop below
+        alivePieces.stream()
+                .filter(piece -> piece.getName() == 'K')
+                .filter(piece -> {
+                    if (piece.getIsInDanger()) {
+                        gameSituation = GameSituation.CHECK;
+                        if (piece.getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
+                    }
+                    return true; // what to return
+                });
+
         for (Piece piece : alivePieces) {
             if (piece.getName() == 'K') {
                 if (piece.getIsInDanger()) {
@@ -60,6 +72,15 @@ public class Board {
             }
         }
         System.out.println();
+    }
+
+    private void checkBoardForCheckmate(Piece piece) {
+        if (piece.getName() == 'K') {
+            if (piece.getIsInDanger()) {
+                gameSituation = GameSituation.CHECK;
+                if (piece.getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
+            }
+        }
     }
 
     public Tile[][] getBoard() {
