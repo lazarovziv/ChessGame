@@ -34,6 +34,24 @@ public class QueenPiece implements Piece {
         generateTilesToMoveTo();
     }
 
+    public QueenPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+        this.board = board;
+
+        name = 'Q';
+        pieceColor = pc;
+        tilesToMoveTo = new ArrayList<Tile>();
+
+        currentTile = initTile;
+        if (pieceColor == PieceColor.BLACK) board.getBlackAlivePieces().put(name, this);
+        if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
+
+        currentTile.setPiece(this);
+        imageIcon = imageView;
+        currentTile.setImageView(imageIcon);
+
+        generateTilesToMoveTo();
+    }
+
     @Override
     public void generateTilesToMoveTo() {
         // queen's moves are bishop's and rook's moves, together

@@ -34,6 +34,24 @@ public class KnightPiece implements Piece {
         generateTilesToMoveTo();
     }
 
+    public KnightPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+        this.board = board;
+
+        name = 'N';
+        pieceColor = pc;
+        tilesToMoveTo = new ArrayList<Tile>();
+
+        currentTile = initTile;
+        if (pieceColor == PieceColor.BLACK) board.getBlackAlivePieces().put(name, this);
+        if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
+
+        currentTile.setPiece(this);
+        imageIcon = imageView;
+        currentTile.setImageView(imageIcon);
+
+        generateTilesToMoveTo();
+    }
+
     @Override
     public void generateTilesToMoveTo() {
         int x = currentTile.getX();

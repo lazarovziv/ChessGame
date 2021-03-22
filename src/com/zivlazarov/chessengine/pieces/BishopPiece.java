@@ -34,6 +34,24 @@ public class BishopPiece implements Piece {
         generateTilesToMoveTo();
     }
 
+    public BishopPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+        this.board = board;
+
+        name = 'B';
+        pieceColor = pc;
+        tilesToMoveTo = new ArrayList<Tile>();
+
+        currentTile = initTile;
+        if (pieceColor == PieceColor.BLACK) board.getBlackAlivePieces().put(name, this);
+        if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
+
+        currentTile.setPiece(this);
+        imageIcon = imageView;
+        currentTile.setImageView(imageIcon);
+
+        generateTilesToMoveTo();
+    }
+
     @Override
     public void generateTilesToMoveTo() {
         int x = currentTile.getX();

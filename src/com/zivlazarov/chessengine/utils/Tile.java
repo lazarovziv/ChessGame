@@ -7,7 +7,7 @@ public class Tile {
 	private int x, y;
 	private Piece piece;
 	private boolean isEmpty;
-	private TileColor tileColor;
+	private final TileColor tileColor;
 	private boolean isThreatenedByWhite;
 	private boolean isThreatenedByBlack;
 	private ImageView imageView;
@@ -105,5 +105,9 @@ public class Tile {
 
 	public void setImageView(ImageView imageView) {
 		this.imageView = imageView;
+	}
+
+	public void clearPieceImageView() {
+		this.setImageView(imageView);
 	}
 }

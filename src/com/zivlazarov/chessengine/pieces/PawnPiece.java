@@ -35,6 +35,24 @@ public class PawnPiece implements Piece {
         generateTilesToMoveTo();
     }
 
+    public PawnPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+        this.board = board;
+
+        name = 'P';
+        pieceColor = pc;
+        tilesToMoveTo = new ArrayList<Tile>();
+
+        currentTile = initTile;
+        if (pieceColor == PieceColor.BLACK) board.getBlackAlivePieces().put(name, this);
+        if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
+
+        currentTile.setPiece(this);
+        imageIcon = imageView;
+        currentTile.setImageView(imageIcon);
+
+        generateTilesToMoveTo();
+    }
+
     @Override
     public void generateTilesToMoveTo() {
         int x = currentTile.getX();
