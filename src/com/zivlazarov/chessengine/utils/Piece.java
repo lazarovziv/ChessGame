@@ -19,6 +19,7 @@ public interface Piece {
     ArrayList<Tile> getTilesToMoveTo();
     PieceColor getPieceColor();
     ImageView getImageIcon();
+    Tile getCurrentTile();
 
     void setName(char name);
     void setIsAlive(boolean isAlive);

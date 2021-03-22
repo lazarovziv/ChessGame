@@ -1,5 +1,7 @@
 package com.zivlazarov.chessengine.utils;
 
+import javafx.scene.image.ImageView;
+
 public class Tile {
 
 	private int x, y;
@@ -8,6 +10,7 @@ public class Tile {
 	private TileColor tileColor;
 	private boolean isThreatenedByWhite;
 	private boolean isThreatenedByBlack;
+	private ImageView imageView;
 
 	public Tile(int x, int y, TileColor tc) {
 		this.x = x;
@@ -16,6 +19,17 @@ public class Tile {
 		isEmpty = true; // if piece is not initialized tile is empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
+
+	}
+
+	public Tile(int x, int y, TileColor tc, ImageView iv) {
+		this.x = x;
+		this.y = y;
+		tileColor = tc;
+		isEmpty = true; // if piece is not initialized tile is empty
+		isThreatenedByWhite = false;
+		isThreatenedByBlack = false;
+		imageView = iv;
 	}
 
 	public Tile(int x, int y, TileColor tc, Piece p) {
@@ -61,6 +75,10 @@ public class Tile {
 		return isThreatenedByBlack;
 	}
 
+	public ImageView getImageView() {
+		return imageView;
+	}
+
 	public void setX(int x) {
 		this.x = x;
 	}
@@ -83,5 +101,9 @@ public class Tile {
 
 	public boolean equals(Tile tile) {
 		return x == tile.x && y == tile.y;
+	}
+
+	public void setImageView(ImageView imageView) {
+		this.imageView = imageView;
 	}
 }

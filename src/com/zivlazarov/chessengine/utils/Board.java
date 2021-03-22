@@ -1,18 +1,20 @@
 package com.zivlazarov.chessengine.utils;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Board {
 
     private Tile[][] board;
 
-    private ArrayList<Piece> alivePieces;
+    private final Map<Character, Piece> blackAlivePieces;
+    private final Map<Character, Piece> whiteAlivePieces;
     private GameSituation gameSituation;
 
     public Board() {
         board = new Tile[8][8];
-        alivePieces = new ArrayList<Piece>();
+        blackAlivePieces = new HashMap<>();
+        whiteAlivePieces = new HashMap<>();
 
         TileColor[] colors = { TileColor.WHITE, TileColor.BLACK };
 
@@ -27,39 +29,27 @@ public class Board {
     // thorough check on every tile to see if it's threatened by black and/or white, which pieces are alive etc.
     // TODO: check for "Check" and/or "Checkmate" and/or "Draw" situation
     public void checkBoard() {
-        for (int r = 0; r < board.length; r++) {
-            for (int c = 0; c < board.length; c++) {
-                Tile current = board[r][c];
-                // checking threats on current tile in loop
-                for (Piece piece : alivePieces) {
-                    if (piece.getTilesToMoveTo().contains(current)) {
-                        if (piece.getPieceColor() == PieceColor.WHITE) current.setThreatenedByWhite(true);
-                        if (piece.getPieceColor() == PieceColor.BLACK) current.setThreatenedByBlack(true);
-                    }
-                }
-            }
-        }
-        // TODO: make improvement to linear search (maybe hash table?)
-        // TODO: check how to use streams to omit for loop below
-        alivePieces.stream()
-                .filter(piece -> piece.getName() == 'K')
-                .filter(piece -> {
-                    if (piece.getIsInDanger()) {
-                        gameSituation = GameSituation.CHECK;
-                        if (piece.getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
-                    }
-                    return true; // what to return
-                });
+        if (blackAlivePieces.size() == 0 || whiteAlivePieces.size() == 0) return;
 
-        for (Piece piece : alivePieces) {
-            if (piece.getName() == 'K') {
-                if (piece.getIsInDanger()) {
-                    // TODO: add (perhaps new method for Piece interface?) if other pieces of same pieceColor can change the game situation
-                    if (piece.getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
-                    gameSituation = GameSituation.CHECK;
-                }
-            }
+        if (blackAlivePieces.get('K').getIsInDanger()) {
+            // TODO: add (perhaps new method for Piece interface?) if other pieces of same pieceColor can change the game situation
+            if (blackAlivePieces.get('K').getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
+            else gameSituation = GameSituation.CHECK;
         }
+
+        if (whiteAlivePieces.get('K').getIsInDanger()) {
+            // TODO: add (perhaps new method for Piece interface?) if other pieces of same pieceColor can change the game situation
+            if (whiteAlivePieces.get('K').getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
+            else gameSituation = GameSituation.CHECK;
+        }
+//        for (Piece piece : alivePieces) {
+//            if (piece.getName() == 'K') {
+//                if (piece.getIsInDanger()) {
+//                    if (piece.getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
+//                    gameSituation = GameSituation.CHECK;
+//                }
+//            }
+//        }
     }
 
     public void printBoard() {
@@ -74,21 +64,18 @@ public class Board {
         System.out.println();
     }
 
-    private void checkBoardForCheckmate(Piece piece) {
-        if (piece.getName() == 'K') {
-            if (piece.getIsInDanger()) {
-                gameSituation = GameSituation.CHECK;
-                if (piece.getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
-            }
-        }
-    }
+
 
     public Tile[][] getBoard() {
         return board;
     }
 
-    public ArrayList<Piece> getAlivePieces() {
-        return alivePieces;
+    public Map<Character, Piece> getBlackAlivePieces() {
+        return blackAlivePieces;
+    }
+
+    public Map<Character, Piece> getWhiteAlivePieces() {
+        return whiteAlivePieces;
     }
 
     public GameSituation getGameSituation() { return gameSituation; }

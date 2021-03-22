@@ -24,10 +24,12 @@ public class KingPiece implements Piece {
 
         name = 'K';
         pieceColor = pc;
-        tilesToMoveTo = new ArrayList<Tile>();
+        tilesToMoveTo = new ArrayList<>();
 
         currentTile = initTile;
-        board.getAlivePieces().add(this);
+        if (pieceColor == PieceColor.BLACK) board.getBlackAlivePieces().put(name, this);
+        if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
+
         currentTile.setPiece(this);
         generateTilesToMoveTo();
     }
@@ -39,7 +41,7 @@ public class KingPiece implements Piece {
 
         // checking the board for threats before adding moves to tilesToMoveTo
         // TODO: checking the board after every turn instead of every generation of moves to each piece to save memory
-        board.checkBoard();
+        // board.checkBoard();
         // checking if King's legal game steps are possible and adding it to tilesToMoveTo
         if (x + 1 < board.getBoard().length) {
             if (board.getBoard()[x + 1][y].isEmpty()) {
@@ -201,6 +203,11 @@ public class KingPiece implements Piece {
     public ImageView getImageIcon() { return imageIcon; }
 
     @Override
+    public Tile getCurrentTile() {
+        return currentTile;
+    }
+
+    @Override
     public void setPieceColor(PieceColor pieceColor) {
         this.pieceColor = pieceColor;
     }
@@ -231,7 +238,11 @@ public class KingPiece implements Piece {
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
                 tile.getPiece().setIsAlive(false);
-                board.getAlivePieces().remove(tile.getPiece());
+                if (pieceColor == PieceColor.BLACK) {
+                    board.getWhiteAlivePieces().remove(tile.getPiece().getName());
+                } else if (pieceColor == PieceColor.WHITE) {
+                    board.getBlackAlivePieces().remove(tile.getPiece().getName());
+                }
             }
             // change to selected tile
             currentTile = tile;

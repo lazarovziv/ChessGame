@@ -27,7 +27,9 @@ public class KnightPiece implements Piece {
         tilesToMoveTo = new ArrayList<Tile>();
 
         currentTile = initTile;
-        board.getAlivePieces().add(this);
+        if (pieceColor == PieceColor.BLACK) board.getBlackAlivePieces().put(name, this);
+        if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
+
         currentTile.setPiece(this);
         generateTilesToMoveTo();
     }
@@ -143,6 +145,11 @@ public class KnightPiece implements Piece {
     }
 
     @Override
+    public Tile getCurrentTile() {
+        return currentTile;
+    }
+
+    @Override
     public boolean isThreatenedAtTile(Tile tile) {
         if (pieceColor == PieceColor.WHITE) {
             if (tile.isThreatenedByBlack()) return true;
@@ -163,7 +170,11 @@ public class KnightPiece implements Piece {
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
                 tile.getPiece().setIsAlive(false);
-                board.getAlivePieces().remove(tile.getPiece());
+                if (pieceColor == PieceColor.BLACK) {
+                    board.getWhiteAlivePieces().remove(tile.getPiece().getName());
+                } else if (pieceColor == PieceColor.WHITE) {
+                    board.getBlackAlivePieces().remove(tile.getPiece().getName());
+                }
             }
             // change to selected tile
             currentTile = tile;
