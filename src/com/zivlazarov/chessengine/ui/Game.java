@@ -43,74 +43,74 @@ public class Game extends Application {
             }
         }
 
-        RookPiece whiteRook0 = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0]);
+        RookPiece whiteRook0 = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0], createImageView("whiteRook"));
 //        whiteRook0.setImageIcon(createImageView("whiteRook"));
-        RookPiece whiteRook1 = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][7]);
+        RookPiece whiteRook1 = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][7], createImageView("whiteRook"));
 //        whiteRook1.setImageIcon(createImageView("whiteRook"));
-        RookPiece blackRook0 = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][0]);
+        RookPiece blackRook0 = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][0], createImageView("blackRook"));
 //        blackRook0.setImageIcon(createImageView("blackRook"));
-        RookPiece blackRook1 = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][7]);
+        RookPiece blackRook1 = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][7], createImageView("blackRook"));
 //        blackRook1.setImageIcon(createImageView("blackRook"));
 
-        KnightPiece whiteKnight0 = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][1]);
+        KnightPiece whiteKnight0 = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][1], createImageView("whiteKnight"));
 //        whiteKnight0.setImageIcon(createImageView("whiteKnight"));
-        KnightPiece whiteKnight1 = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][6]);
+        KnightPiece whiteKnight1 = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][6], createImageView("whiteKnight"));
 //        whiteKnight1.setImageIcon(createImageView("whiteKnight"));
-        KnightPiece blackKnight0 = new KnightPiece(board, PieceColor.BLACK, board.getBoard()[7][1]);
+        KnightPiece blackKnight0 = new KnightPiece(board, PieceColor.BLACK, board.getBoard()[7][1], createImageView("blackKnight"));
 //        blackKnight0.setImageIcon(createImageView("blackKnight"));
-        KnightPiece blackKnight1 = new KnightPiece(board, PieceColor.BLACK, board.getBoard()[7][6]);
+        KnightPiece blackKnight1 = new KnightPiece(board, PieceColor.BLACK, board.getBoard()[7][6], createImageView("blackKnight"));
 //        blackKnight1.setImageIcon(createImageView("blackKnight"));
 
         BishopPiece whiteBishop0 = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[0][2], createImageView("whiteBishop"));
 //        whiteBishop0.setImageIcon(createImageView("whiteBishop"));
-        BishopPiece whiteBishop1 = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[0][5]);
+        BishopPiece whiteBishop1 = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[0][5], createImageView("whiteBishop"));
 //        whiteBishop1.setImageIcon(createImageView("whiteBishop"));
-        BishopPiece blackBishop0 = new BishopPiece(board, PieceColor.BLACK, board.getBoard()[7][2]);
+        BishopPiece blackBishop0 = new BishopPiece(board, PieceColor.BLACK, board.getBoard()[7][2], createImageView("blackBishop"));
 //        blackBishop0.setImageIcon(createImageView("blackBishop"));
-        BishopPiece blackBishop1 = new BishopPiece(board, PieceColor.BLACK, board.getBoard()[7][5]);
+        BishopPiece blackBishop1 = new BishopPiece(board, PieceColor.BLACK, board.getBoard()[7][5], createImageView("blackBishop"));
 //        blackBishop1.setImageIcon(createImageView("blackBishop"));
 
-        QueenPiece whiteQueen = new QueenPiece(board, PieceColor.WHITE, board.getBoard()[0][4]);
+        QueenPiece whiteQueen = new QueenPiece(board, PieceColor.WHITE, board.getBoard()[0][4], createImageView("whiteQueen"));
 //        whiteQueen.setImageIcon(createImageView("whiteQueen"));
-        QueenPiece blackQueen = new QueenPiece(board, PieceColor.BLACK, board.getBoard()[7][3]);
+        QueenPiece blackQueen = new QueenPiece(board, PieceColor.BLACK, board.getBoard()[7][3], createImageView("blackQueen"));
 //        blackQueen.setImageIcon(createImageView("blackQueen"));
 
-        KingPiece whiteKing = new KingPiece(board, PieceColor.BLACK, board.getBoard()[0][3]);
+        KingPiece whiteKing = new KingPiece(board, PieceColor.BLACK, board.getBoard()[0][3], createImageView("whiteKing"));
 //        whiteKing.setImageIcon(createImageView("whiteKing"));
-        KingPiece blackKing = new KingPiece(board, PieceColor.WHITE, board.getBoard()[7][4]);
+        KingPiece blackKing = new KingPiece(board, PieceColor.WHITE, board.getBoard()[7][4], createImageView("blackKing"));
 //        blackKing.setImageIcon(createImageView("blackKing"));
-        PawnPiece whitePawn0 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0]);
+        PawnPiece whitePawn0 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0], createImageView("whitePawn"));
 //        whitePawn0.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn1 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][1]);
+        PawnPiece whitePawn1 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][1], createImageView("whitePawn"));
 //        whitePawn1.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn2 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][2]);
+        PawnPiece whitePawn2 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][2], createImageView("whitePawn"));
 //        whitePawn2.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn3 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][3]);
+        PawnPiece whitePawn3 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][3], createImageView("whitePawn"));
 //        whitePawn3.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn4 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][4]);
+        PawnPiece whitePawn4 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][4], createImageView("whitePawn"));
 //        whitePawn4.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn5 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][5]);
+        PawnPiece whitePawn5 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][5], createImageView("whitePawn"));
 //        whitePawn5.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn6 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][6]);
+        PawnPiece whitePawn6 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][6], createImageView("whitePawn"));
 //        whitePawn6.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn7 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][7]);
+        PawnPiece whitePawn7 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][7], createImageView("whitePawn"));
 //        whitePawn7.setImageIcon(createImageView("whitePawn"));
 
-        PawnPiece blackPawn0 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][0]);
+        PawnPiece blackPawn0 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][0], createImageView("blackPawn"));
 //        blackPawn0.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn1 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][1]);
+        PawnPiece blackPawn1 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][1], createImageView("blackPawn"));
 //        blackPawn1.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn2 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][2]);
+        PawnPiece blackPawn2 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][2], createImageView("blackPawn"));
 //        blackPawn2.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn3 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][3]);
+        PawnPiece blackPawn3 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][3], createImageView("blackPawn"));
 //        blackPawn3.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn4 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][4]);
+        PawnPiece blackPawn4 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][4], createImageView("blackPawn"));
 //        blackPawn4.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn5 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][5]);
+        PawnPiece blackPawn5 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][5], createImageView("blackPawn"));
 //        blackPawn5.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn6 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][6]);
+        PawnPiece blackPawn6 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][6], createImageView("blackPawn"));
 //        blackPawn6.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn7 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][7]);
+        PawnPiece blackPawn7 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][7], createImageView("blackPawn"));
 //        blackPawn7.setImageIcon(createImageView("blackPawn"));
 
         board.printBoard();
