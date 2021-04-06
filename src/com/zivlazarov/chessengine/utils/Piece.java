@@ -34,4 +34,6 @@ public interface Piece {
     boolean isThreatenedAtTile(Tile tile);
 
     boolean isTileAvailable(Tile tile);
+
+    void setOnClickListener();
 }

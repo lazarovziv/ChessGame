@@ -46,7 +46,7 @@ public class KnightPiece implements Piece {
 
         currentTile.setPiece(this);
         imageIcon = imageView;
-        currentTile.setImageView(imageIcon);
+        currentTile.setPieceImageView(imageIcon);
 
         generateTilesToMoveTo();
     }
@@ -207,5 +207,10 @@ public class KnightPiece implements Piece {
         if (tile.isEmpty()) {
             return true;
         } else return tile.getPiece().getPieceColor() != pieceColor;
+    }
+
+    @Override
+    public void setOnClickListener() {
+
     }
 }

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ChessEngine.iml" filepath="$PROJECT_DIR$/ChessEngine.iml" />
+      <module fileurl="file://$USER_HOME$/Downloads/hibernate-release-5.4.30.Final/lib/lib.iml" filepath="$USER_HOME$/Downloads/hibernate-release-5.4.30.Final/lib/lib.iml" />
     </modules>
   </component>
 </project>

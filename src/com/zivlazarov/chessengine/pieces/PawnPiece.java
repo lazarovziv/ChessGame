@@ -47,9 +47,14 @@ public class PawnPiece implements Piece {
 
         currentTile.setPiece(this);
         imageIcon = imageView;
-        currentTile.setImageView(imageIcon);
+        currentTile.setPieceImageView(imageIcon);
 
         generateTilesToMoveTo();
+    }
+
+    @Override
+    public void setOnClickListener() {
+
     }
 
     @Override
@@ -61,7 +66,6 @@ public class PawnPiece implements Piece {
 
         // if it's white, it's only way forward is "down the matrix" which is using a lower x value
         if (pieceColor == PieceColor.BLACK) {
-//            if (y-1 < 0 || y-2 < 0) return;
             if (board.getBoard()[x-1][y].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[x-1][y]);
             } else if (board.getBoard()[x-1][y].getPiece().getPieceColor() != pieceColor) {
@@ -79,7 +83,6 @@ public class PawnPiece implements Piece {
         }
         // if black, forward means "going up the matrix" which is using a higher x value
         if (pieceColor == PieceColor.WHITE) {
-//            if (y+1 > 7 || y+2 > 7) return;
             if (board.getBoard()[x+1][y].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[x+1][y]);
             } else if (board.getBoard()[x+1][y].getPiece().getPieceColor() != pieceColor) {

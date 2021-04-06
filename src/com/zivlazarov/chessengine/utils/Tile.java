@@ -10,7 +10,8 @@ public class Tile {
 	private final TileColor tileColor;
 	private boolean isThreatenedByWhite;
 	private boolean isThreatenedByBlack;
-	private ImageView imageView;
+	private ImageView tileImageView;
+	private ImageView pieceImageView;
 
 	public Tile(int x, int y, TileColor tc) {
 		this.x = x;
@@ -29,7 +30,7 @@ public class Tile {
 		isEmpty = true; // if piece is not initialized tile is empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
-		imageView = iv;
+		tileImageView = iv;
 	}
 
 	public Tile(int x, int y, TileColor tc, Piece p) {
@@ -75,8 +76,8 @@ public class Tile {
 		return isThreatenedByBlack;
 	}
 
-	public ImageView getImageView() {
-		return imageView;
+	public ImageView getTileImageView() {
+		return tileImageView;
 	}
 
 	public void setX(int x) {
@@ -89,6 +90,7 @@ public class Tile {
 
 	public void setPiece(Piece p) {
 		piece = p;
+		isEmpty = p == null;
 	}
 
 	public void setThreatenedByWhite(boolean threatenedByWhite) {
@@ -103,11 +105,15 @@ public class Tile {
 		return x == tile.x && y == tile.y;
 	}
 
-	public void setImageView(ImageView imageView) {
-		this.imageView = imageView;
+	public void setTileImageView(ImageView tileImageView) {
+		this.tileImageView = tileImageView;
 	}
 
 	public void clearPieceImageView() {
-		this.setImageView(imageView);
+		this.setTileImageView(tileImageView);
 	}
+
+	public ImageView getPieceImageView() { return pieceImageView; }
+
+	public void setPieceImageView(ImageView pieceImageView) { this.pieceImageView = pieceImageView; }
 }

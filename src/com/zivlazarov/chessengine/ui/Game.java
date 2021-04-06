@@ -4,6 +4,7 @@ import com.zivlazarov.chessengine.pieces.*;
 import com.zivlazarov.chessengine.utils.Board;
 import com.zivlazarov.chessengine.utils.Piece;
 import com.zivlazarov.chessengine.utils.PieceColor;
+import com.zivlazarov.chessengine.utils.Tile;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -40,7 +41,7 @@ public class Game extends Application {
             for (int j = 0; j < board.getBoard().length; j++) {
                 // associating image tiles to board tiles
                 ImageView tileImageView = createImageView(colors[(i+j) % colors.length]);
-                board.getBoard()[i][j].setImageView(tileImageView);
+                board.getBoard()[i][j].setTileImageView(tileImageView);
                 gridPane.add(tileImageView, i, j);
             }
         }
@@ -126,11 +127,23 @@ public class Game extends Application {
             gridPane.add(piece.getImageIcon(), piece.getCurrentTile().getY(), piece.getCurrentTile().getX());
         }
 
-        blackKnight0.moveToTile(board.getBoard()[5][2]);
+//        blackKnight0.moveToTile(board.getBoard()[5][2]);
+        movePieceToTile(blackKnight0, board.getBoard()[5][2]);
         board.printBoard();
         updateBoard();
 
-        whitePawn0.moveToTile(board.getBoard()[3][0]);
+//        whitePawn0.moveToTile(board.getBoard()[3][0]);
+        movePieceToTile(whitePawn0, board.getBoard()[3][0]);
+        board.printBoard();
+        updateBoard();
+
+//        blackKnight0.moveToTile(board.getBoard()[3][1]);
+        movePieceToTile(blackKnight0, board.getBoard()[3][1]);
+        board.printBoard();
+        updateBoard();
+
+//        whitePawn1.moveToTile(board.getBoard()[3][1]);
+        movePieceToTile(whitePawn1, board.getBoard()[3][1]);
         board.printBoard();
         updateBoard();
 
@@ -156,7 +169,7 @@ public class Game extends Application {
 //        return imageView;
 //    }
 
-    private ImageView createImageView(String fileName) throws FileNotFoundException {
+    public static ImageView createImageView(String fileName) throws FileNotFoundException {
         InputStream stream = new FileInputStream("/home/ziv/IdeaProjects/ChessGame/src/" + fileName + ".png");
         Image image = new Image(stream);
 
@@ -174,13 +187,22 @@ public class Game extends Application {
         for (int r = 0; r < board.getBoard().length; r++) {
             for (int c = 0; c < board.getBoard().length; c++) {
                 ImageView tileImageView = createImageView(colors[(r+c) % colors.length]);
-                board.getBoard()[r][c].setImageView(tileImageView);
+                board.getBoard()[r][c].setTileImageView(tileImageView);
                 gridPane.add(tileImageView, r, c);
             }
         }
         for (Piece piece : allPieces) {
+            if (piece.getImageIcon() == null) continue;
             gridPane.add(piece.getImageIcon(), piece.getCurrentTile().getY(), piece.getCurrentTile().getX());
         }
+    }
+
+    private void movePieceToTile(Piece piece, Tile tile) {
+        if (!tile.isEmpty()) {
+            tile.getPiece().setImageIcon(null);
+        }
+        piece.moveToTile(tile);
+        tile.setPieceImageView(piece.getImageIcon());
     }
 
     public static void main(String[] args) {
