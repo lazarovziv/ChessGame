@@ -18,9 +18,15 @@ import java.io.InputStream;
 public class Game extends Application {
 
     private final Board board;
+    private final GridPane gridPane;
+
+    private final String[] colors = {"brownTile", "whiteTile"};
+    private Piece[] allPieces;
 
     public Game() {
         board = new Board();
+        gridPane = new GridPane();
+        allPieces = new Piece[32];
     }
 
     @Override
@@ -29,10 +35,6 @@ public class Game extends Application {
 //                "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn"};
 //        String[] blackPieces = {"blackRook", "blackKnight", "blackBishop", "blackKing", "blackQueen", "blackBishop", "blackKnight", "blackRook",
 //                "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn"};
-
-        String[] colors = {"brownTile", "whiteTile"};
-
-        GridPane gridPane = new GridPane();
 
         for (int i = 0; i < board.getBoard().length; i++) {
             for (int j = 0; j < board.getBoard().length; j++) {
@@ -115,7 +117,7 @@ public class Game extends Application {
 
         board.printBoard();
 
-        Piece[] allPieces = {whiteRook0, whiteRook1, whiteKnight0, whiteKnight1, whiteBishop0, whiteBishop1, whiteQueen, whiteKing, whitePawn0, whitePawn1,
+        allPieces = new Piece[] {whiteRook0, whiteRook1, whiteKnight0, whiteKnight1, whiteBishop0, whiteBishop1, whiteQueen, whiteKing, whitePawn0, whitePawn1,
                 whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7,
         blackRook0, blackRook1, blackKnight0, blackKnight1, blackBishop0, blackBishop1, blackQueen, blackKing, blackPawn0, blackPawn1, blackPawn2,
                 blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7};
@@ -124,9 +126,13 @@ public class Game extends Application {
             gridPane.add(piece.getImageIcon(), piece.getCurrentTile().getY(), piece.getCurrentTile().getX());
         }
 
-        whitePawn0.moveToTile(board.getBoard()[2][0]);
-        blackKnight0.moveToTile(board.getBoard()[5][0]);
+        blackKnight0.moveToTile(board.getBoard()[5][2]);
         board.printBoard();
+        updateBoard();
+
+        whitePawn0.moveToTile(board.getBoard()[3][0]);
+        board.printBoard();
+        updateBoard();
 
         Scene scene = new Scene(gridPane, 225*8,225*8);
         stage.setTitle("Chess");
@@ -135,20 +141,20 @@ public class Game extends Application {
         stage.show();
     }
 
-    private ImageView createImageView(String fileName, double x, double y) throws FileNotFoundException {
-        InputStream stream = new FileInputStream("/home/ziv/IdeaProjects/ChessGame/src/" + fileName + ".png");
-        Image image = new Image(stream);
-
-        ImageView imageView = new ImageView();
-        imageView.setImage(image);
-
-        imageView.setX(x);
-        imageView.setY(y);
-//        imageView.setFitWidth(150);
-        imageView.setPreserveRatio(true);
-
-        return imageView;
-    }
+//    private ImageView createImageView(String fileName, double x, double y) throws FileNotFoundException {
+//        InputStream stream = new FileInputStream("/home/ziv/IdeaProjects/ChessGame/src/" + fileName + ".png");
+//        Image image = new Image(stream);
+//
+//        ImageView imageView = new ImageView();
+//        imageView.setImage(image);
+//
+//        imageView.setX(x);
+//        imageView.setY(y);
+////        imageView.setFitWidth(150);
+//        imageView.setPreserveRatio(true);
+//
+//        return imageView;
+//    }
 
     private ImageView createImageView(String fileName) throws FileNotFoundException {
         InputStream stream = new FileInputStream("/home/ziv/IdeaProjects/ChessGame/src/" + fileName + ".png");
@@ -161,6 +167,20 @@ public class Game extends Application {
         imageView.setPreserveRatio(true);
 
         return imageView;
+    }
+
+    private void updateBoard() throws FileNotFoundException {
+        gridPane.getChildren().clear();
+        for (int r = 0; r < board.getBoard().length; r++) {
+            for (int c = 0; c < board.getBoard().length; c++) {
+                ImageView tileImageView = createImageView(colors[(r+c) % colors.length]);
+                board.getBoard()[r][c].setImageView(tileImageView);
+                gridPane.add(tileImageView, r, c);
+            }
+        }
+        for (Piece piece : allPieces) {
+            gridPane.add(piece.getImageIcon(), piece.getCurrentTile().getY(), piece.getCurrentTile().getX());
+        }
     }
 
     public static void main(String[] args) {

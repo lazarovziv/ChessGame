@@ -1,5 +1,4 @@
 package com.zivlazarov.chessengine.pieces;
-
 import com.zivlazarov.chessengine.utils.Board;
 import com.zivlazarov.chessengine.utils.Piece;
 import com.zivlazarov.chessengine.utils.PieceColor;
@@ -61,7 +60,8 @@ public class PawnPiece implements Piece {
         boolean canMoveFurther = !hasMoved;
 
         // if it's white, it's only way forward is "down the matrix" which is using a lower x value
-        if (pieceColor == PieceColor.WHITE) {
+        if (pieceColor == PieceColor.BLACK) {
+//            if (y-1 < 0 || y-2 < 0) return;
             if (board.getBoard()[x-1][y].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[x-1][y]);
             } else if (board.getBoard()[x-1][y].getPiece().getPieceColor() != pieceColor) {
@@ -69,7 +69,7 @@ public class PawnPiece implements Piece {
             }
             // checking canMoveFurther for another step
             if (canMoveFurther) {
-                if (x-2< 0) return;
+                if (x - 2 < 0) return;
                 if (board.getBoard()[x-2][y].isEmpty()) {
                     tilesToMoveTo.add(board.getBoard()[x-2][y]);
                 } else if (board.getBoard()[x-2][y].getPiece().getPieceColor() != pieceColor) {
@@ -78,14 +78,15 @@ public class PawnPiece implements Piece {
             }
         }
         // if black, forward means "going up the matrix" which is using a higher x value
-        if (pieceColor == PieceColor.BLACK) {
+        if (pieceColor == PieceColor.WHITE) {
+//            if (y+1 > 7 || y+2 > 7) return;
             if (board.getBoard()[x+1][y].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[x+1][y]);
             } else if (board.getBoard()[x+1][y].getPiece().getPieceColor() != pieceColor) {
                 tilesToMoveTo.add(board.getBoard()[x+1][y]);
             }
             if (canMoveFurther) {
-                if (x+2 > 7) return;
+                if (x + 2 > 7) return;
                 if (board.getBoard()[x+2][y].isEmpty()) {
                     tilesToMoveTo.add(board.getBoard()[x+2][y]);
                 } else if (board.getBoard()[x+2][y].getPiece().getPieceColor() != pieceColor) {

@@ -1,5 +1,4 @@
 package com.zivlazarov.chessengine.pieces;
-
 import com.zivlazarov.chessengine.utils.Board;
 import com.zivlazarov.chessengine.utils.Piece;
 import com.zivlazarov.chessengine.utils.PieceColor;
