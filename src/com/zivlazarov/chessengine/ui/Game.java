@@ -123,8 +123,11 @@ public class Game extends Application {
         blackRook0, blackRook1, blackKnight0, blackKnight1, blackBishop0, blackBishop1, blackQueen, blackKing, blackPawn0, blackPawn1, blackPawn2,
                 blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7};
 
-        for (Piece piece : allPieces) {
-            gridPane.add(piece.getImageIcon(), piece.getCurrentTile().getY(), piece.getCurrentTile().getX());
+        for (Tile[] tiles : board.getBoard()) {
+            for (Tile tile : tiles) {
+                if (tile.getPieceImageView() == null) continue;
+                gridPane.add(tile.getPieceImageView(), tile.getY(), tile.getY());
+            }
         }
 
 //        blackKnight0.moveToTile(board.getBoard()[5][2]);
