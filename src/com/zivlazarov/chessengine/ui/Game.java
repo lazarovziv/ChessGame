@@ -31,7 +31,7 @@ public class Game extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
 //        String[] whitePieces = {"whiteRook", "whiteKnight", "whiteBishop", "whiteQueen", "whiteKing", "whiteBishop", "whiteKnight", "whiteRook",
 //                "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn"};
 //        String[] blackPieces = {"blackRook", "blackKnight", "blackBishop", "blackKing", "blackQueen", "blackBishop", "blackKnight", "blackRook",
@@ -126,11 +126,17 @@ public class Game extends Application {
         for (Tile[] tiles : board.getBoard()) {
             for (Tile tile : tiles) {
                 if (tile.getPieceImageView() == null) continue;
-                gridPane.add(tile.getPieceImageView(), tile.getY(), tile.getY());
+                gridPane.add(tile.getPieceImageView(), tile.getCol(), tile.getCol());
             }
         }
 
-//        blackKnight0.moveToTile(board.getBoard()[5][2]);
+        Scene scene = new Scene(gridPane, 225*8,225*8);
+        stage.setTitle("Chess");
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
+
+        //        blackKnight0.moveToTile(board.getBoard()[5][2]);
         movePieceToTile(blackKnight0, board.getBoard()[5][2]);
         board.printBoard();
         updateBoard();
@@ -150,31 +156,60 @@ public class Game extends Application {
         board.printBoard();
         updateBoard();
 
-        Scene scene = new Scene(gridPane, 225*8,225*8);
-        stage.setTitle("Chess");
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
+        blackPawn0.setOnClickListener();
+        blackPawn1.setOnClickListener();
+        blackPawn2.setOnClickListener();
+        blackPawn3.setOnClickListener();
+        blackPawn4.setOnClickListener();
+        blackPawn5.setOnClickListener();
+        blackPawn6.setOnClickListener();
+        blackPawn7.setOnClickListener();
+
+        whitePawn0.setOnClickListener();
+        whitePawn1.setOnClickListener();
+        whitePawn2.setOnClickListener();
+        whitePawn3.setOnClickListener();
+        whitePawn4.setOnClickListener();
+        whitePawn5.setOnClickListener();
+        whitePawn6.setOnClickListener();
+        whitePawn7.setOnClickListener();
+
+        blackRook0.setOnClickListener();
+        blackRook1.setOnClickListener();
+
+        whiteRook0.setOnClickListener();
+        whiteRook1.setOnClickListener();
+
+        blackKnight0.setOnClickListener();
+        blackKnight1.setOnClickListener();
+
+        whiteKnight0.setOnClickListener();
+        whiteKnight1.setOnClickListener();
+
+        blackBishop0.setOnClickListener();
+        blackBishop1.setOnClickListener();
+
+        whiteBishop0.setOnClickListener();
+        whiteBishop1.setOnClickListener();
+
+        blackQueen.setOnClickListener();
+        whiteQueen.setOnClickListener();
+
+        blackKing.setOnClickListener();
+        whiteKing.setOnClickListener();
     }
 
-//    private ImageView createImageView(String fileName, double x, double y) throws FileNotFoundException {
-//        InputStream stream = new FileInputStream("/home/ziv/IdeaProjects/ChessGame/src/" + fileName + ".png");
-//        Image image = new Image(stream);
-//
-//        ImageView imageView = new ImageView();
-//        imageView.setImage(image);
-//
-//        imageView.setX(x);
-//        imageView.setY(y);
-////        imageView.setFitWidth(150);
-//        imageView.setPreserveRatio(true);
-//
-//        return imageView;
-//    }
-
-    public static ImageView createImageView(String fileName) throws FileNotFoundException {
-        InputStream stream = new FileInputStream("/home/ziv/IdeaProjects/ChessGame/src/" + fileName + ".png");
-        Image image = new Image(stream);
+    public static ImageView createImageView(String fileName) {
+        InputStream stream = null;
+        try {
+            stream = new FileInputStream("/home/ziv/IdeaProjects/ChessGame/src/" + fileName + ".png");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        Image image = null;
+        if (stream != null) {
+            image = new Image(stream);
+        }
 
         ImageView imageView = new ImageView();
         imageView.setImage(image);
@@ -185,7 +220,7 @@ public class Game extends Application {
         return imageView;
     }
 
-    private void updateBoard() throws FileNotFoundException {
+    private void updateBoard() {
         gridPane.getChildren().clear();
         for (int r = 0; r < board.getBoard().length; r++) {
             for (int c = 0; c < board.getBoard().length; c++) {
@@ -196,7 +231,7 @@ public class Game extends Application {
         }
         for (Piece piece : allPieces) {
             if (piece.getImageIcon() == null) continue;
-            gridPane.add(piece.getImageIcon(), piece.getCurrentTile().getY(), piece.getCurrentTile().getX());
+            gridPane.add(piece.getImageIcon(), piece.getCurrentTile().getCol(), piece.getCurrentTile().getRow());
         }
     }
 

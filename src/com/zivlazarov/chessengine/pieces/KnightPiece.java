@@ -7,6 +7,8 @@ import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
+import static com.zivlazarov.chessengine.ui.Game.createImageView;
+
 public class KnightPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
@@ -30,7 +32,8 @@ public class KnightPiece implements Piece {
         if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
 
         currentTile.setPiece(this);
-        generateTilesToMoveTo();
+
+//        generateTilesToMoveTo();
     }
 
     public KnightPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
@@ -48,13 +51,18 @@ public class KnightPiece implements Piece {
         imageIcon = imageView;
         currentTile.setPieceImageView(imageIcon);
 
+//        generateTilesToMoveTo();
+    }
+
+    @Override
+    public void init() {
         generateTilesToMoveTo();
     }
 
     @Override
     public void generateTilesToMoveTo() {
-        int x = currentTile.getX();
-        int y = currentTile.getY();
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
         
         // 1 right 2 up
         if (x + 2 < board.getBoard().length && y + 1 < board.getBoard().length) {
@@ -211,6 +219,13 @@ public class KnightPiece implements Piece {
 
     @Override
     public void setOnClickListener() {
-
+//        if (!isAlive) return;
+        if (imageIcon == null) return;
+        imageIcon.setOnMouseClicked(mouseEvent -> {
+            if (tilesToMoveTo.size() == 0) return;
+            for (Tile tile : tilesToMoveTo) {
+                tile.setTileImageView(createImageView("redTile"));
+            }
+        });
     }
 }

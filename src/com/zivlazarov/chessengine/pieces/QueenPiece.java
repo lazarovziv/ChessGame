@@ -7,6 +7,8 @@ import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
+import static com.zivlazarov.chessengine.ui.Game.createImageView;
+
 public class QueenPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
@@ -30,7 +32,8 @@ public class QueenPiece implements Piece {
         if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
 
         currentTile.setPiece(this);
-        generateTilesToMoveTo();
+
+//        generateTilesToMoveTo();
     }
 
     public QueenPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
@@ -48,6 +51,11 @@ public class QueenPiece implements Piece {
         imageIcon = imageView;
         currentTile.setPieceImageView(imageIcon);
 
+//        generateTilesToMoveTo();
+    }
+
+    @Override
+    public void init() {
         generateTilesToMoveTo();
     }
 
@@ -55,8 +63,8 @@ public class QueenPiece implements Piece {
     public void generateTilesToMoveTo() {
         // queen's moves are bishop's and rook's moves, together
         // diagonal moves
-        int x = currentTile.getX();
-        int y = currentTile.getY();
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
 
         // TODO: use 1 loop in each iteration, maybe use a local variable outside of loop and zero it right before each one executes
 
@@ -266,6 +274,13 @@ public class QueenPiece implements Piece {
 
     @Override
     public void setOnClickListener() {
-
+//        if (!isAlive) return;
+        if (imageIcon == null) return;
+        imageIcon.setOnMouseClicked(mouseEvent -> {
+            if (tilesToMoveTo.size() == 0) return;
+            for (Tile tile : tilesToMoveTo) {
+                tile.setTileImageView(createImageView("redTile"));
+            }
+        });
     }
 }

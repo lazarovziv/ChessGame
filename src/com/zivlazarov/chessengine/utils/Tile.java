@@ -4,7 +4,8 @@ import javafx.scene.image.ImageView;
 
 public class Tile {
 
-	private int x, y;
+	private int row;
+	private int col;
 	private Piece piece;
 	private boolean isEmpty;
 	private final TileColor tileColor;
@@ -13,19 +14,18 @@ public class Tile {
 	private ImageView tileImageView;
 	private ImageView pieceImageView;
 
-	public Tile(int x, int y, TileColor tc) {
-		this.x = x;
-		this.y = y;
+	public Tile(int row, int col, TileColor tc) {
+		this.row = row;
+		this.col = col;
 		tileColor = tc;
 		isEmpty = true; // if piece is not initialized tile is empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
-
 	}
 
-	public Tile(int x, int y, TileColor tc, ImageView iv) {
-		this.x = x;
-		this.y = y;
+	public Tile(int row, int col, TileColor tc, ImageView iv) {
+		this.row = row;
+		this.col = col;
 		tileColor = tc;
 		isEmpty = true; // if piece is not initialized tile is empty
 		isThreatenedByWhite = false;
@@ -33,22 +33,22 @@ public class Tile {
 		tileImageView = iv;
 	}
 
-	public Tile(int x, int y, TileColor tc, Piece p) {
-		this.x = x;
-		this.y = y;
+	public Tile(int row, int col, TileColor tc, Piece p) {
+		this.row = row;
+		this.col = col;
 		tileColor = tc;
 		piece = p;
-		isEmpty = false; // if piece is initialized tile is not empty
+		isEmpty = piece == null; // if piece is initialized (as NOT null) tile is not empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
 	}
 
-	public int getX() { 
-		return x; 
+	public int getRow() {
+		return row;
 	}
 
-	public int getY() { 
-		return y; 
+	public int getCol() {
+		return col;
 	}
 
 	public Piece getPiece() {
@@ -56,11 +56,6 @@ public class Tile {
 	}
 
 	public boolean isEmpty() {
-		if (piece != null) {
-			isEmpty = false;
-		} else {
-			isEmpty = true;
-		}
 		return isEmpty;
 	}
 
@@ -80,17 +75,17 @@ public class Tile {
 		return tileImageView;
 	}
 
-	public void setX(int x) {
-		this.x = x;
+	public void setRow(int row) {
+		this.row = row;
 	}
 
-	public void setY(int y) {
-		this.y = y;
+	public void setCol(int col) {
+		this.col = col;
 	}
 
 	public void setPiece(Piece p) {
 		piece = p;
-		isEmpty = p == null;
+		isEmpty = piece == null;
 	}
 
 	public void setThreatenedByWhite(boolean threatenedByWhite) {
@@ -102,7 +97,7 @@ public class Tile {
 	}
 
 	public boolean equals(Tile tile) {
-		return x == tile.x && y == tile.y;
+		return row == tile.row && col == tile.col;
 	}
 
 	public void setTileImageView(ImageView tileImageView) {

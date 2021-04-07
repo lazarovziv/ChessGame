@@ -8,6 +8,8 @@ import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
+import static com.zivlazarov.chessengine.ui.Game.createImageView;
+
 public class BishopPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
@@ -31,7 +33,9 @@ public class BishopPiece implements Piece {
         if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
 
         currentTile.setPiece(this);
-        generateTilesToMoveTo();
+
+        // need to be called after all pieces have been initialized
+//        generateTilesToMoveTo();
     }
 
     public BishopPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
@@ -49,17 +53,28 @@ public class BishopPiece implements Piece {
         imageIcon = imageView;
         currentTile.setPieceImageView(imageIcon);
 
+//        generateTilesToMoveTo();
+    }
+
+    @Override
+    public void init() {
         generateTilesToMoveTo();
     }
 
     @Override
     public void generateTilesToMoveTo() {
-        int x = currentTile.getX();
-        int y = currentTile.getY();
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
 
         // TODO: use 1 loop in each iteration, maybe use a local variable outside of loop and zero it right before each one executes
 
-        // "going right and down diagonally"
+        int[][] directions = new int[][]{ {1,1}, {-1,-1}, {1,-1}, {-1,1} };
+
+//        for (int i = 0; i < directions.length; i++) {
+//            int row = 0, col = 1;
+//        }
+
+        // "going down and right diagonally"
         for (int i = x + 1, j = y + 1; i < board.getBoard().length && j < board.getBoard().length; i++, j++) {
             if (board.getBoard()[i][j].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
@@ -67,7 +82,7 @@ public class BishopPiece implements Piece {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
             } else break;
         }
-        // "going left and up diagonally"
+        // "going up and left diagonally"
         for (int i = x - 1, j = y - 1; i >= 0 && j >=0; i--, j--) {
             if (board.getBoard()[i][j].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
@@ -76,7 +91,7 @@ public class BishopPiece implements Piece {
             } else break;
         }
 
-        // "going right and up diagonally"
+        // "going down and left diagonally"
         for (int i = x + 1, j = y - 1; i < board.getBoard().length && j >= 0; i++, j--) {
             if (board.getBoard()[i][j].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
@@ -85,7 +100,7 @@ public class BishopPiece implements Piece {
             } else break;
         }
 
-        // "going left and down diagonally"
+        // "going up and right diagonally"
         for (int i = x - 1, j = y + 1; i >= 0 && j < board.getBoard().length; i--, j++) {
             if (board.getBoard()[i][j].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
@@ -188,7 +203,7 @@ public class BishopPiece implements Piece {
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
             generateTilesToMoveTo();
-        } else throw new RuntimeException("Cannot move to [" + tile.getX() + ", " + tile.getY() + "] !!!");
+        } else throw new RuntimeException("Cannot move to [" + tile.getRow() + ", " + tile.getCol() + "] !!!");
     }
 
 
@@ -201,6 +216,13 @@ public class BishopPiece implements Piece {
 
     @Override
     public void setOnClickListener() {
-
+//        if (!isAlive) return;
+        if (imageIcon == null) return;
+        imageIcon.setOnMouseClicked(mouseEvent -> {
+            if (tilesToMoveTo.size() == 0) return;
+            for (Tile tile : tilesToMoveTo) {
+                tile.setTileImageView(createImageView("redTile"));
+            }
+        });
     }
 }

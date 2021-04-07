@@ -7,6 +7,8 @@ import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
+import static com.zivlazarov.chessengine.ui.Game.createImageView;
+
 public class RookPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
@@ -30,7 +32,8 @@ public class RookPiece implements Piece {
         if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
 
         currentTile.setPiece(this);
-        generateTilesToMoveTo();
+
+//        generateTilesToMoveTo();
     }
 
     public RookPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
@@ -48,13 +51,18 @@ public class RookPiece implements Piece {
         imageIcon = imageView;
         currentTile.setPieceImageView(imageIcon);
 
+//        generateTilesToMoveTo();
+    }
+
+    @Override
+    public void init() {
         generateTilesToMoveTo();
     }
 
     @Override
     public void generateTilesToMoveTo() {
-        int x = currentTile.getX();
-        int y = currentTile.getY();
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
 
         // checking the board for threats before adding moves to tilesToMoveTo
         // TODO: checking the board after every turn instead of every generation of moves to each piece to save memory
@@ -226,6 +234,13 @@ public class RookPiece implements Piece {
 
     @Override
     public void setOnClickListener() {
-
+//        if (!isAlive) return;
+        if (imageIcon == null) return;
+        imageIcon.setOnMouseClicked(mouseEvent -> {
+            if (tilesToMoveTo.size() == 0) return;
+            for (Tile tile : tilesToMoveTo) {
+                tile.setTileImageView(createImageView("redTile"));
+            }
+        });
     }
 }

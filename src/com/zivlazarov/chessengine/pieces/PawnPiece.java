@@ -7,6 +7,8 @@ import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
+import static com.zivlazarov.chessengine.ui.Game.createImageView;
+
 public class PawnPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
@@ -31,7 +33,8 @@ public class PawnPiece implements Piece {
         if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
 
         currentTile.setPiece(this);
-        generateTilesToMoveTo();
+
+//        generateTilesToMoveTo();
     }
 
     public PawnPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
@@ -49,18 +52,18 @@ public class PawnPiece implements Piece {
         imageIcon = imageView;
         currentTile.setPieceImageView(imageIcon);
 
+//        generateTilesToMoveTo();
+    }
+
+    @Override
+    public void init() {
         generateTilesToMoveTo();
     }
 
     @Override
-    public void setOnClickListener() {
-
-    }
-
-    @Override
     public void generateTilesToMoveTo() {
-        int x = currentTile.getX();
-        int y = currentTile.getY();
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
 
         boolean canMoveFurther = !hasMoved;
 
@@ -200,5 +203,18 @@ public class PawnPiece implements Piece {
         if (tile.isEmpty()) {
             return true;
         } else return tile.getPiece().getPieceColor() != pieceColor;
+    }
+
+    @Override
+    public void setOnClickListener() {
+//        if (!isAlive) return;
+        if (imageIcon == null) return;
+        imageIcon.setOnMouseClicked(mouseEvent -> {
+            if (tilesToMoveTo.size() == 0) return;
+            for (Tile tile : tilesToMoveTo) {
+                tile.setTileImageView(createImageView("redTile"));
+                System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
+            }
+        });
     }
 }

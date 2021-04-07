@@ -36,4 +36,6 @@ public interface Piece {
     boolean isTileAvailable(Tile tile);
 
     void setOnClickListener();
+
+    void init();
 }
