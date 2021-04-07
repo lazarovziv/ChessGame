@@ -70,6 +70,7 @@ public class PawnPiece implements Piece {
 
         // if it's white, it's only way forward is "down the matrix" which is using a lower x value
         if (pieceColor == PieceColor.BLACK) {
+            if (x - 1 < 0) return;
             if (board.getBoard()[x-1][y].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[x-1][y]);
             } else if (board.getBoard()[x-1][y].getPiece().getPieceColor() != pieceColor) {

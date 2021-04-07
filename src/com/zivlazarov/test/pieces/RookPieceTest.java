@@ -17,12 +17,14 @@ public class RookPieceTest {
     private static Board board;
     private static RookPiece rookPiece;
     private static PawnPiece pawnPiece;
+    private static PawnPiece opponentPawnPiece;
 
     @BeforeAll
     public static void setup() {
         board = new Board();
         rookPiece = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0]);
         pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0]);
+        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[0][3]);
         board.checkBoard();
     }
 
@@ -34,7 +36,7 @@ public class RookPieceTest {
 
         List<Tile> tilesTrue = new ArrayList<>();
 
-        for (int i = 1; i < board.getBoard().length; i++) tilesTrue.add(board.getBoard()[0][i]);
+        for (int i = 1; i <= opponentPawnPiece.getCurrentTile().getCol(); i++) tilesTrue.add(board.getBoard()[0][i]);
 
         Assertions.assertEquals(tilesTrue, tilesGenerated);
     }
@@ -44,6 +46,7 @@ public class RookPieceTest {
         List<Tile> tilesGenerated = rookPiece.getTilesToMoveTo();
 
         pawnPiece.moveToTile(board.getBoard()[3][0]);
+        opponentPawnPiece.getCurrentTile().setPiece(null);
         board.checkBoard();
 
         List<Tile> tilesTrue = new ArrayList<>();

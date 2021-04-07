@@ -16,6 +16,7 @@ public class BishopPieceTest {
 
     private static BishopPiece bishopPiece;
     private static PawnPiece pawnPiece;
+    private static PawnPiece opponentPawnPiece;
     private static Board board;
 
     @BeforeAll
@@ -23,6 +24,7 @@ public class BishopPieceTest {
         board = new Board();
         bishopPiece = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[0][2]);
         pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][3]);
+        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[1][1]);
         board.checkBoard();
     }
 
@@ -34,6 +36,8 @@ public class BishopPieceTest {
         tilesTrue.add(board.getBoard()[1][1]);
         tilesTrue.add(board.getBoard()[2][0]);
 
+        board.printBoard();
+
 //        Assertions.assertEquals(tilesGenerated.size(), tilesTrue.size());
         Assertions.assertEquals(tilesTrue, tilesGenerated);
     }
@@ -41,10 +45,11 @@ public class BishopPieceTest {
     @Test
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
         pawnPiece.moveToTile(board.getBoard()[2][3]);
+        opponentPawnPiece.getCurrentTile().setPiece(null);
         board.checkBoard();
 
         List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
-        for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
+//        for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
         board.printBoard();
 
         List<Tile> tilesTrue = new ArrayList<>();

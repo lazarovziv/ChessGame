@@ -17,12 +17,14 @@ public class KnightPieceTest {
     private static Board board;
     private static KnightPiece knightPiece;
     private static PawnPiece pawnPiece;
+    private static PawnPiece opponentPawnPiece;
 
     @BeforeAll
     public static void setup() {
         board = new Board();
         knightPiece = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][1]);
         pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[2][2]);
+        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[1][3]);
         board.checkBoard();
     }
 
@@ -42,6 +44,7 @@ public class KnightPieceTest {
     @Test
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
         pawnPiece.moveToTile(board.getBoard()[3][2]);
+        opponentPawnPiece.getCurrentTile().setPiece(null);
         board.checkBoard();
 
         List<Tile> tilesGenerated = knightPiece.getTilesToMoveTo();
