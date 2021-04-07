@@ -29,8 +29,10 @@ public class Board {
     // thorough check on every tile to see if it's threatened by black and/or white, which pieces are alive etc.
     // TODO: check for "Check" and/or "Checkmate" and/or "Draw" situation
     public void checkBoard() {
-        if (blackAlivePieces.size() == 0 || whiteAlivePieces.size() == 0) return;
-
+        // call refresh() method after every turn instead
+        for (Piece piece : whiteAlivePieces.values()) piece.refresh();
+        for (Piece piece : blackAlivePieces.values()) piece.refresh();
+/*
         if (blackAlivePieces.get('K').getIsInDanger()) {
             // TODO: add (perhaps new method for Piece interface?) if other pieces of same pieceColor can change the game situation
             if (blackAlivePieces.get('K').getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
@@ -42,14 +44,7 @@ public class Board {
             if (whiteAlivePieces.get('K').getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
             else gameSituation = GameSituation.CHECK;
         }
-//        for (Piece piece : alivePieces) {
-//            if (piece.getName() == 'K') {
-//                if (piece.getIsInDanger()) {
-//                    if (piece.getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
-//                    gameSituation = GameSituation.CHECK;
-//                }
-//            }
-//        }
+        */
     }
 
     public void printBoard() {

@@ -55,7 +55,8 @@ public class QueenPiece implements Piece {
     }
 
     @Override
-    public void init() {
+    public void refresh() {
+        tilesToMoveTo.clear();
         generateTilesToMoveTo();
     }
 

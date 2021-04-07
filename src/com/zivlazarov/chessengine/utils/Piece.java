@@ -37,5 +37,5 @@ public interface Piece {
 
     void setOnClickListener();
 
-    void init();
+    void refresh();
 }

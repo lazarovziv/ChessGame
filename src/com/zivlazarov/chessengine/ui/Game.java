@@ -118,6 +118,8 @@ public class Game extends Application {
 
         board.printBoard();
 
+        // when calling the init() method for every piece, first call for the pieces on the back row!!! because tiles in front of them aren't empty
+
         allPieces = new Piece[] {whiteRook0, whiteRook1, whiteKnight0, whiteKnight1, whiteBishop0, whiteBishop1, whiteQueen, whiteKing, whitePawn0, whitePawn1,
                 whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7,
         blackRook0, blackRook1, blackKnight0, blackKnight1, blackBishop0, blackBishop1, blackQueen, blackKing, blackPawn0, blackPawn1, blackPawn2,
@@ -221,6 +223,7 @@ public class Game extends Application {
     }
 
     private void updateBoard() {
+        board.checkBoard();
         gridPane.getChildren().clear();
         for (int r = 0; r < board.getBoard().length; r++) {
             for (int c = 0; c < board.getBoard().length; c++) {
