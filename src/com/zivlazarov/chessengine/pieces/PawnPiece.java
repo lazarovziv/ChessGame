@@ -73,34 +73,35 @@ public class PawnPiece implements Piece {
             if (x - 1 < 0) return;
             if (board.getBoard()[x-1][y].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[x-1][y]);
+                // checking canMoveFurther for another step
+                if (canMoveFurther) {
+                    if (x - 2 < 0) return;
+                    if (board.getBoard()[x-2][y].isEmpty()) {
+                        tilesToMoveTo.add(board.getBoard()[x-2][y]);
+                    } else if (board.getBoard()[x-2][y].getPiece().getPieceColor() != pieceColor) {
+                        tilesToMoveTo.add(board.getBoard()[x-2][y]);
+                    }
+                }
             } else if (board.getBoard()[x-1][y].getPiece().getPieceColor() != pieceColor) {
                 tilesToMoveTo.add(board.getBoard()[x-1][y]);
-            }
-            // checking canMoveFurther for another step
-            if (canMoveFurther) {
-                if (x - 2 < 0) return;
-                if (board.getBoard()[x-2][y].isEmpty()) {
-                    tilesToMoveTo.add(board.getBoard()[x-2][y]);
-                } else if (board.getBoard()[x-2][y].getPiece().getPieceColor() != pieceColor) {
-                    tilesToMoveTo.add(board.getBoard()[x-2][y]);
-                }
             }
         }
         // if black, forward means "going up the matrix" which is using a higher x value
         if (pieceColor == PieceColor.WHITE) {
             if (board.getBoard()[x+1][y].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[x+1][y]);
+                if (canMoveFurther) {
+                    if (x + 2 > 7) return;
+                    if (board.getBoard()[x+2][y].isEmpty()) {
+                        tilesToMoveTo.add(board.getBoard()[x+2][y]);
+                    } else if (board.getBoard()[x+2][y].getPiece().getPieceColor() != pieceColor) {
+                        tilesToMoveTo.add(board.getBoard()[x+2][y]);
+                    }
+                }
             } else if (board.getBoard()[x+1][y].getPiece().getPieceColor() != pieceColor) {
                 tilesToMoveTo.add(board.getBoard()[x+1][y]);
             }
-            if (canMoveFurther) {
-                if (x + 2 > 7) return;
-                if (board.getBoard()[x+2][y].isEmpty()) {
-                    tilesToMoveTo.add(board.getBoard()[x+2][y]);
-                } else if (board.getBoard()[x+2][y].getPiece().getPieceColor() != pieceColor) {
-                    tilesToMoveTo.add(board.getBoard()[x+2][y]);
-                }
-            }
+
         }
     }
 
