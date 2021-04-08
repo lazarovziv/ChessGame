@@ -14,7 +14,7 @@ public class BishopPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final Board board;
-    private char name;
+    private String name;
     private boolean isAlive = true;
     private boolean isInDanger = false;
     private Tile currentTile;
@@ -24,13 +24,19 @@ public class BishopPiece implements Piece {
     public BishopPiece(Board board, PieceColor pc, Tile initTile) {
         this.board = board;
 
-        name = 'B';
+//        name = "B";
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
 
         currentTile = initTile;
-        if (pieceColor == PieceColor.BLACK) board.getBlackAlivePieces().put(name, this);
-        if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
+        if (pieceColor == PieceColor.BLACK) {
+            name = "bB";
+            board.getBlackAlivePieces().put(name, this);
+        }
+        if (pieceColor == PieceColor.WHITE) {
+            name = "wB";
+            board.getWhiteAlivePieces().put(name, this);
+        }
 
         currentTile.setPiece(this);
 
@@ -41,13 +47,19 @@ public class BishopPiece implements Piece {
     public BishopPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
         this.board = board;
 
-        name = 'B';
+//        name = "B";
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
 
         currentTile = initTile;
-        if (pieceColor == PieceColor.BLACK) board.getBlackAlivePieces().put(name, this);
-        if (pieceColor == PieceColor.WHITE) board.getWhiteAlivePieces().put(name, this);
+        if (pieceColor == PieceColor.BLACK) {
+            name = "bB";
+            board.getBlackAlivePieces().put(name, this);
+        }
+        if (pieceColor == PieceColor.WHITE) {
+            name = "wB";
+            board.getWhiteAlivePieces().put(name, this);
+        }
 
         currentTile.setPiece(this);
         imageIcon = imageView;
@@ -112,7 +124,7 @@ public class BishopPiece implements Piece {
     }
 
     @Override
-    public char getName() {
+    public String getName() {
         return name;
     }
 
@@ -147,7 +159,7 @@ public class BishopPiece implements Piece {
     }
 
     @Override
-    public void setName(char name) {
+    public void setName(String name) {
         this.name = name;
     }
 

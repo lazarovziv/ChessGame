@@ -7,8 +7,8 @@ public class Board {
 
     private Tile[][] board;
 
-    private final Map<Character, Piece> blackAlivePieces;
-    private final Map<Character, Piece> whiteAlivePieces;
+    private final Map<String, Piece> blackAlivePieces;
+    private final Map<String, Piece> whiteAlivePieces;
     private GameSituation gameSituation;
 
     public Board() {
@@ -65,11 +65,11 @@ public class Board {
         return board;
     }
 
-    public Map<Character, Piece> getBlackAlivePieces() {
+    public Map<String, Piece> getBlackAlivePieces() {
         return blackAlivePieces;
     }
 
-    public Map<Character, Piece> getWhiteAlivePieces() {
+    public Map<String, Piece> getWhiteAlivePieces() {
         return whiteAlivePieces;
     }
 

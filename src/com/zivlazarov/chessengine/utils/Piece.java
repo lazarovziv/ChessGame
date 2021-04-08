@@ -6,14 +6,14 @@ import java.util.ArrayList;
 
 public interface Piece {
 
-    char name = 'a';
+    String name = "";
     boolean isAlive = true;
     boolean isInDanger = false;
     final ArrayList<Tile> tilesToMoveTo = new ArrayList<>();
     PieceColor pieceColor = PieceColor.WHITE;
     ImageView imageIcon = null;
 
-    char getName();
+    String getName();
     boolean getIsAlive();
     boolean getIsInDanger();
     ArrayList<Tile> getTilesToMoveTo();
@@ -21,7 +21,7 @@ public interface Piece {
     ImageView getImageIcon();
     Tile getCurrentTile();
 
-    void setName(char name);
+    void setName(String name);
     void setIsAlive(boolean isAlive);
     void setIsInDanger(boolean isInDanger);
     void setPieceColor(PieceColor pieceColor);
