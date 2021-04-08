@@ -53,7 +53,7 @@ public class Board {
             for (int c = 0; c < board.length; c++) {
                 if (board[r][c].getPiece() != null) {
                     System.out.print(board[r][c].getPiece().getName() + " ");
-                } else System.out.print("- ");
+                } else System.out.print("-- ");
             }
         }
         System.out.println();

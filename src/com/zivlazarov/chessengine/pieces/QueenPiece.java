@@ -81,7 +81,7 @@ public class QueenPiece implements Piece {
 
         // TODO: use 1 loop in each iteration, maybe use a local variable outside of loop and zero it right before each one executes
 
-        // "going right and down diagonally"
+        // "going down and right diagonally"
         for (int i = x + 1, j = y + 1; i < board.getBoard().length && j < board.getBoard().length; i++, j++) {
             if (board.getBoard()[i][j].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
@@ -89,7 +89,7 @@ public class QueenPiece implements Piece {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
             } else break;
         }
-        // "going left and up diagonally"
+        // "going up and left diagonally"
         for (int i = x - 1, j = y - 1; i >= 0 && j >=0; i--, j--) {
             if (board.getBoard()[i][j].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
@@ -98,7 +98,7 @@ public class QueenPiece implements Piece {
             } else break;
         }
 
-        // "going right and up diagonally"
+        // "going up and right diagonally"
         for (int i = x + 1, j = y - 1; i < board.getBoard().length && j >= 0; i++, j--) {
             if (board.getBoard()[i][j].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[i][j]);
@@ -107,7 +107,7 @@ public class QueenPiece implements Piece {
             } else break;
         }
 
-        // "going left and down diagonally"
+        // "going down and left diagonally"
         for (int i = x - 1, j = y + 1; i >= 0 && j < board.getBoard().length; i--, j++) {
             if (board.getBoard()[i][j].isEmpty()) {
                 tilesToMoveTo.add(board.getBoard()[i][j]);

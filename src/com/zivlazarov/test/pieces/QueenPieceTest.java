@@ -5,6 +5,7 @@ import com.zivlazarov.chessengine.pieces.QueenPiece;
 import com.zivlazarov.chessengine.utils.Board;
 import com.zivlazarov.chessengine.utils.PieceColor;
 import com.zivlazarov.chessengine.utils.Tile;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,7 @@ public class QueenPieceTest {
         queenPiece = new QueenPiece(board, PieceColor.WHITE, board.getBoard()[3][3]);
         pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[4][3]);
         opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[5][3]);
+        board.checkBoard();
     }
 
     @Test
@@ -31,5 +33,10 @@ public class QueenPieceTest {
         List<Tile> tilesGenerated = pawnPiece.getTilesToMoveTo();
         board.printBoard();
         List<Tile> tilesTrue = new ArrayList<>();
+
+        int queenRow = queenPiece.getCurrentTile().getRow();
+        int queenCol = queenPiece.getCurrentTile().getCol();
+
+//        Assertions.assertEquals(tilesTrue, tilesGenerated);
     }
 }
