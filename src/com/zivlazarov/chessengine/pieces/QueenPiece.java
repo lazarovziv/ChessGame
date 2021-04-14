@@ -249,7 +249,8 @@ public class QueenPiece implements Piece {
             else return false;
         }
         if (pieceColor == PieceColor.BLACK) {
-            return tile.isThreatenedByWhite();
+            if (tile.isThreatenedByWhite()) return true;
+            else return false;
         }
         return false;
     }

@@ -26,7 +26,7 @@ public class BishopPiece implements Piece {
 
 //        name = "B";
         pieceColor = pc;
-        tilesToMoveTo = new ArrayList<Tile>();
+        tilesToMoveTo = new ArrayList<>();
 
         currentTile = initTile;
         if (pieceColor == PieceColor.BLACK) {

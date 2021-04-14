@@ -111,4 +111,9 @@ public class Tile {
 	public ImageView getPieceImageView() { return pieceImageView; }
 
 	public void setPieceImageView(ImageView pieceImageView) { this.pieceImageView = pieceImageView; }
+
+	@Override
+	public String toString() {
+		return "[" + (row+1) + ", " + (col+1) + "]";
+	}
 }

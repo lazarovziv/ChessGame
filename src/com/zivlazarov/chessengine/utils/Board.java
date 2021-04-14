@@ -48,14 +48,24 @@ public class Board {
     }
 
     public void printBoard() {
+        char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+        int[] nums = {1, 2, 3, 4, 5, 6, 7, 8};
+
         for (int r = 0; r < board.length; r++) {
             System.out.println();
             for (int c = 0; c < board.length; c++) {
+                if (c == 0) /*System.out.print(letters[r] + " ");*/ System.out.print(nums[r] + " ");
                 if (board[r][c].getPiece() != null) {
                     System.out.print(board[r][c].getPiece().getName() + " ");
                 } else System.out.print("-- ");
             }
         }
+        System.out.println();
+        for (int i = 0; i < board.length; i++) {
+            if (i == 0) System.out.print("  ");
+            System.out.print(nums[i] + "  ");
+        }
+        System.out.println();
         System.out.println();
     }
 
