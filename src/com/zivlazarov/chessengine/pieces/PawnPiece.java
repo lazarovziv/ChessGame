@@ -69,7 +69,9 @@ public class PawnPiece implements Piece {
 
     @Override
     public void refresh() {
-        tilesToMoveTo.clear();
+        if (tilesToMoveTo.size() != 0) {
+            tilesToMoveTo.clear();
+        }
         generateTilesToMoveTo();
     }
 
