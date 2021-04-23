@@ -1,10 +1,7 @@
 package com.zivlazarov.chessengine.ui;
 
 import com.zivlazarov.chessengine.pieces.*;
-import com.zivlazarov.chessengine.utils.Board;
-import com.zivlazarov.chessengine.utils.Piece;
-import com.zivlazarov.chessengine.utils.PieceColor;
-import com.zivlazarov.chessengine.utils.Tile;
+import com.zivlazarov.chessengine.utils.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -15,6 +12,8 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class Game extends Application {
 
@@ -36,6 +35,21 @@ public class Game extends Application {
 //                "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn"};
 //        String[] blackPieces = {"blackRook", "blackKnight", "blackBishop", "blackKing", "blackQueen", "blackBishop", "blackKnight", "blackRook",
 //                "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn"};
+
+        boolean gameStarted = false;
+
+        String answer = "";
+
+        do {
+            System.out.println("Would you like to start a game? (y/n)");
+
+            Scanner scanner = new Scanner(System.in);
+            answer = scanner.nextLine();
+
+            if (answer.equals("y") || answer.equals("Y")) gameStarted = true;
+            else if (answer.equals("n") || answer.equals("N")) System.exit(0);
+
+        } while (!gameStarted);
 
         for (int i = 0; i < board.getBoard().length; i++) {
             for (int j = 0; j < board.getBoard().length; j++) {
@@ -125,12 +139,15 @@ public class Game extends Application {
         blackRook0, blackRook1, blackKnight0, blackKnight1, blackBishop0, blackBishop1, blackQueen, blackKing, blackPawn0, blackPawn1, blackPawn2,
                 blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7};
 
-        for (Tile[] tiles : board.getBoard()) {
-            for (Tile tile : tiles) {
-                if (tile.getPieceImageView() == null) continue;
-                gridPane.add(tile.getPieceImageView(), tile.getCol(), tile.getCol());
-            }
-        }
+        // !!!!!!!!!!!!!!!!!!!!!
+//        for (Tile[] tiles : board.getBoard()) {
+//            for (Tile tile : tiles) {
+//                if (tile.getPieceImageView() == null) continue;
+//                gridPane.add(tile.getPieceImageView(), tile.getCol(), tile.getCol());
+//            }
+//        }
+
+        updateBoard();
 
         Scene scene = new Scene(gridPane, 225*8,225*8);
         stage.setTitle("Chess");
@@ -138,67 +155,72 @@ public class Game extends Application {
         stage.setResizable(false);
         stage.show();
 
-        //        blackKnight0.moveToTile(board.getBoard()[5][2]);
-        movePieceToTile(blackKnight0, board.getBoard()[5][2]);
-        board.printBoard();
-        updateBoard();
+//        //        blackKnight0.moveToTile(board.getBoard()[5][2]);
+//        movePieceToTile(blackKnight0, board.getBoard()[5][2]);
+//        board.printBoard();
+//        updateBoard();
+//
+////        whitePawn0.moveToTile(board.getBoard()[3][0]);
+//        movePieceToTile(whitePawn0, board.getBoard()[3][0]);
+//        board.printBoard();
+//        updateBoard();
+//
+////        blackKnight0.moveToTile(board.getBoard()[3][1]);
+//        movePieceToTile(blackKnight0, board.getBoard()[3][1]);
+//        board.printBoard();
+//        updateBoard();
+//
+////        whitePawn1.moveToTile(board.getBoard()[3][1]);
+//        movePieceToTile(whitePawn1, board.getBoard()[3][1]);
+//        board.printBoard();
+//        updateBoard();
 
-//        whitePawn0.moveToTile(board.getBoard()[3][0]);
-        movePieceToTile(whitePawn0, board.getBoard()[3][0]);
-        board.printBoard();
-        updateBoard();
+//        blackPawn0.setOnClickListener();
+//        blackPawn1.setOnClickListener();
+//        blackPawn2.setOnClickListener();
+//        blackPawn3.setOnClickListener();
+//        blackPawn4.setOnClickListener();
+//        blackPawn5.setOnClickListener();
+//        blackPawn6.setOnClickListener();
+//        blackPawn7.setOnClickListener();
+//
+//        whitePawn0.setOnClickListener();
+//        whitePawn1.setOnClickListener();
+//        whitePawn2.setOnClickListener();
+//        whitePawn3.setOnClickListener();
+//        whitePawn4.setOnClickListener();
+//        whitePawn5.setOnClickListener();
+//        whitePawn6.setOnClickListener();
+//        whitePawn7.setOnClickListener();
+//
+//        blackRook0.setOnClickListener();
+//        blackRook1.setOnClickListener();
+//
+//        whiteRook0.setOnClickListener();
+//        whiteRook1.setOnClickListener();
+//
+//        blackKnight0.setOnClickListener();
+//        blackKnight1.setOnClickListener();
+//
+//        whiteKnight0.setOnClickListener();
+//        whiteKnight1.setOnClickListener();
+//
+//        blackBishop0.setOnClickListener();
+//        blackBishop1.setOnClickListener();
+//
+//        whiteBishop0.setOnClickListener();
+//        whiteBishop1.setOnClickListener();
+//
+//        blackQueen.setOnClickListener();
+//        whiteQueen.setOnClickListener();
+//
+//        blackKing.setOnClickListener();
+//        whiteKing.setOnClickListener();
 
-//        blackKnight0.moveToTile(board.getBoard()[3][1]);
-        movePieceToTile(blackKnight0, board.getBoard()[3][1]);
-        board.printBoard();
-        updateBoard();
-
-//        whitePawn1.moveToTile(board.getBoard()[3][1]);
-        movePieceToTile(whitePawn1, board.getBoard()[3][1]);
-        board.printBoard();
-        updateBoard();
-
-        blackPawn0.setOnClickListener();
-        blackPawn1.setOnClickListener();
-        blackPawn2.setOnClickListener();
-        blackPawn3.setOnClickListener();
-        blackPawn4.setOnClickListener();
-        blackPawn5.setOnClickListener();
-        blackPawn6.setOnClickListener();
-        blackPawn7.setOnClickListener();
-
-        whitePawn0.setOnClickListener();
-        whitePawn1.setOnClickListener();
-        whitePawn2.setOnClickListener();
-        whitePawn3.setOnClickListener();
-        whitePawn4.setOnClickListener();
-        whitePawn5.setOnClickListener();
-        whitePawn6.setOnClickListener();
-        whitePawn7.setOnClickListener();
-
-        blackRook0.setOnClickListener();
-        blackRook1.setOnClickListener();
-
-        whiteRook0.setOnClickListener();
-        whiteRook1.setOnClickListener();
-
-        blackKnight0.setOnClickListener();
-        blackKnight1.setOnClickListener();
-
-        whiteKnight0.setOnClickListener();
-        whiteKnight1.setOnClickListener();
-
-        blackBishop0.setOnClickListener();
-        blackBishop1.setOnClickListener();
-
-        whiteBishop0.setOnClickListener();
-        whiteBishop1.setOnClickListener();
-
-        blackQueen.setOnClickListener();
-        whiteQueen.setOnClickListener();
-
-        blackKing.setOnClickListener();
-        whiteKing.setOnClickListener();
+//        while (gameStarted) {
+//            updateBoard();
+//
+//        }
     }
 
     public static ImageView createImageView(String fileName) {
