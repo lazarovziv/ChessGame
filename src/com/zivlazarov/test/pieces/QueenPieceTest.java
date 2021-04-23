@@ -23,8 +23,8 @@ public class QueenPieceTest {
     public static void setup() {
         board = new Board();
         queenPiece = new QueenPiece(board, PieceColor.WHITE, board.getBoard()[3][3]);
-        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[4][3]);
-        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[5][3]);
+        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[4][3], 0);
+        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[5][3], 0);
         board.checkBoard();
     }
 

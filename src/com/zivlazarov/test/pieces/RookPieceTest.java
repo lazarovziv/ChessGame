@@ -22,9 +22,9 @@ public class RookPieceTest {
     @BeforeAll
     public static void setup() {
         board = new Board();
-        rookPiece = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0]);
-        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0]);
-        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[0][3]);
+        rookPiece = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0], 0);
+        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0], 0);
+        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[0][3], 0);
         board.checkBoard();
     }
 

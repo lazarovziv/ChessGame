@@ -22,9 +22,9 @@ public class KnightPieceTest {
     @BeforeAll
     public static void setup() {
         board = new Board();
-        knightPiece = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][1]);
-        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[2][2]);
-        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[1][3]);
+        knightPiece = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][1], 0);
+        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[2][2], 0);
+        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[1][3], 0);
         board.checkBoard();
     }
 
