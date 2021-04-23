@@ -15,13 +15,14 @@ public class BishopPiece implements Piece {
     private final ArrayList<Tile> tilesToMoveTo;
     private final Board board;
     private String name;
+    private int pieceCounter;
     private boolean isAlive = true;
     private boolean isInDanger = false;
     private Tile currentTile;
     private PieceColor pieceColor;
     private ImageView imageIcon;
 
-    public BishopPiece(Board board, PieceColor pc, Tile initTile) {
+    public BishopPiece(Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.board = board;
 
 //        name = "B";
@@ -29,13 +30,15 @@ public class BishopPiece implements Piece {
         tilesToMoveTo = new ArrayList<>();
 
         currentTile = initTile;
+        this.pieceCounter = pieceCounter;
+
         if (pieceColor == PieceColor.BLACK) {
             name = "bB";
-            board.getBlackAlivePieces().put(name, this);
+            board.getBlackAlivePieces().put(name + pieceCounter, this);
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wB";
-            board.getWhiteAlivePieces().put(name, this);
+            board.getWhiteAlivePieces().put(name + pieceCounter, this);
         }
 
         currentTile.setPiece(this);
@@ -207,9 +210,9 @@ public class BishopPiece implements Piece {
             if (!tile.isEmpty()) {
                 tile.getPiece().setIsAlive(false);
                 if (pieceColor == PieceColor.BLACK) {
-                    board.getWhiteAlivePieces().remove(tile.getPiece().getName());
+                    board.getWhiteAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 } else if (pieceColor == PieceColor.WHITE) {
-                    board.getBlackAlivePieces().remove(tile.getPiece().getName());
+                    board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
             }
             // change to selected tile
