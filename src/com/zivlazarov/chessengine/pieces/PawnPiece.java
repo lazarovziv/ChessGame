@@ -237,4 +237,9 @@ public class PawnPiece implements Piece {
             }
         });
     }
+
+    @Override
+    public boolean canMove() {
+        return tilesToMoveTo.size() != 0;
+    }
 }

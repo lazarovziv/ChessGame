@@ -20,6 +20,7 @@ public interface Piece {
     PieceColor getPieceColor();
     ImageView getImageIcon();
     Tile getCurrentTile();
+    boolean canMove();
 
     void setName(String name);
     void setIsAlive(boolean isAlive);
