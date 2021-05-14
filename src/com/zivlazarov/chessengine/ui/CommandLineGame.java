@@ -64,9 +64,9 @@ public class CommandLineGame {
         QueenPiece blackQueen = new QueenPiece(board, PieceColor.BLACK, board.getBoard()[7][3]);
 //        blackQueen.setImageIcon(createImageView("blackQueen"));
 
-        KingPiece whiteKing = new KingPiece(board, PieceColor.BLACK, board.getBoard()[0][3]);
+        KingPiece whiteKing = new KingPiece(board, PieceColor.WHITE, board.getBoard()[0][3]);
 //        whiteKing.setImageIcon(createImageView("whiteKing"));
-        KingPiece blackKing = new KingPiece(board, PieceColor.WHITE, board.getBoard()[7][4]);
+        KingPiece blackKing = new KingPiece(board, PieceColor.BLACK, board.getBoard()[7][4]);
 //        blackKing.setImageIcon(createImageView("blackKing"));
         PawnPiece whitePawn0 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0], 0);
 //        whitePawn0.setImageIcon(createImageView("whitePawn"));
@@ -102,7 +102,7 @@ public class CommandLineGame {
         PawnPiece blackPawn7 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][7], 7);
 //        blackPawn7.setImageIcon(createImageView("blackPawn"));
 
-        board.printBoard();
+//        board.printBoard();
 
         // when calling the refresh() method for every piece, first call for the pieces on the back row!!! because tiles in front of them aren't empty
 
@@ -137,20 +137,36 @@ public class CommandLineGame {
             System.out.println("Choose a piece from tile: (row, column)");
 
             do {
+                // getting row input
                 System.out.print("Row: ");
                 rowChosen = scanner.nextInt();
+
+                while (rowChosen < 1 || rowChosen > 8) {
+                    System.out.println("Please enter a value from 1 to 8: ");
+                    System.out.print("Row: ");
+                    rowChosen = scanner.nextInt();
+                }
+
+                // getting column input
                 System.out.print("Column: ");
                 colChosen = scanner.nextInt();
 
-                if (rowChosen < 1 || rowChosen > 8) {
+                while (colChosen < 1 || colChosen > 8) {
                     System.out.println("Please enter a value from 1 to 8: ");
-                    break;
-                } else if (colChosen < 1 || colChosen > 8) {
-                    System.out.println("Please enter a value from 1 to 8: ");
-                    break;
+                    System.out.print("Column: ");
+                    colChosen = scanner.nextInt();
                 }
 
+//                if (rowChosen < 1 || rowChosen > 8) {
+//                    System.out.println("Please enter a value from 1 to 8: ");
+//                    break;
+//                } else if (colChosen < 1 || colChosen > 8) {
+//                    System.out.println("Please enter a value from 1 to 8: ");
+//                    break;
+//                }
+
                 tileChosen = board.getBoard()[rowChosen-1][colChosen-1];
+                System.out.println(tileChosen.getPiece().getTilesToMoveTo().size());
 
                 if (tileChosen.isEmpty()) {
                     System.out.println("This tile is empty! Please choose another tile: ");
@@ -161,7 +177,10 @@ public class CommandLineGame {
                 }
 
             } while (rowChosen < 1 || rowChosen > 8 || colChosen < 1 || colChosen > 8 ||
-                    tileChosen.isEmpty() || tileChosen.getPiece().getPieceColor() != currentTurn);
+                    tileChosen.isEmpty() || tileChosen.getPiece().getPieceColor() != currentTurn
+                    || tileChosen.getPiece().getTilesToMoveTo().size() == 0);
+
+            board.printBoard(tileChosen);
 
             Piece pieceChosen = null;
 
@@ -174,7 +193,13 @@ public class CommandLineGame {
             Tile tileToMoveChosen;
 
             System.out.println("Please choose a tile to move to: (row, column)");
-            pieceChosen.getTilesToMoveTo().forEach(System.out::println);
+            for (int i = 0; i < pieceChosen.getTilesToMoveTo().size(); i++) {
+                if (i == pieceChosen.getTilesToMoveTo().size() - 1) {
+                    System.out.print(pieceChosen.getTilesToMoveTo().get(i) + " ");
+                } else System.out.print(pieceChosen.getTilesToMoveTo().get(i) + ", ");
+            }
+
+            System.out.println();
 
             do {
                 System.out.print("Row: ");
