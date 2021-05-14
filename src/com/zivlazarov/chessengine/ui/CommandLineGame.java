@@ -120,7 +120,7 @@ public class CommandLineGame {
 
         while (gameStarted) {
             board.checkBoard();
-            board.printBoard();
+//            board.printBoard();
 
             PieceColor currentTurn = playersColors[(turn + playersColors.length) % 2];
 
@@ -129,6 +129,10 @@ public class CommandLineGame {
             } else {
                 System.out.println(currentTurn + " turn: ");
             }
+
+            // show board to player from his side of view
+            if (turn % 2 == 0) board.printBoardUpsideDown();
+            else board.printBoard();
 
             int rowChosen;
             int colChosen;
@@ -166,21 +170,22 @@ public class CommandLineGame {
 //                }
 
                 tileChosen = board.getBoard()[rowChosen-1][colChosen-1];
-                System.out.println(tileChosen.getPiece().getTilesToMoveTo().size());
 
                 if (tileChosen.isEmpty()) {
                     System.out.println("This tile is empty! Please choose another tile: ");
                 } else if (tileChosen.getPiece().getPieceColor() != currentTurn) {
                     System.out.println("Please choose a " + currentTurn + " piece!");
-                } else if (tileChosen.getPiece().getTilesToMoveTo().size() == 0) {
+                } else if (!tileChosen.getPiece().canMove()) {
                     System.out.println("This piece can't move!");
                 }
 
             } while (rowChosen < 1 || rowChosen > 8 || colChosen < 1 || colChosen > 8 ||
                     tileChosen.isEmpty() || tileChosen.getPiece().getPieceColor() != currentTurn
-                    || tileChosen.getPiece().getTilesToMoveTo().size() == 0);
+                    || !tileChosen.getPiece().canMove());
 
-            board.printBoard(tileChosen);
+            // show board to player from his side of view
+            if (turn % 2 == 0) board.printBoardUpsideDown(tileChosen);
+            else board.printBoard(tileChosen);
 
             Piece pieceChosen = null;
 

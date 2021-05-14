@@ -114,10 +114,7 @@ public class Board {
     }
 
     public boolean canKingEscape(KingPiece kingPiece) {
-        if (kingPiece.getTilesToMoveTo().size() == 0) {
-            return false;
-        }
-        return true;
+        return kingPiece.canMove();
     }
 
     public void printBoard() {
@@ -142,6 +139,27 @@ public class Board {
         System.out.println();
     }
 
+    public void printBoardUpsideDown() {
+        int[] nums = {1, 2, 3, 4, 5, 6, 7, 8};
+
+        for (int r = board.length - 1; r >= 0; r--) {
+            System.out.println();
+            for (int c = board.length - 1; c >= 0; c--) {
+                if (c == board.length - 1) System.out.print(nums[r] + " ");
+                if (board[r][c].getPiece() != null) {
+                    System.out.print(board[r][c].getPiece().getName() + " ");
+                } else System.out.print("-- ");
+            }
+        }
+        System.out.println();
+        for (int i = nums.length - 1; i >= 0; i--) {
+            if (i == nums.length - 1) System.out.print("  ");
+            System.out.print(nums[i] + "  ");
+        }
+        System.out.println();
+        System.out.println();
+    }
+
     public void printBoard(Tile tileChosen) {
         char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
         int[] nums = {1, 2, 3, 4, 5, 6, 7, 8};
@@ -160,6 +178,29 @@ public class Board {
         System.out.println();
         for (int i = 0; i < board.length; i++) {
             if (i == 0) System.out.print("  ");
+            System.out.print(nums[i] + "  ");
+        }
+        System.out.println();
+        System.out.println();
+    }
+
+    public void printBoardUpsideDown(Tile tileChosen) {
+        int[] nums = {1, 2, 3, 4, 5, 6, 7, 8};
+
+        for (int r = board.length - 1; r >= 0; r--) {
+            System.out.println();
+            for (int c = board.length - 1; c >= 0; c--) {
+                if (c == board.length - 1) /*System.out.print(letters[r] + " ");*/ System.out.print(nums[r] + " ");
+                if (board[r][c].getPiece() != null) {
+                    if (board[r][c] == tileChosen) {
+                        System.out.print(ANSI_RED + board[r][c].getPiece().getName() + " " + ANSI_RESET);
+                    } else System.out.print(board[r][c].getPiece().getName() + " ");
+                } else System.out.print("-- ");
+            }
+        }
+        System.out.println();
+        for (int i = board.length - 1; i >= 0; i--) {
+            if (i == board.length - 1) System.out.print("  ");
             System.out.print(nums[i] + "  ");
         }
         System.out.println();
