@@ -1,4 +1,14 @@
-class Player {
+package com.zivlazarov.chessengine.ui;
+
+import com.zivlazarov.chessengine.utils.Board;
+import com.zivlazarov.chessengine.utils.Piece;
+import com.zivlazarov.chessengine.utils.PieceColor;
+import com.zivlazarov.chessengine.utils.Tile;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Player {
 
     private Player opponentPlayer;
     private Board board;
@@ -9,11 +19,20 @@ class Player {
     private List<Piece> deadPieces;
     private boolean hasWonGame;
     private boolean startsGame;
-    
-    public Player(Board b, PieceColor pc, String n, boolean sg) {
+
+    public Player(Board b, PieceColor pc, boolean sg) {
         board = b;
         playerColor = pc;
-        name = n;
+        alivePieces = new ArrayList();
+        deadPieces = new ArrayList();
+        hasWonGame = false;
+        startsGame = sg;
+    }
+    
+    public Player(Board b, PieceColor pc, String name, boolean sg) {
+        board = b;
+        playerColor = pc;
+        this.name = name;
         alivePieces = new ArrayList();
         deadPieces = new ArrayList();
         hasWonGame = false;
@@ -23,7 +42,7 @@ class Player {
     public boolean movePiece(Piece piece, Tile targetTile) {
         if (alivePieces.contains(piece)) {
             if (piece.getTilesToMoveTo().contains(targetTile)) {
-                piece.moveToTile(targtTile));
+                piece.moveToTile(targetTile);
                 return true;
             }
         }
@@ -52,5 +71,17 @@ class Player {
     
     public List<Piece> getDeadPieces() {
         return deadPieces;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setOpponentPlayer(Player op) {
+        opponentPlayer = op;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

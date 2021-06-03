@@ -1,8 +1,12 @@
 package com.zivlazarov.chessengine.utils;
 
 import com.zivlazarov.chessengine.pieces.KingPiece;
+import com.zivlazarov.chessengine.pieces.KnightPiece;
+import com.zivlazarov.chessengine.ui.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Board {
@@ -59,9 +63,14 @@ public class Board {
         */
     }
 
-    public void checkBoard(PieceColor currentTurn) {
+    public void checkBoard(Player currentPlayer) {
+        PieceColor currentTurn = currentPlayer.getPlayerColor();
         for (Piece piece : whiteAlivePieces.values()) piece.refresh();
         for (Piece piece : blackAlivePieces.values()) piece.refresh();
+
+        List<Piece> threateningBlackPieces = new ArrayList<>();
+        List<Piece> threateningWhitePieces = new ArrayList<>();
+
 
         if (currentTurn == PieceColor.WHITE) {
             for (Piece blackPiece : blackAlivePieces.values()) {
@@ -78,7 +87,7 @@ public class Board {
         }
     }
 
-    public boolean pieceCanGetInTheWayOfPiece(Piece defendingPiece, Piece threateningPiece) {
+    public boolean canPieceGetInTheWayOfPiece(Piece defendingPiece, Piece threateningPiece) {
 
 
         return false;

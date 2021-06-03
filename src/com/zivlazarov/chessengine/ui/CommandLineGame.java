@@ -1,12 +1,11 @@
 package com.zivlazarov.chessengine.ui;
 
 import com.zivlazarov.chessengine.pieces.*;
-import com.zivlazarov.chessengine.utils.Board;
-import com.zivlazarov.chessengine.utils.Piece;
-import com.zivlazarov.chessengine.utils.PieceColor;
-import com.zivlazarov.chessengine.utils.Tile;
+import com.zivlazarov.chessengine.utils.*;
 
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class CommandLineGame {
 
@@ -16,6 +15,12 @@ public class CommandLineGame {
     public static void main(String[] args) {
 
         boolean gameStarted = false;
+
+        String whitePlayerName = "";
+        String blackPlayerName = "";
+
+        Player whitePlayer = new Player(board, PieceColor.WHITE, "Ziv", true);
+        Player blackPlayer = new Player(board, PieceColor.BLACK, "Opponent", false);
 
         PieceColor[] playersColors = {PieceColor.WHITE, PieceColor.BLACK};
 
@@ -31,6 +36,20 @@ public class CommandLineGame {
             else if (answer.equals("n") || answer.equals("N")) System.exit(0);
 
         } while (!gameStarted);
+
+        do {
+            System.out.println("Who plays white? ");
+
+            whitePlayerName = scanner.nextLine();
+            whitePlayer.setName(whitePlayerName);
+
+            System.out.println("Who plays black? ");
+
+            blackPlayerName = scanner.nextLine();
+            blackPlayer.setName(blackPlayerName);
+            System.out.println();
+
+        } while (whitePlayerName.equals("") || blackPlayerName.equals(""));
 
         RookPiece whiteRook0 = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0], 0);
 //        whiteRook0.setImageIcon(createImageView("whiteRook"));
@@ -115,6 +134,17 @@ public class CommandLineGame {
 //        ArrayList<String> piecesNames = new ArrayList<>();
 //        Collections.addAll(piecesNames, pn);
 
+        // adding players' alive pieces
+        whitePlayer.getAlivePieces().addAll(
+                Arrays.stream(allPieces)
+                .filter(piece -> piece.getPieceColor() == PieceColor.WHITE)
+                .collect(Collectors.toList()));
+
+        blackPlayer.getAlivePieces().addAll(
+                Arrays.stream(allPieces)
+                .filter(piece -> piece.getPieceColor() == PieceColor.BLACK)
+                .collect(Collectors.toList()));
+
         // white always starts first
         int turn = 0;
 
@@ -124,10 +154,26 @@ public class CommandLineGame {
 
             PieceColor currentTurn = playersColors[(turn + playersColors.length) % 2];
 
-            if (turn == 0) {
-                System.out.println(currentTurn + " starts! ");
+            Player currentPlayer = null;
+            if (currentTurn == whitePlayer.getPlayerColor()) {
+                currentPlayer = whitePlayer;
+            } else currentPlayer = blackPlayer;
+
+            if (board.getGameSituation() == GameSituation.CHECKMATE) {
+                System.out.println("Checkmate! " + currentPlayer.getName() + " wins!");
+                break;
+            } else if (board.getGameSituation() == GameSituation.DRAW) {
+                System.out.println("Draw! ");
+                break;
+            } else if (board.getGameSituation() == GameSituation.CHECK) {
+                System.out.println("Check! " + currentPlayer.getName() + "'s King is in danger!");
+                System.out.println(currentPlayer.getName() + "'s turn: ");
             } else {
-                System.out.println(currentTurn + " turn: ");
+                if (turn == 0) {
+                    System.out.println(currentPlayer.getName() + " starts! ");
+                } else {
+                    System.out.println(currentPlayer.getName() + "'s turn: ");
+                }
             }
 
             // show board to player from his side of view
@@ -173,8 +219,8 @@ public class CommandLineGame {
 
                 if (tileChosen.isEmpty()) {
                     System.out.println("This tile is empty! Please choose another tile: ");
-                } else if (tileChosen.getPiece().getPieceColor() != currentTurn) {
-                    System.out.println("Please choose a " + currentTurn + " piece!");
+                } else if (tileChosen.getPiece().getPieceColor() != currentPlayer.getPlayerColor()) {
+                    System.out.println("Please choose a " + currentPlayer.getPlayerColor() + " piece!");
                 } else if (!tileChosen.getPiece().canMove()) {
                     System.out.println("This piece can't move!");
                 }
@@ -220,9 +266,11 @@ public class CommandLineGame {
 
             } while (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen));
 
-            pieceChosen.moveToTile(tileToMoveChosen);
+            currentPlayer.movePiece(pieceChosen, tileToMoveChosen);
+//            pieceChosen.moveToTile(tileToMoveChosen);
 
             turn = turn + 1;
+            System.out.println();
         }
     }
 
