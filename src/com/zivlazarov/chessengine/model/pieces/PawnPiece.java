@@ -1,11 +1,13 @@
-package com.zivlazarov.chessengine.pieces;
-import com.zivlazarov.chessengine.utils.Board;
-import com.zivlazarov.chessengine.utils.Piece;
-import com.zivlazarov.chessengine.utils.PieceColor;
-import com.zivlazarov.chessengine.utils.Tile;
+package com.zivlazarov.chessengine.model.pieces;
+import com.zivlazarov.chessengine.model.utils.Board;
+import com.zivlazarov.chessengine.model.utils.Piece;
+import com.zivlazarov.chessengine.model.utils.PieceColor;
+import com.zivlazarov.chessengine.model.utils.Tile;
 import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
@@ -80,47 +82,112 @@ public class PawnPiece implements Piece {
 
     @Override
     public void generateTilesToMoveTo() {
+        Map<PieceColor, Integer> map = new HashMap<>();
+        map.put(PieceColor.WHITE, 1);
+        map.put(PieceColor.BLACK, -1);
+        int[] eatingDirections = new int[] {-1, 1};
+
         int x = currentTile.getRow();
         int y = currentTile.getCol();
 
         boolean canMoveFurther = !hasMoved;
 
-        // if it's white, it's only way forward is "down the matrix" which is using a lower x value
-        if (pieceColor == PieceColor.BLACK) {
-            if (x - 1 < 0) return;
-            if (board.getBoard()[x-1][y].isEmpty()) {
-                tilesToMoveTo.add(board.getBoard()[x-1][y]);
-                // checking canMoveFurther for another step
-                if (canMoveFurther) {
-                    if (x - 2 < 0) return;
-                    if (board.getBoard()[x-2][y].isEmpty()) {
-                        tilesToMoveTo.add(board.getBoard()[x-2][y]);
-                    } else if (board.getBoard()[x-2][y].getPiece().getPieceColor() != pieceColor) {
-                        tilesToMoveTo.add(board.getBoard()[x-2][y]);
-                    }
+        int direction = map.get(pieceColor);
+        int longDirection = direction * 2;
+
+        if (x + map.get(pieceColor) > 7 ||  x + map.get(pieceColor) < 0) return;
+
+        if (board.getBoard()[x+direction][y].isEmpty()) {
+            tilesToMoveTo.add(board.getBoard()[x+direction][y]);
+            if (canMoveFurther) {
+                if (x + longDirection < 0 || x + longDirection > 7) return;
+                if (board.getBoard()[x+longDirection][y].isEmpty()) {
+                    tilesToMoveTo.add(board.getBoard()[x+longDirection][y]);
                 }
-            } else if (board.getBoard()[x-1][y].getPiece().getPieceColor() != pieceColor) {
-                tilesToMoveTo.add(board.getBoard()[x-1][y]);
             }
         }
-        // if black, forward means "going up the matrix" which is using a higher x value
-        if (pieceColor == PieceColor.WHITE) {
-            if (board.getBoard()[x+1][y].isEmpty()) {
-                tilesToMoveTo.add(board.getBoard()[x+1][y]);
-                if (canMoveFurther) {
-                    if (x + 2 > 7) return;
-                    if (board.getBoard()[x+2][y].isEmpty()) {
-                        tilesToMoveTo.add(board.getBoard()[x+2][y]);
-                    } else if (board.getBoard()[x+2][y].getPiece().getPieceColor() != pieceColor) {
-                        tilesToMoveTo.add(board.getBoard()[x+2][y]);
-                    }
-                }
-            } else if (board.getBoard()[x+1][y].getPiece().getPieceColor() != pieceColor) {
-                tilesToMoveTo.add(board.getBoard()[x+1][y]);
+        for (int d : eatingDirections) {
+            if (y + d > 7 || y + d < 0) return;
+            if (!board.getBoard()[x+direction][y+d].isEmpty() &&
+                    board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[x+direction][y+d]);
             }
-
         }
     }
+
+//    @Override
+//    public void asdgenerateTilesToMoveTo() {
+//        int x = currentTile.getRow();
+//        int y = currentTile.getCol();
+//
+//        boolean canMoveFurther = !hasMoved;
+//
+//        // if it's white, it's only way forward is "down the matrix" which is using a lower x value
+//        if (pieceColor == PieceColor.BLACK) {
+//            if (x - 1 < 0) return;
+//            if (board.getBoard()[x-1][y].isEmpty()) {
+//                tilesToMoveTo.add(board.getBoard()[x-1][y]);
+//                // checking canMoveFurther for another step
+//                if (canMoveFurther) {
+//                    if (x - 2 < 0) return;
+//                    if (board.getBoard()[x-2][y].isEmpty()) {
+//                        tilesToMoveTo.add(board.getBoard()[x-2][y]);
+//                    } else if (board.getBoard()[x-2][y].getPiece().getPieceColor() != pieceColor) {
+//                        tilesToMoveTo.add(board.getBoard()[x-2][y]);
+//                    }
+//                }
+//            } else if (board.getBoard()[x-1][y].getPiece().getPieceColor() != pieceColor) {
+//                if (board.getBoard()[x-1][y+1].getPiece() != null) {
+//                    if (board.getBoard()[x-1][y+1].getPiece().getPieceColor() != pieceColor) {
+//                        tilesToMoveTo.add(board.getBoard()[x-1][y+1]);
+//                    }
+//                }
+//                if (board.getBoard()[x-1][y-1].getPiece() != null) {
+//                    if (board.getBoard()[x-1][y-1].getPiece().getPieceColor() != pieceColor) {
+//                        tilesToMoveTo.add(board.getBoard()[x-1][y-1]);
+//                    }
+//                }
+//            }
+//        }
+//        // if black, forward means "going up the matrix" which is using a higher x value
+//        if (pieceColor == PieceColor.WHITE) {
+//            if (x + 1 > 7) return;
+//            if (board.getBoard()[x+1][y].isEmpty()) {
+//                tilesToMoveTo.add(board.getBoard()[x+1][y]);
+//                if (canMoveFurther) {
+//                    if (x + 2 > 7) return;
+//                    if (board.getBoard()[x+2][y].isEmpty()) {
+//                        tilesToMoveTo.add(board.getBoard()[x+2][y]);
+//                    } else if (board.getBoard()[x+2][y].getPiece().getPieceColor() != pieceColor) {
+//                        tilesToMoveTo.add(board.getBoard()[x+2][y]);
+//                    }
+//                }
+//                if (board.getBoard()[x+1][y].getPiece().getPieceColor() != pieceColor) {
+//                    if (board.getBoard()[x+1][y+1].getPiece() != null) {
+//                        if (board.getBoard()[x+1][y+1].getPiece().getPieceColor() != pieceColor) {
+//                            tilesToMoveTo.add(board.getBoard()[x-1][y+1]);
+//                        }
+//                    }
+//                    if (board.getBoard()[x+1][y-1].getPiece() != null) {
+//                        if (board.getBoard()[x+1][y-1].getPiece().getPieceColor() != pieceColor) {
+//                            tilesToMoveTo.add(board.getBoard()[x-1][y-1]);
+//                        }
+//                    }
+//                }
+//            } else if (board.getBoard()[x+1][y].getPiece().getPieceColor() != pieceColor) {
+//                if (board.getBoard()[x+1][y+1].getPiece() != null) {
+//                    if (board.getBoard()[x+1][y+1].getPiece().getPieceColor() != pieceColor) {
+//                        tilesToMoveTo.add(board.getBoard()[x-1][y+1]);
+//                    }
+//                }
+//                if (board.getBoard()[x+1][y-1].getPiece() != null) {
+//                    if (board.getBoard()[x+1][y-1].getPiece().getPieceColor() != pieceColor) {
+//                        tilesToMoveTo.add(board.getBoard()[x-1][y-1]);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     @Override
     public String getName() {
@@ -214,6 +281,7 @@ public class PawnPiece implements Piece {
             // set the piece at selected tile
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
+            hasMoved = true;
             generateTilesToMoveTo();
         }
     }
