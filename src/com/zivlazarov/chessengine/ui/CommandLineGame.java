@@ -1,7 +1,8 @@
 package com.zivlazarov.chessengine.ui;
 
-import com.zivlazarov.chessengine.pieces.*;
-import com.zivlazarov.chessengine.utils.*;
+import com.zivlazarov.chessengine.controllers.PlayerController;
+import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.utils.*;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -19,8 +20,12 @@ public class CommandLineGame {
         String whitePlayerName = "";
         String blackPlayerName = "";
 
-        Player whitePlayer = new Player(board, PieceColor.WHITE, "Ziv", true);
-        Player blackPlayer = new Player(board, PieceColor.BLACK, "Opponent", false);
+        Player whitePlayer = new Player(board, PieceColor.WHITE, true);
+        Player blackPlayer = new Player(board, PieceColor.BLACK, false);
+
+//        PlayerController controller = new PlayerController(whitePlayer, blackPlayer);
+        PlayerController whiteController = new PlayerController(whitePlayer);
+        PlayerController blackController = new PlayerController(blackPlayer);
 
         PieceColor[] playersColors = {PieceColor.WHITE, PieceColor.BLACK};
 
@@ -41,12 +46,14 @@ public class CommandLineGame {
             System.out.println("Who plays white? ");
 
             whitePlayerName = scanner.nextLine();
-            whitePlayer.setName(whitePlayerName);
+            whiteController.setPlayerName(whitePlayerName);
+//            whitePlayer.setName(whitePlayerName);
 
             System.out.println("Who plays black? ");
 
             blackPlayerName = scanner.nextLine();
-            blackPlayer.setName(blackPlayerName);
+            blackController.setPlayerName(blackPlayerName);
+//            blackPlayer.setName(blackPlayerName);
             System.out.println();
 
         } while (whitePlayerName.equals("") || blackPlayerName.equals(""));
@@ -135,15 +142,20 @@ public class CommandLineGame {
 //        Collections.addAll(piecesNames, pn);
 
         // adding players' alive pieces
-        whitePlayer.getAlivePieces().addAll(
-                Arrays.stream(allPieces)
-                .filter(piece -> piece.getPieceColor() == PieceColor.WHITE)
-                .collect(Collectors.toList()));
+        whiteController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == whiteController.getPlayer().getPlayerColor());
+        blackController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == blackController.getPlayer().getPlayerColor());
+//        whiteController.addAlivePieces(allPieces);
+//        blackController.addAlivePieces(allPieces);
 
-        blackPlayer.getAlivePieces().addAll(
-                Arrays.stream(allPieces)
-                .filter(piece -> piece.getPieceColor() == PieceColor.BLACK)
-                .collect(Collectors.toList()));
+//        whitePlayer.getAlivePieces().addAll(
+//                Arrays.stream(allPieces)
+//                .filter(piece -> piece.getPieceColor() == PieceColor.WHITE)
+//                .collect(Collectors.toList()));
+//
+//        blackPlayer.getAlivePieces().addAll(
+//                Arrays.stream(allPieces)
+//                .filter(piece -> piece.getPieceColor() == PieceColor.BLACK)
+//                .collect(Collectors.toList()));
 
         // white always starts first
         int turn = 0;

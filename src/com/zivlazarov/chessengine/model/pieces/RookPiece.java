@@ -1,8 +1,8 @@
-package com.zivlazarov.chessengine.pieces;
-import com.zivlazarov.chessengine.utils.Board;
-import com.zivlazarov.chessengine.utils.Piece;
-import com.zivlazarov.chessengine.utils.PieceColor;
-import com.zivlazarov.chessengine.utils.Tile;
+package com.zivlazarov.chessengine.model.pieces;
+import com.zivlazarov.chessengine.model.utils.Board;
+import com.zivlazarov.chessengine.model.utils.Piece;
+import com.zivlazarov.chessengine.model.utils.PieceColor;
+import com.zivlazarov.chessengine.model.utils.Tile;
 import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ public class RookPiece implements Piece {
     private int pieceCounter;
     private boolean isAlive = true;
     private boolean isInDanger = false;
+    private boolean hasMoved = false;
     private Tile currentTile;
     private PieceColor pieceColor;
     private ImageView imageIcon;
@@ -79,6 +80,37 @@ public class RookPiece implements Piece {
 
     @Override
     public void generateTilesToMoveTo() {
+        int[][] directions = {
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1}
+        };
+
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
+
+        for (int[] direction : directions) {
+            int r = direction[0];
+            int c = direction[1];
+
+            if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
+            for (int i = 1; i < board.getBoard().length - 1; i++) {
+                if (x + i*r > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
+                Tile targetTile = board.getBoard()[x+r*i][y+c*i];
+                if (targetTile.isEmpty()) {
+                    tilesToMoveTo.add(targetTile);
+                } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
+                    tilesToMoveTo.add(targetTile);
+                    break;
+                }
+                if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
+            }
+        }
+    }
+
+//    @Override
+    public void asdasgenerateTilesToMoveTo() {
         int x = currentTile.getRow();
         int y = currentTile.getCol();
 
@@ -239,6 +271,8 @@ public class RookPiece implements Piece {
             // set the piece at selected tile
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
+            hasMoved = true;
+
             generateTilesToMoveTo();
         }
     }

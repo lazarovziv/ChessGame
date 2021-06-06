@@ -1,10 +1,10 @@
 package com.zivlazarov.test.pieces;
 
-import com.zivlazarov.chessengine.pieces.BishopPiece;
-import com.zivlazarov.chessengine.pieces.PawnPiece;
-import com.zivlazarov.chessengine.utils.Board;
-import com.zivlazarov.chessengine.utils.PieceColor;
-import com.zivlazarov.chessengine.utils.Tile;
+import com.zivlazarov.chessengine.model.pieces.BishopPiece;
+import com.zivlazarov.chessengine.model.pieces.PawnPiece;
+import com.zivlazarov.chessengine.model.utils.Board;
+import com.zivlazarov.chessengine.model.utils.PieceColor;
+import com.zivlazarov.chessengine.model.utils.Tile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ public class BishopPieceTest {
         board.checkBoard();
 
         List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
-//        for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
+        for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
         board.printBoard();
 
         List<Tile> tilesTrue = new ArrayList<>();
@@ -70,5 +70,17 @@ public class BishopPieceTest {
         bishopPiece.moveToTile(tile);
 
         Assertions.assertEquals(tile, bishopPiece.getCurrentTile());
+    }
+
+    @Test
+    public void testWhichTilesAreBeingGenerated() {
+        opponentPawnPiece.getCurrentTile().setPiece(null);
+        pawnPiece.getCurrentTile().setPiece(null);
+        bishopPiece.moveToTile(board.getBoard()[3][5]);
+        board.checkBoard();
+
+        List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
+        for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
+        board.printBoard();
     }
 }

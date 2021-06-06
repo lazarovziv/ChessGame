@@ -1,7 +1,6 @@
-package com.zivlazarov.chessengine.utils;
+package com.zivlazarov.chessengine.model.utils;
 
-import com.zivlazarov.chessengine.pieces.KingPiece;
-import com.zivlazarov.chessengine.pieces.KnightPiece;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.ui.Player;
 
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
-package com.zivlazarov.chessengine.pieces;
-import com.zivlazarov.chessengine.utils.Board;
-import com.zivlazarov.chessengine.utils.Piece;
-import com.zivlazarov.chessengine.utils.PieceColor;
-import com.zivlazarov.chessengine.utils.Tile;
+package com.zivlazarov.chessengine.model.pieces;
+import com.zivlazarov.chessengine.model.utils.Board;
+import com.zivlazarov.chessengine.model.utils.Piece;
+import com.zivlazarov.chessengine.model.utils.PieceColor;
+import com.zivlazarov.chessengine.model.utils.Tile;
 import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;

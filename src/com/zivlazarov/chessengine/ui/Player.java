@@ -1,9 +1,9 @@
 package com.zivlazarov.chessengine.ui;
 
-import com.zivlazarov.chessengine.utils.Board;
-import com.zivlazarov.chessengine.utils.Piece;
-import com.zivlazarov.chessengine.utils.PieceColor;
-import com.zivlazarov.chessengine.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.Board;
+import com.zivlazarov.chessengine.model.utils.Piece;
+import com.zivlazarov.chessengine.model.utils.PieceColor;
+import com.zivlazarov.chessengine.model.utils.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,23 +20,23 @@ public class Player {
     private boolean hasWonGame;
     private boolean startsGame;
 
-    public Player(Board b, PieceColor pc, boolean sg) {
+    public Player(Board b, PieceColor pc, boolean startGame) {
         board = b;
         playerColor = pc;
         alivePieces = new ArrayList();
         deadPieces = new ArrayList();
         hasWonGame = false;
-        startsGame = sg;
+        this.startsGame = startGame;
     }
     
-    public Player(Board b, PieceColor pc, String name, boolean sg) {
+    public Player(Board b, PieceColor pc, String name, boolean startsGame) {
         board = b;
         playerColor = pc;
         this.name = name;
         alivePieces = new ArrayList();
         deadPieces = new ArrayList();
         hasWonGame = false;
-        startsGame = sg;
+        this.startsGame = startsGame;
     }
     
     public boolean movePiece(Piece piece, Tile targetTile) {
@@ -75,6 +75,10 @@ public class Player {
 
     public String getName() {
         return name;
+    }
+
+    public Player getOpponentPlayer() {
+        return opponentPlayer;
     }
 
     public void setOpponentPlayer(Player op) {

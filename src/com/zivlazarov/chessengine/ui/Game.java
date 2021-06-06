@@ -1,7 +1,10 @@
 package com.zivlazarov.chessengine.ui;
 
-import com.zivlazarov.chessengine.pieces.*;
-import com.zivlazarov.chessengine.utils.*;
+import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.utils.Board;
+import com.zivlazarov.chessengine.model.utils.Piece;
+import com.zivlazarov.chessengine.model.utils.PieceColor;
+import com.zivlazarov.chessengine.model.utils.Tile;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -12,7 +15,6 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Game extends Application {

@@ -95,19 +95,19 @@ public class PawnPiece implements Piece {
         int direction = map.get(pieceColor);
         int longDirection = direction * 2;
 
-        if (x + map.get(pieceColor) > 7 ||  x + map.get(pieceColor) < 0) return;
+        if (x + map.get(pieceColor) > board.getBoard().length - 1 ||  x + map.get(pieceColor) < 0) return;
 
         if (board.getBoard()[x+direction][y].isEmpty()) {
             tilesToMoveTo.add(board.getBoard()[x+direction][y]);
             if (canMoveFurther) {
-                if (x + longDirection < 0 || x + longDirection > 7) return;
+                if (x + longDirection < 0 || x + longDirection > board.getBoard().length - 1) return;
                 if (board.getBoard()[x+longDirection][y].isEmpty()) {
                     tilesToMoveTo.add(board.getBoard()[x+longDirection][y]);
                 }
             }
         }
         for (int d : eatingDirections) {
-            if (y + d > 7 || y + d < 0) return;
+            if (y + d > board.getBoard().length - 1 || y + d < 0) return;
             if (!board.getBoard()[x+direction][y+d].isEmpty() &&
                     board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
                 tilesToMoveTo.add(board.getBoard()[x+direction][y+d]);

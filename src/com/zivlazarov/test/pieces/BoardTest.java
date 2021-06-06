@@ -1,9 +1,9 @@
 package com.zivlazarov.test.pieces;
 
-import com.zivlazarov.chessengine.pieces.KingPiece;
-import com.zivlazarov.chessengine.pieces.PawnPiece;
-import com.zivlazarov.chessengine.utils.Board;
-import com.zivlazarov.chessengine.utils.PieceColor;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.pieces.PawnPiece;
+import com.zivlazarov.chessengine.model.utils.Board;
+import com.zivlazarov.chessengine.model.utils.PieceColor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
