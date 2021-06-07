@@ -319,7 +319,7 @@ public class KingPiece implements Piece {
             // set the piece at selected tile
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
-            hasMoved = true;
+            if (!hasMoved) hasMoved = true;
 
             generateTilesToMoveTo();
         }

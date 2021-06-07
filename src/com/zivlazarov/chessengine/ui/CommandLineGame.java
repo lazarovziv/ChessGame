@@ -4,9 +4,7 @@ import com.zivlazarov.chessengine.controllers.PlayerController;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.utils.*;
 
-import java.util.Arrays;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class CommandLineGame {
 

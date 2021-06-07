@@ -62,4 +62,20 @@ public class RookPieceTest {
 
         Assertions.assertEquals(tilesTrue, tilesGenerated);
     }
+
+    @Test
+    public void testWhatTilesAreBeingGenerated() {
+        rookPiece.getCurrentTile().setPiece(null);
+        rookPiece = new RookPiece(board, PieceColor.WHITE, board.getBoard()[3][3], 0);
+        pawnPiece.getCurrentTile().setPiece(null);
+        opponentPawnPiece.getCurrentTile().setPiece(null);
+
+        board.checkBoard();
+
+        List<Tile> tilesGenerated = rookPiece.getTilesToMoveTo();
+
+        board.printBoard();
+
+        for (Tile tile : tilesGenerated) System.out.println(tile);
+    }
 }
