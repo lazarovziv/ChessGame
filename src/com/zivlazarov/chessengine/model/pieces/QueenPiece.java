@@ -76,6 +76,42 @@ public class QueenPiece implements Piece {
 
     @Override
     public void generateTilesToMoveTo() {
+        int[][] directions = {
+                {1, 0},
+                {-1, 0},
+                {0, 1},
+                {0, -1},
+                {1, 1},
+                {1, -1},
+                {-1, -1},
+                {-1, 1}
+        };
+
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
+
+        for (int[] direction : directions) {
+            int r = direction[0];
+            int c = direction[1];
+
+            if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
+
+            for (int i = 1; i < board.getBoard().length; i++) {
+                if (x + i*r > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
+                Tile targetTile = board.getBoard()[x+r*i][y+c*i];
+                if (targetTile.isEmpty()) {
+                    tilesToMoveTo.add(targetTile);
+                } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
+                    tilesToMoveTo.add(targetTile);
+                    break;
+                }
+                if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
+            }
+        }
+    }
+
+//    @Override
+    public void asfsagenerateTilesToMoveTo() {
         // queen's moves are bishop's and rook's moves, together
         // diagonal moves
         int x = currentTile.getRow();

@@ -1,5 +1,6 @@
 package com.zivlazarov.test.pieces;
 
+import com.zivlazarov.chessengine.model.pieces.BishopPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.QueenPiece;
 import com.zivlazarov.chessengine.model.utils.Board;
@@ -100,5 +101,21 @@ public class QueenPieceTest {
         tilesTrue.add(board.getBoard()[0][3]);
 
         Assertions.assertEquals(tilesTrue, tilesGenerated);
+    }
+
+    @Test
+    public void testWhatTilesAreBeingGenerated() {
+        queenPiece.getCurrentTile().setPiece(null);
+        queenPiece = new QueenPiece(board, PieceColor.WHITE, board.getBoard()[3][3]);
+        pawnPiece.getCurrentTile().setPiece(null);
+        opponentPawnPiece.getCurrentTile().setPiece(null);
+
+        board.checkBoard();
+
+        List<Tile> tilesGenerated = queenPiece.getTilesToMoveTo();
+
+        board.printBoard();
+
+        for (Tile tile : tilesGenerated) System.out.println(tile);
     }
 }
