@@ -97,7 +97,7 @@ public class BishopPiece implements Piece {
 
             if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
 
-            for (int i = 1; i < board.getBoard().length - 1; i++) {
+            for (int i = 1; i < board.getBoard().length; i++) {
                 if (x+r*i > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
                 Tile targetTile = board.getBoard()[x+r*i][y+c*i];
                 if (targetTile.isEmpty()) {

@@ -95,6 +95,7 @@ public class RookPiece implements Piece {
             int c = direction[1];
 
             if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
+
             for (int i = 1; i < board.getBoard().length; i++) {
                 if (x + i*r > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
                 Tile targetTile = board.getBoard()[x+r*i][y+c*i];

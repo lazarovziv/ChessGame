@@ -2,6 +2,7 @@ package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.pieces.BishopPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
+import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.PieceColor;
 import com.zivlazarov.chessengine.model.utils.Tile;
@@ -82,5 +83,21 @@ public class BishopPieceTest {
         List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
         for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
         board.printBoard();
+    }
+
+    @Test
+    public void testWhatTilesAreBeingGenerated() {
+        bishopPiece.getCurrentTile().setPiece(null);
+        bishopPiece = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[3][3], 0);
+        pawnPiece.getCurrentTile().setPiece(null);
+        opponentPawnPiece.getCurrentTile().setPiece(null);
+
+        board.checkBoard();
+
+        List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
+
+        board.printBoard();
+
+        for (Tile tile : tilesGenerated) System.out.println(tile);
     }
 }
