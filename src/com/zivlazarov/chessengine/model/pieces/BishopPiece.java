@@ -194,6 +194,11 @@ public class BishopPiece implements Piece {
     public Tile getCurrentTile() {
         return currentTile;
     }
+    
+    @Override
+    public int getPieceCounter() {
+        return pieceCounter;
+    }
 
     @Override
     public void setName(String name) {
