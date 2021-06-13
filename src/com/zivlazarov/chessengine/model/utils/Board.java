@@ -70,7 +70,6 @@ public class Board {
         List<Piece> threateningBlackPieces = new ArrayList<>();
         List<Piece> threateningWhitePieces = new ArrayList<>();
 
-
         if (currentTurn == PieceColor.WHITE) {
             for (Piece blackPiece : blackAlivePieces.values()) {
                 if (blackPiece.getTilesToMoveTo().contains(whiteAlivePieces.get("wK").getCurrentTile())) {

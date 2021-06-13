@@ -20,13 +20,13 @@ public class Player {
     private boolean hasWonGame;
     private boolean startsGame;
 
-    public Player(Board b, PieceColor pc, boolean startGame) {
+    public Player(Board b, PieceColor pc, boolean startsGame) {
         board = b;
         playerColor = pc;
         alivePieces = new ArrayList();
         deadPieces = new ArrayList();
         hasWonGame = false;
-        this.startsGame = startGame;
+        this.startsGame = startsGame;
     }
     
     public Player(Board b, PieceColor pc, String name, boolean startsGame) {
@@ -38,15 +38,21 @@ public class Player {
         hasWonGame = false;
         this.startsGame = startsGame;
     }
+
+    public void updatePieceAsDead(Piece piece) {
+        piece.setIsAlive(false);
+        opponentPlayer.addPieceToDead(piece);
+    }
+
+    public void updatePieceAsAlive(Piece piece) {
+        piece.setIsAlive(true);
+        addPieceToAlive(piece);
+    }
     
-    public boolean movePiece(Piece piece, Tile targetTile) {
+    public void movePiece(Piece piece, Tile targetTile) {
         if (alivePieces.contains(piece)) {
-            if (piece.getTilesToMoveTo().contains(targetTile)) {
-                piece.moveToTile(targetTile);
-                return true;
-            }
+            piece.moveToTile(targetTile);
         }
-        return false;
     }
     
     public void addPieceToAlive(Piece piece) {
@@ -87,5 +93,9 @@ public class Player {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean equals(Player other) {
+        return playerColor == other.getPlayerColor();
     }
 }

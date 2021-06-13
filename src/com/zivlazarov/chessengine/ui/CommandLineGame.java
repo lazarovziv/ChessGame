@@ -22,8 +22,8 @@ public class CommandLineGame {
         Player blackPlayer = new Player(board, PieceColor.BLACK, false);
 
 //        PlayerController controller = new PlayerController(whitePlayer, blackPlayer);
-        PlayerController whiteController = new PlayerController(whitePlayer);
-        PlayerController blackController = new PlayerController(blackPlayer);
+        PlayerController whiteController = new PlayerController(whitePlayer, blackPlayer);
+        PlayerController blackController = new PlayerController(blackPlayer, whitePlayer);
 
         PieceColor[] playersColors = {PieceColor.WHITE, PieceColor.BLACK};
 
@@ -140,8 +140,10 @@ public class CommandLineGame {
 //        Collections.addAll(piecesNames, pn);
 
         // adding players' alive pieces
-        whiteController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == whiteController.getPlayer().getPlayerColor());
-        blackController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == blackController.getPlayer().getPlayerColor());
+        whiteController.addAlivePieces(allPieces);
+        blackController.addAlivePieces(allPieces);
+//        whiteController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == whiteController.getPlayer().getPlayerColor());
+//        blackController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == blackController.getPlayer().getPlayerColor());
 //        whiteController.addAlivePieces(allPieces);
 //        blackController.addAlivePieces(allPieces);
 
@@ -164,7 +166,7 @@ public class CommandLineGame {
 
             PieceColor currentTurn = playersColors[(turn + playersColors.length) % 2];
 
-            Player currentPlayer = null;
+            Player currentPlayer;
             if (currentTurn == whitePlayer.getPlayerColor()) {
                 currentPlayer = whitePlayer;
             } else currentPlayer = blackPlayer;
@@ -192,7 +194,7 @@ public class CommandLineGame {
 
             int rowChosen;
             int colChosen;
-            Tile tileChosen = null;
+            Tile tileChosen;
 
             System.out.println("Choose a piece from tile: (row, column)");
 
@@ -216,14 +218,6 @@ public class CommandLineGame {
                     System.out.print("Column: ");
                     colChosen = scanner.nextInt();
                 }
-
-//                if (rowChosen < 1 || rowChosen > 8) {
-//                    System.out.println("Please enter a value from 1 to 8: ");
-//                    break;
-//                } else if (colChosen < 1 || colChosen > 8) {
-//                    System.out.println("Please enter a value from 1 to 8: ");
-//                    break;
-//                }
 
                 tileChosen = board.getBoard()[rowChosen-1][colChosen-1];
 
@@ -276,8 +270,8 @@ public class CommandLineGame {
 
             } while (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen));
 
-            currentPlayer.movePiece(pieceChosen, tileToMoveChosen);
-//            pieceChosen.moveToTile(tileToMoveChosen);
+            if (currentPlayer.equals(whitePlayer)) whiteController.movePiece(pieceChosen, tileToMoveChosen);
+            else blackController.movePiece(pieceChosen, tileToMoveChosen);
 
             turn = turn + 1;
             System.out.println();
