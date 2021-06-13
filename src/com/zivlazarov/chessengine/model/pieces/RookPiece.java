@@ -3,11 +3,11 @@ import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
 import com.zivlazarov.chessengine.model.utils.PieceColor;
 import com.zivlazarov.chessengine.model.utils.Tile;
-import javafx.scene.image.ImageView;
+//import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
-import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
 public class RookPiece implements Piece {
 
@@ -20,7 +20,7 @@ public class RookPiece implements Piece {
     private boolean hasMoved = false;
     private Tile currentTile;
     private PieceColor pieceColor;
-    private ImageView imageIcon;
+//    private ImageView imageIcon;
 
     public RookPiece(Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.board = board;
@@ -46,29 +46,29 @@ public class RookPiece implements Piece {
 //        generateTilesToMoveTo();
     }
 
-    public RookPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
-        this.board = board;
-
-//        name = 'R';
-        pieceColor = pc;
-        tilesToMoveTo = new ArrayList<Tile>();
-
-        currentTile = initTile;
-        if (pieceColor == PieceColor.BLACK) {
-            name = "bR";
-            board.getBlackAlivePieces().put(name, this);
-        }
-        if (pieceColor == PieceColor.WHITE) {
-            name = "wR";
-            board.getWhiteAlivePieces().put(name, this);
-        }
-
-        currentTile.setPiece(this);
-        imageIcon = imageView;
-        currentTile.setPieceImageView(imageIcon);
-
-//        generateTilesToMoveTo();
-    }
+//    public RookPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+//        this.board = board;
+//
+////        name = 'R';
+//        pieceColor = pc;
+//        tilesToMoveTo = new ArrayList<Tile>();
+//
+//        currentTile = initTile;
+//        if (pieceColor == PieceColor.BLACK) {
+//            name = "bR";
+//            board.getBlackAlivePieces().put(name, this);
+//        }
+//        if (pieceColor == PieceColor.WHITE) {
+//            name = "wR";
+//            board.getWhiteAlivePieces().put(name, this);
+//        }
+//
+//        currentTile.setPiece(this);
+//        imageIcon = imageView;
+//        currentTile.setPieceImageView(imageIcon);
+//
+////        generateTilesToMoveTo();
+//    }
 
     @Override
     public void refresh() {
@@ -205,10 +205,10 @@ public class RookPiece implements Piece {
         return isInDanger;
     }
 
-    @Override
-    public ImageView getImageIcon() {
-        return imageIcon;
-    }
+//    @Override
+//    public ImageView getImageIcon() {
+//        return imageIcon;
+//    }
 
     @Override
     public void setIsInDanger(boolean isInDanger) {
@@ -230,10 +230,10 @@ public class RookPiece implements Piece {
         this.pieceColor = pieceColor;
     }
 
-    @Override
-    public void setImageIcon(ImageView imageView) {
-        this.imageIcon = imageView;
-    }
+//    @Override
+//    public void setImageIcon(ImageView imageView) {
+//        this.imageIcon = imageView;
+//    }
 
     @Override
     public Tile getCurrentTile() {
@@ -286,17 +286,17 @@ public class RookPiece implements Piece {
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
 
-    @Override
-    public void setOnClickListener() {
-//        if (!isAlive) return;
-        if (imageIcon == null) return;
-        imageIcon.setOnMouseClicked(mouseEvent -> {
-            if (tilesToMoveTo.size() == 0) return;
-            for (Tile tile : tilesToMoveTo) {
-                tile.setTileImageView(createImageView("redTile"));
-            }
-        });
-    }
+//    @Override
+//    public void setOnClickListener() {
+////        if (!isAlive) return;
+//        if (imageIcon == null) return;
+//        imageIcon.setOnMouseClicked(mouseEvent -> {
+//            if (tilesToMoveTo.size() == 0) return;
+//            for (Tile tile : tilesToMoveTo) {
+//                tile.setTileImageView(createImageView("redTile"));
+//            }
+//        });
+//    }
 
     @Override
     public boolean canMove() {

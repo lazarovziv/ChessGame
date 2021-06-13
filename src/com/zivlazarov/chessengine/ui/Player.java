@@ -6,7 +6,9 @@ import com.zivlazarov.chessengine.model.utils.PieceColor;
 import com.zivlazarov.chessengine.model.utils.Tile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Player {
 
@@ -65,6 +67,12 @@ public class Player {
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
         }
+    }
+
+    public void addAlivePieces(Piece[] pieces) {
+        alivePieces.addAll(Arrays.stream(pieces)
+        .filter(piece -> piece.getPieceColor() == playerColor)
+        .collect(Collectors.toList()));
     }
     
     public PieceColor getPlayerColor() {

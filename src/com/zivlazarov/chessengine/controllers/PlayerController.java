@@ -22,6 +22,8 @@ public class PlayerController {
 //        this.player = player;
 //    }
 
+    public PlayerController() {}
+
     public PlayerController(Player player, Player opponentPlayer) {
         this.player = player;
         this.opponentPlayer = opponentPlayer;
@@ -49,9 +51,11 @@ public class PlayerController {
     }
 
     public void addAlivePieces(Piece[] pieces) {
-        player.getAlivePieces().addAll(Arrays.stream(pieces)
-        .filter(piece -> piece.getPieceColor() == player.getPlayerColor())
-        .collect(Collectors.toList()));
+        player.addAlivePieces(pieces);
+    }
+
+    public void addAlivePiecesToOpponent(Piece[] pieces) {
+        opponentPlayer.addAlivePieces(pieces);
     }
 
     public Player getPlayer() {
@@ -65,6 +69,8 @@ public class PlayerController {
     public void setPlayerName(String name) {
         player.setName(name);
     }
+
+    public void setOpponentPlayerName(String name) { opponentPlayer.setName(name); }
 
     public void setOpponentPlayer(Player opponentPlayer) {
         this.opponentPlayer = opponentPlayer;

@@ -1,6 +1,6 @@
 package com.zivlazarov.chessengine.model.utils;
 
-import javafx.scene.image.ImageView;
+//import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
@@ -11,14 +11,14 @@ public interface Piece {
     boolean isInDanger = false;
     final ArrayList<Tile> tilesToMoveTo = new ArrayList<>();
     PieceColor pieceColor = PieceColor.WHITE;
-    ImageView imageIcon = null;
+//    ImageView imageIcon = null;
 
     String getName();
     boolean getIsAlive();
     boolean getIsInDanger();
     ArrayList<Tile> getTilesToMoveTo();
     PieceColor getPieceColor();
-    ImageView getImageIcon();
+//    ImageView getImageIcon();
     Tile getCurrentTile();
     boolean canMove();
 
@@ -26,7 +26,7 @@ public interface Piece {
     void setIsAlive(boolean isAlive);
     void setIsInDanger(boolean isInDanger);
     void setPieceColor(PieceColor pieceColor);
-    void setImageIcon(ImageView imageView);
+//    void setImageIcon(ImageView imageView);
 
     void moveToTile(Tile tile);
 
@@ -36,7 +36,7 @@ public interface Piece {
 
     boolean isTileAvailable(Tile tile);
 
-    void setOnClickListener();
+//    void setOnClickListener();
 
     void refresh();
 }

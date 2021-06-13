@@ -3,11 +3,11 @@ import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
 import com.zivlazarov.chessengine.model.utils.PieceColor;
 import com.zivlazarov.chessengine.model.utils.Tile;
-import javafx.scene.image.ImageView;
+//import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
-import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
 public class KingPiece implements Piece {
 
@@ -19,7 +19,7 @@ public class KingPiece implements Piece {
     private boolean hasMoved = false;
     private Tile currentTile;
     private PieceColor pieceColor;
-    private ImageView imageIcon;
+//    private ImageView imageIcon;
 
     public KingPiece(Board board, PieceColor pc, Tile initTile) {
         this.board = board;
@@ -43,29 +43,29 @@ public class KingPiece implements Piece {
 //        generateTilesToMoveTo();
     }
 
-    public KingPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
-        this.board = board;
-
-//        name = 'K';
-        pieceColor = pc;
-        tilesToMoveTo = new ArrayList<>();
-
-        currentTile = initTile;
-        if (pieceColor == PieceColor.BLACK) {
-            name = "bK";
-            board.getBlackAlivePieces().put(name, this);
-        }
-        if (pieceColor == PieceColor.WHITE) {
-            name = "wK";
-            board.getWhiteAlivePieces().put(name, this);
-        }
-
-        currentTile.setPiece(this);
-        imageIcon = imageView;
-        currentTile.setPieceImageView(imageIcon);
-
-//        generateTilesToMoveTo();
-    }
+//    public KingPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+//        this.board = board;
+//
+////        name = 'K';
+//        pieceColor = pc;
+//        tilesToMoveTo = new ArrayList<>();
+//
+//        currentTile = initTile;
+//        if (pieceColor == PieceColor.BLACK) {
+//            name = "bK";
+//            board.getBlackAlivePieces().put(name, this);
+//        }
+//        if (pieceColor == PieceColor.WHITE) {
+//            name = "wK";
+//            board.getWhiteAlivePieces().put(name, this);
+//        }
+//
+//        currentTile.setPiece(this);
+//        imageIcon = imageView;
+//        currentTile.setPieceImageView(imageIcon);
+//
+////        generateTilesToMoveTo();
+//    }
 
     @Override
     public void refresh() {
@@ -269,8 +269,8 @@ public class KingPiece implements Piece {
         return pieceColor;
     }
 
-    @Override
-    public ImageView getImageIcon() { return imageIcon; }
+//    @Override
+//    public ImageView getImageIcon() { return imageIcon; }
 
     @Override
     public Tile getCurrentTile() {
@@ -295,10 +295,10 @@ public class KingPiece implements Piece {
         return false;
     }
 
-    @Override
-    public void setImageIcon(ImageView imageIcon) {
-        this.imageIcon = imageIcon;
-    }
+//    @Override
+//    public void setImageIcon(ImageView imageIcon) {
+//        this.imageIcon = imageIcon;
+//    }
 
     @Override
     public void moveToTile(Tile tile) {
@@ -332,17 +332,17 @@ public class KingPiece implements Piece {
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
 
-    @Override
-    public void setOnClickListener() {
-//        if (!isAlive) return;
-        if (imageIcon == null) return;
-        imageIcon.setOnMouseClicked(mouseEvent -> {
-            if (tilesToMoveTo.size() == 0) return;
-            for (Tile tile : tilesToMoveTo) {
-                tile.setTileImageView(createImageView("redTile"));
-            }
-        });
-    }
+//    @Override
+//    public void setOnClickListener() {
+////        if (!isAlive) return;
+//        if (imageIcon == null) return;
+//        imageIcon.setOnMouseClicked(mouseEvent -> {
+//            if (tilesToMoveTo.size() == 0) return;
+//            for (Tile tile : tilesToMoveTo) {
+//                tile.setTileImageView(createImageView("redTile"));
+//            }
+//        });
+//    }
 
     @Override
     public boolean canMove() {
