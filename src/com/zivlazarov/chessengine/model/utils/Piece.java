@@ -2,6 +2,7 @@ package com.zivlazarov.chessengine.model.utils;
 
 //import javafx.scene.image.ImageView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public interface Piece {
@@ -11,6 +12,7 @@ public interface Piece {
     boolean isInDanger = false;
     final ArrayList<Tile> tilesToMoveTo = new ArrayList<>();
     PieceColor pieceColor = PieceColor.WHITE;
+    final ArrayList<Piece> piecesUnderThreat = new ArrayList<>();
 //    ImageView imageIcon = null;
 
     String getName();
@@ -39,4 +41,6 @@ public interface Piece {
 //    void setOnClickListener();
 
     void refresh();
+
+    boolean hasMoved();
 }

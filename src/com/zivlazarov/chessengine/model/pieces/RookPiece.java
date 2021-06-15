@@ -12,12 +12,13 @@ import java.util.ArrayList;
 public class RookPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Piece> piecesUnderThreat;
     private final Board board;
     private String name;
     private int pieceCounter;
     private boolean isAlive = true;
     private boolean isInDanger = false;
-    private boolean hasMoved = false;
+    private boolean hasMoved;
     private Tile currentTile;
     private PieceColor pieceColor;
 //    private ImageView imageIcon;
@@ -28,6 +29,9 @@ public class RookPiece implements Piece {
 //        name = 'R';
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
+        piecesUnderThreat = new ArrayList<>();
+
+        hasMoved = false;
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -42,7 +46,6 @@ public class RookPiece implements Piece {
         }
 
         currentTile.setPiece(this);
-
 //        generateTilesToMoveTo();
     }
 
@@ -106,6 +109,13 @@ public class RookPiece implements Piece {
                     break;
                 }
                 if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
+            }
+        }
+        for (Tile tile : tilesToMoveTo) {
+            if (!tile.isEmpty()) {
+                if (tile.getPiece().getPieceColor() != pieceColor) {
+                    piecesUnderThreat.add(tile.getPiece());
+                }
             }
         }
     }
@@ -266,6 +276,7 @@ public class RookPiece implements Piece {
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                tile.setPiece(null);
             }
             // change to selected tile
             currentTile = tile;
@@ -301,5 +312,10 @@ public class RookPiece implements Piece {
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return hasMoved;
     }
 }

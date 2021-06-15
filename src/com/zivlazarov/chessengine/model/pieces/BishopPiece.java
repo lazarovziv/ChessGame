@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class BishopPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Piece> piecesUnderThreat;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -28,6 +29,7 @@ public class BishopPiece implements Piece {
 //        name = "B";
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<>();
+        piecesUnderThreat = new ArrayList<>();
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -107,6 +109,14 @@ public class BishopPiece implements Piece {
                     break;
                 }
                 if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
+            }
+        }
+
+        for (Tile tile : tilesToMoveTo) {
+            if (!tile.isEmpty()) {
+                if (tile.getPiece().getPieceColor() != pieceColor) {
+                    piecesUnderThreat.add(tile.getPiece());
+                }
             }
         }
     }
@@ -246,6 +256,7 @@ public class BishopPiece implements Piece {
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                tile.setPiece(null);
             }
             // change to selected tile
             currentTile = tile;
@@ -279,5 +290,10 @@ public class BishopPiece implements Piece {
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return false;
     }
 }

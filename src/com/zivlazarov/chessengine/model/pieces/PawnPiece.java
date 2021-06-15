@@ -14,6 +14,7 @@ import java.util.Map;
 public class PawnPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Piece> piecesUnderThreat;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -30,6 +31,7 @@ public class PawnPiece implements Piece {
 //        name = 'P';
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
+        piecesUnderThreat = new ArrayList<>();
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -111,8 +113,11 @@ public class PawnPiece implements Piece {
             if (!board.getBoard()[x+direction][y+d].isEmpty() &&
                     board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
                 tilesToMoveTo.add(board.getBoard()[x+direction][y+d]);
+                piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
             }
         }
+
+
     }
 
 //    @Override
@@ -275,6 +280,7 @@ public class PawnPiece implements Piece {
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                tile.setPiece(null);
             }
             // change to selected tile
             currentTile = tile;
@@ -309,5 +315,10 @@ public class PawnPiece implements Piece {
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return false;
     }
 }

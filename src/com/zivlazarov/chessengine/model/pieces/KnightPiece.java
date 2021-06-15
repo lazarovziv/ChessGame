@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class KnightPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Piece> piecesUnderThreat;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -27,6 +28,7 @@ public class KnightPiece implements Piece {
 //        name = 'N';
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
+        piecesUnderThreat = new ArrayList<>();
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -100,6 +102,14 @@ public class KnightPiece implements Piece {
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
                 tilesToMoveTo.add(targetTile);
+            }
+        }
+
+        for (Tile tile : tilesToMoveTo) {
+            if (!tile.isEmpty()) {
+                if (tile.getPiece().getPieceColor() != pieceColor) {
+                    piecesUnderThreat.add(tile.getPiece());
+                }
             }
         }
     }
@@ -245,6 +255,7 @@ public class KnightPiece implements Piece {
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                tile.setPiece(null);
             }
             // change to selected tile
             currentTile = tile;
@@ -277,5 +288,10 @@ public class KnightPiece implements Piece {
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return false;
     }
 }
