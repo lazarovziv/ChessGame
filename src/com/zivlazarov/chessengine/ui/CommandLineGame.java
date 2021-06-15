@@ -18,8 +18,8 @@ public class CommandLineGame {
         String whitePlayerName = "";
         String blackPlayerName = "";
 
-        Player whitePlayer = new Player(board, PieceColor.WHITE, true);
-        Player blackPlayer = new Player(board, PieceColor.BLACK, false);
+        Player whitePlayer = new Player(board, PieceColor.WHITE);
+        Player blackPlayer = new Player(board, PieceColor.BLACK);
 
 //        PlayerController controller = new PlayerController(whitePlayer, blackPlayer);
         PlayerController playerController = new PlayerController();
@@ -282,7 +282,31 @@ public class CommandLineGame {
 
             } while (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen));
 
-            playerController.movePiece(pieceChosen, tileToMoveChosen);
+            if (currentPlayer.equals(whitePlayer)) {
+                if (pieceChosen.getName().equals("wK") && tileToMoveChosen.equals(board.getBoard()[0][1])) {
+                    playerController.kingSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[0][0].getPiece());
+                    turn = turn + 1;
+                    System.out.println();
+                    continue;
+                } else if (pieceChosen.getName().equals("wK") && tileToMoveChosen.equals(board.getBoard()[0][5])) {
+                    playerController.queenSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[0][7].getPiece());
+                    turn = turn + 1;
+                    System.out.println();
+                    continue;
+                } else playerController.movePiece(pieceChosen, tileToMoveChosen);
+            } else if (currentPlayer.equals(blackPlayer)) {
+                if (pieceChosen.getName().equals("bK") && tileToMoveChosen.equals(board.getBoard()[7][2])) {
+                    playerController.kingSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[7][0].getPiece());
+                    turn = turn + 1;
+                    System.out.println();
+                    continue;
+                } else if (pieceChosen.getName().equals("bK") && tileToMoveChosen.equals(board.getBoard()[7][6])) {
+                    playerController.queenSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[7][7].getPiece());
+                    turn = turn + 1;
+                    System.out.println();
+                    continue;
+                } else playerController.movePiece(pieceChosen, tileToMoveChosen);
+            }
 
 //            if (currentPlayer.equals(whitePlayer)) whiteController.movePiece(pieceChosen, tileToMoveChosen);
 //            else blackController.movePiece(pieceChosen, tileToMoveChosen);
