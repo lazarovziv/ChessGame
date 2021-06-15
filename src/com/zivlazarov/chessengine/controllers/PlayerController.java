@@ -1,9 +1,11 @@
 package com.zivlazarov.chessengine.controllers;
 
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
 import com.zivlazarov.chessengine.model.utils.Tile;
-import com.zivlazarov.chessengine.ui.Player;
+import com.zivlazarov.chessengine.model.utils.Player;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
@@ -37,6 +39,14 @@ public class PlayerController {
 
     public void movePiece(Piece piece, Tile targetTile) {
         player.movePiece(piece, targetTile);
+    }
+
+    public void kingSideCastle(KingPiece kingPiece, RookPiece rookPiece) {
+        player.kingSideCastle(kingPiece, rookPiece);
+    }
+
+    public void queenSideCastle(KingPiece kingPiece, RookPiece rookPiece) {
+        player.queenSideCastle(kingPiece, rookPiece);
     }
 
     public void updateStatusOfPiece(Piece piece, boolean isAlive) {

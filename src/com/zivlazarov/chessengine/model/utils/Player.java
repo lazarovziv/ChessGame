@@ -1,9 +1,7 @@
-package com.zivlazarov.chessengine.ui;
+package com.zivlazarov.chessengine.model.utils;
 
-import com.zivlazarov.chessengine.model.utils.Board;
-import com.zivlazarov.chessengine.model.utils.Piece;
-import com.zivlazarov.chessengine.model.utils.PieceColor;
-import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.pieces.RookPiece;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +20,7 @@ public class Player {
     private boolean hasWonGame;
     private boolean startsGame;
 
-    public Player(Board b, PieceColor pc, boolean startsGame) {
+    public Player(Board b, PieceColor pc) {
         board = b;
         playerColor = pc;
         alivePieces = new ArrayList();
@@ -31,7 +29,7 @@ public class Player {
         this.startsGame = startsGame;
     }
     
-    public Player(Board b, PieceColor pc, String name, boolean startsGame) {
+    public Player(Board b, PieceColor pc, String name) {
         board = b;
         playerColor = pc;
         this.name = name;
@@ -54,6 +52,30 @@ public class Player {
     public void movePiece(Piece piece, Tile targetTile) {
         if (alivePieces.contains(piece)) {
             piece.moveToTile(targetTile);
+        }
+    }
+
+    public void kingSideCastle(KingPiece kingPiece, RookPiece rookPiece) {
+        if (playerColor == PieceColor.BLACK) {
+            movePiece(kingPiece, board.getBoard()[kingPiece.getCurrentTile().getRow()][kingPiece.getCurrentTile().getCol() + 2]);
+            movePiece(rookPiece, board.getBoard()[rookPiece.getCurrentTile().getRow()][rookPiece.getCurrentTile().getCol() - 2]);
+        }
+
+        if (playerColor == PieceColor.WHITE) {
+            movePiece(kingPiece, board.getBoard()[kingPiece.getCurrentTile().getRow()][kingPiece.getCurrentTile().getCol() - 2]);
+            movePiece(rookPiece, board.getBoard()[rookPiece.getCurrentTile().getRow()][rookPiece.getCurrentTile().getCol() + 2]);
+        }
+    }
+
+    public void queenSideCastle(KingPiece kingPiece, RookPiece rookPiece) {
+        if (playerColor == PieceColor.BLACK) {
+            movePiece(kingPiece, board.getBoard()[kingPiece.getCurrentTile().getRow()][kingPiece.getCurrentTile().getCol() - 2]);
+            movePiece(rookPiece, board.getBoard()[rookPiece.getCurrentTile().getRow()][rookPiece.getCurrentTile().getCol() + 3]);
+        }
+
+        if (playerColor == PieceColor.WHITE) {
+            movePiece(kingPiece, board.getBoard()[kingPiece.getCurrentTile().getRow()][kingPiece.getCurrentTile().getCol() + 2]);
+            movePiece(rookPiece, board.getBoard()[rookPiece.getCurrentTile().getRow()][rookPiece.getCurrentTile().getCol() - 3]);
         }
     }
     
