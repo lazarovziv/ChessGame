@@ -4,15 +4,16 @@ import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
 import com.zivlazarov.chessengine.model.utils.PieceColor;
 import com.zivlazarov.chessengine.model.utils.Tile;
-import javafx.scene.image.ImageView;
+//import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
-import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
 public class BishopPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Piece> piecesUnderThreat;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -20,7 +21,7 @@ public class BishopPiece implements Piece {
     private boolean isInDanger = false;
     private Tile currentTile;
     private PieceColor pieceColor;
-    private ImageView imageIcon;
+//    private ImageView imageIcon;
 
     public BishopPiece(Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.board = board;
@@ -28,6 +29,7 @@ public class BishopPiece implements Piece {
 //        name = "B";
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<>();
+        piecesUnderThreat = new ArrayList<>();
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -47,29 +49,29 @@ public class BishopPiece implements Piece {
 //        generateTilesToMoveTo();
     }
 
-    public BishopPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
-        this.board = board;
-
-//        name = "B";
-        pieceColor = pc;
-        tilesToMoveTo = new ArrayList<Tile>();
-
-        currentTile = initTile;
-        if (pieceColor == PieceColor.BLACK) {
-            name = "bB";
-            board.getBlackAlivePieces().put(name, this);
-        }
-        if (pieceColor == PieceColor.WHITE) {
-            name = "wB";
-            board.getWhiteAlivePieces().put(name, this);
-        }
-
-        currentTile.setPiece(this);
-        imageIcon = imageView;
-        currentTile.setPieceImageView(imageIcon);
-
-//        generateTilesToMoveTo();
-    }
+//    public BishopPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+//        this.board = board;
+//
+////        name = "B";
+//        pieceColor = pc;
+//        tilesToMoveTo = new ArrayList<Tile>();
+//
+//        currentTile = initTile;
+//        if (pieceColor == PieceColor.BLACK) {
+//            name = "bB";
+//            board.getBlackAlivePieces().put(name, this);
+//        }
+//        if (pieceColor == PieceColor.WHITE) {
+//            name = "wB";
+//            board.getWhiteAlivePieces().put(name, this);
+//        }
+//
+//        currentTile.setPiece(this);
+//        imageIcon = imageView;
+//        currentTile.setPieceImageView(imageIcon);
+//
+////        generateTilesToMoveTo();
+//    }
 
     @Override
     public void refresh() {
@@ -107,6 +109,14 @@ public class BishopPiece implements Piece {
                     break;
                 }
                 if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
+            }
+        }
+
+        for (Tile tile : tilesToMoveTo) {
+            if (!tile.isEmpty()) {
+                if (tile.getPiece().getPieceColor() != pieceColor) {
+                    piecesUnderThreat.add(tile.getPiece());
+                }
             }
         }
     }
@@ -185,10 +195,10 @@ public class BishopPiece implements Piece {
         return pieceColor;
     }
 
-    @Override
-    public ImageView getImageIcon() {
-        return imageIcon;
-    }
+//    @Override
+//    public ImageView getImageIcon() {
+//        return imageIcon;
+//    }
 
     @Override
     public Tile getCurrentTile() {
@@ -220,10 +230,10 @@ public class BishopPiece implements Piece {
         this.pieceColor = pieceColor;
     }
 
-    @Override
-    public void setImageIcon(ImageView imageIcon) {
-        this.imageIcon = imageIcon;
-    }
+//    @Override
+//    public void setImageIcon(ImageView imageIcon) {
+//        this.imageIcon = imageIcon;
+//    }
 
     @Override
     public boolean isThreatenedAtTile(Tile tile) {
@@ -251,6 +261,7 @@ public class BishopPiece implements Piece {
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                tile.setPiece(null);
             }
             // change to selected tile
             currentTile = tile;
@@ -269,20 +280,25 @@ public class BishopPiece implements Piece {
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
 
-    @Override
-    public void setOnClickListener() {
-//        if (!isAlive) return;
-        if (imageIcon == null) return;
-        imageIcon.setOnMouseClicked(mouseEvent -> {
-            if (tilesToMoveTo.size() == 0) return;
-            for (Tile tile : tilesToMoveTo) {
-                tile.setTileImageView(createImageView("redTile"));
-            }
-        });
-    }
+//    @Override
+//    public void setOnClickListener() {
+////        if (!isAlive) return;
+//        if (imageIcon == null) return;
+//        imageIcon.setOnMouseClicked(mouseEvent -> {
+//            if (tilesToMoveTo.size() == 0) return;
+//            for (Tile tile : tilesToMoveTo) {
+//                tile.setTileImageView(createImageView("redTile"));
+//            }
+//        });
+//    }
 
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return false;
     }
 }

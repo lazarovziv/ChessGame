@@ -3,17 +3,18 @@ import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
 import com.zivlazarov.chessengine.model.utils.PieceColor;
 import com.zivlazarov.chessengine.model.utils.Tile;
-import javafx.scene.image.ImageView;
+//import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
 public class PawnPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Piece> piecesUnderThreat;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -22,7 +23,7 @@ public class PawnPiece implements Piece {
     private Tile currentTile;
     private PieceColor pieceColor;
     private boolean hasMoved = false;
-    private ImageView imageIcon;
+//    private ImageView imageIcon;
 
     public PawnPiece(Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.board = board;
@@ -30,6 +31,7 @@ public class PawnPiece implements Piece {
 //        name = 'P';
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
+        piecesUnderThreat = new ArrayList<>();
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -48,29 +50,29 @@ public class PawnPiece implements Piece {
 //        generateTilesToMoveTo();
     }
 
-    public PawnPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
-        this.board = board;
-
-//        name = 'P';
-        pieceColor = pc;
-        tilesToMoveTo = new ArrayList<Tile>();
-
-        currentTile = initTile;
-        if (pieceColor == PieceColor.BLACK) {
-            name = "bP";
-            board.getBlackAlivePieces().put(name, this);
-        }
-        if (pieceColor == PieceColor.WHITE) {
-            name = "wP";
-            board.getWhiteAlivePieces().put(name, this);
-        }
-
-        currentTile.setPiece(this);
-        imageIcon = imageView;
-        currentTile.setPieceImageView(imageIcon);
-
-//        generateTilesToMoveTo();
-    }
+//    public PawnPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+//        this.board = board;
+//
+////        name = 'P';
+//        pieceColor = pc;
+//        tilesToMoveTo = new ArrayList<Tile>();
+//
+//        currentTile = initTile;
+//        if (pieceColor == PieceColor.BLACK) {
+//            name = "bP";
+//            board.getBlackAlivePieces().put(name, this);
+//        }
+//        if (pieceColor == PieceColor.WHITE) {
+//            name = "wP";
+//            board.getWhiteAlivePieces().put(name, this);
+//        }
+//
+//        currentTile.setPiece(this);
+//        imageIcon = imageView;
+//        currentTile.setPieceImageView(imageIcon);
+//
+////        generateTilesToMoveTo();
+//    }
 
     @Override
     public void refresh() {
@@ -111,8 +113,11 @@ public class PawnPiece implements Piece {
             if (!board.getBoard()[x+direction][y+d].isEmpty() &&
                     board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
                 tilesToMoveTo.add(board.getBoard()[x+direction][y+d]);
+                piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
             }
         }
+
+
     }
 
 //    @Override
@@ -214,10 +219,10 @@ public class PawnPiece implements Piece {
         return pieceColor;
     }
 
-    @Override
-    public ImageView getImageIcon() {
-        return imageIcon;
-    }
+//    @Override
+//    public ImageView getImageIcon() {
+//        return imageIcon;
+//    }
 
     @Override
     public Tile getCurrentTile() {
@@ -249,10 +254,10 @@ public class PawnPiece implements Piece {
         this.pieceColor = pieceColor;
     }
 
-    @Override
-    public void setImageIcon(ImageView imageIcon) {
-        this.imageIcon = imageIcon;
-    }
+//    @Override
+//    public void setImageIcon(ImageView imageIcon) {
+//        this.imageIcon = imageIcon;
+//    }
 
     @Override
     public boolean isThreatenedAtTile(Tile tile) {
@@ -280,6 +285,7 @@ public class PawnPiece implements Piece {
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                tile.setPiece(null);
             }
             // change to selected tile
             currentTile = tile;
@@ -298,21 +304,26 @@ public class PawnPiece implements Piece {
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
 
-    @Override
-    public void setOnClickListener() {
-//        if (!isAlive) return;
-        if (imageIcon == null) return;
-        imageIcon.setOnMouseClicked(mouseEvent -> {
-            if (tilesToMoveTo.size() == 0) return;
-            for (Tile tile : tilesToMoveTo) {
-                tile.setTileImageView(createImageView("redTile"));
-                System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
-            }
-        });
-    }
+//    @Override
+//    public void setOnClickListener() {
+////        if (!isAlive) return;
+//        if (imageIcon == null) return;
+//        imageIcon.setOnMouseClicked(mouseEvent -> {
+//            if (tilesToMoveTo.size() == 0) return;
+//            for (Tile tile : tilesToMoveTo) {
+//                tile.setTileImageView(createImageView("redTile"));
+//                System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
+//            }
+//        });
+//    }
 
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return false;
     }
 }

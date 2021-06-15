@@ -3,24 +3,25 @@ import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
 import com.zivlazarov.chessengine.model.utils.PieceColor;
 import com.zivlazarov.chessengine.model.utils.Tile;
-import javafx.scene.image.ImageView;
+//import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 
-import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
 public class RookPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Piece> piecesUnderThreat;
     private final Board board;
     private String name;
     private int pieceCounter;
     private boolean isAlive = true;
     private boolean isInDanger = false;
-    private boolean hasMoved = false;
+    private boolean hasMoved;
     private Tile currentTile;
     private PieceColor pieceColor;
-    private ImageView imageIcon;
+//    private ImageView imageIcon;
 
     public RookPiece(Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.board = board;
@@ -28,6 +29,9 @@ public class RookPiece implements Piece {
 //        name = 'R';
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
+        piecesUnderThreat = new ArrayList<>();
+
+        hasMoved = false;
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -42,33 +46,32 @@ public class RookPiece implements Piece {
         }
 
         currentTile.setPiece(this);
-
 //        generateTilesToMoveTo();
     }
 
-    public RookPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
-        this.board = board;
-
-//        name = 'R';
-        pieceColor = pc;
-        tilesToMoveTo = new ArrayList<Tile>();
-
-        currentTile = initTile;
-        if (pieceColor == PieceColor.BLACK) {
-            name = "bR";
-            board.getBlackAlivePieces().put(name, this);
-        }
-        if (pieceColor == PieceColor.WHITE) {
-            name = "wR";
-            board.getWhiteAlivePieces().put(name, this);
-        }
-
-        currentTile.setPiece(this);
-        imageIcon = imageView;
-        currentTile.setPieceImageView(imageIcon);
-
-//        generateTilesToMoveTo();
-    }
+//    public RookPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
+//        this.board = board;
+//
+////        name = 'R';
+//        pieceColor = pc;
+//        tilesToMoveTo = new ArrayList<Tile>();
+//
+//        currentTile = initTile;
+//        if (pieceColor == PieceColor.BLACK) {
+//            name = "bR";
+//            board.getBlackAlivePieces().put(name, this);
+//        }
+//        if (pieceColor == PieceColor.WHITE) {
+//            name = "wR";
+//            board.getWhiteAlivePieces().put(name, this);
+//        }
+//
+//        currentTile.setPiece(this);
+//        imageIcon = imageView;
+//        currentTile.setPieceImageView(imageIcon);
+//
+////        generateTilesToMoveTo();
+//    }
 
     @Override
     public void refresh() {
@@ -106,6 +109,13 @@ public class RookPiece implements Piece {
                     break;
                 }
                 if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
+            }
+        }
+        for (Tile tile : tilesToMoveTo) {
+            if (!tile.isEmpty()) {
+                if (tile.getPiece().getPieceColor() != pieceColor) {
+                    piecesUnderThreat.add(tile.getPiece());
+                }
             }
         }
     }
@@ -205,10 +215,10 @@ public class RookPiece implements Piece {
         return isInDanger;
     }
 
-    @Override
-    public ImageView getImageIcon() {
-        return imageIcon;
-    }
+//    @Override
+//    public ImageView getImageIcon() {
+//        return imageIcon;
+//    }
 
     @Override
     public void setIsInDanger(boolean isInDanger) {
@@ -230,10 +240,10 @@ public class RookPiece implements Piece {
         this.pieceColor = pieceColor;
     }
 
-    @Override
-    public void setImageIcon(ImageView imageView) {
-        this.imageIcon = imageView;
-    }
+//    @Override
+//    public void setImageIcon(ImageView imageView) {
+//        this.imageIcon = imageView;
+//    }
 
     @Override
     public Tile getCurrentTile() {
@@ -271,6 +281,7 @@ public class RookPiece implements Piece {
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                tile.setPiece(null);
             }
             // change to selected tile
             currentTile = tile;
@@ -291,20 +302,25 @@ public class RookPiece implements Piece {
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
 
-    @Override
-    public void setOnClickListener() {
-//        if (!isAlive) return;
-        if (imageIcon == null) return;
-        imageIcon.setOnMouseClicked(mouseEvent -> {
-            if (tilesToMoveTo.size() == 0) return;
-            for (Tile tile : tilesToMoveTo) {
-                tile.setTileImageView(createImageView("redTile"));
-            }
-        });
-    }
+//    @Override
+//    public void setOnClickListener() {
+////        if (!isAlive) return;
+//        if (imageIcon == null) return;
+//        imageIcon.setOnMouseClicked(mouseEvent -> {
+//            if (tilesToMoveTo.size() == 0) return;
+//            for (Tile tile : tilesToMoveTo) {
+//                tile.setTileImageView(createImageView("redTile"));
+//            }
+//        });
+//    }
 
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return hasMoved;
     }
 }

@@ -18,14 +18,18 @@ public class CommandLineGame {
         String whitePlayerName = "";
         String blackPlayerName = "";
 
-        Player whitePlayer = new Player(board, PieceColor.WHITE, true);
-        Player blackPlayer = new Player(board, PieceColor.BLACK, false);
+        Player whitePlayer = new Player(board, PieceColor.WHITE);
+        Player blackPlayer = new Player(board, PieceColor.BLACK);
 
 //        PlayerController controller = new PlayerController(whitePlayer, blackPlayer);
-        PlayerController whiteController = new PlayerController(whitePlayer);
-        PlayerController blackController = new PlayerController(blackPlayer);
+        PlayerController playerController = new PlayerController();
+//        PlayerController whiteController = new PlayerController(whitePlayer, blackPlayer);
+//        PlayerController blackController = new PlayerController(blackPlayer, whitePlayer);
 
         PieceColor[] playersColors = {PieceColor.WHITE, PieceColor.BLACK};
+
+        playerController.setPlayer(whitePlayer);
+        playerController.setOpponentPlayer(blackPlayer);
 
         String answer = "";
         Scanner scanner = new Scanner(System.in);
@@ -44,14 +48,16 @@ public class CommandLineGame {
             System.out.println("Who plays white? ");
 
             whitePlayerName = scanner.nextLine();
-            whiteController.setPlayerName(whitePlayerName);
+//            whiteController.setPlayerName(whitePlayerName);
 //            whitePlayer.setName(whitePlayerName);
+            playerController.setPlayerName(whitePlayerName);
 
             System.out.println("Who plays black? ");
 
             blackPlayerName = scanner.nextLine();
-            blackController.setPlayerName(blackPlayerName);
+//            blackController.setPlayerName(blackPlayerName);
 //            blackPlayer.setName(blackPlayerName);
+            playerController.setOpponentPlayerName(blackPlayerName);
             System.out.println();
 
         } while (whitePlayerName.equals("") || blackPlayerName.equals(""));
@@ -140,8 +146,12 @@ public class CommandLineGame {
 //        Collections.addAll(piecesNames, pn);
 
         // adding players' alive pieces
-        whiteController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == whiteController.getPlayer().getPlayerColor());
-        blackController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == blackController.getPlayer().getPlayerColor());
+        playerController.addAlivePieces(allPieces);
+        playerController.addAlivePiecesToOpponent(allPieces);
+//        whitePlayer.addAlivePieces(allPieces);
+//        blackPlayer.addAlivePieces(allPieces);
+//        whiteController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == whiteController.getPlayer().getPlayerColor());
+//        blackController.addAlivePieces(allPieces, piece -> piece.getPieceColor() == blackController.getPlayer().getPlayerColor());
 //        whiteController.addAlivePieces(allPieces);
 //        blackController.addAlivePieces(allPieces);
 
@@ -157,6 +167,7 @@ public class CommandLineGame {
 
         // white always starts first
         int turn = 0;
+//        playerController.setPlayer(whitePlayer);
 
         while (gameStarted) {
             board.checkBoard();
@@ -164,10 +175,13 @@ public class CommandLineGame {
 
             PieceColor currentTurn = playersColors[(turn + playersColors.length) % 2];
 
-            Player currentPlayer = null;
-            if (currentTurn == whitePlayer.getPlayerColor()) {
-                currentPlayer = whitePlayer;
-            } else currentPlayer = blackPlayer;
+            Player currentPlayer = playerController.getPlayer();
+            if (turn != 0) {
+                if (currentTurn == whitePlayer.getPlayerColor()) {
+                    currentPlayer = whitePlayer;
+                } else currentPlayer = blackPlayer;
+                playerController.setPlayer(currentPlayer);
+            }
 
             if (board.getGameSituation() == GameSituation.CHECKMATE) {
                 System.out.println("Checkmate! " + currentPlayer.getName() + " wins!");
@@ -192,7 +206,7 @@ public class CommandLineGame {
 
             int rowChosen;
             int colChosen;
-            Tile tileChosen = null;
+            Tile tileChosen;
 
             System.out.println("Choose a piece from tile: (row, column)");
 
@@ -216,14 +230,6 @@ public class CommandLineGame {
                     System.out.print("Column: ");
                     colChosen = scanner.nextInt();
                 }
-
-//                if (rowChosen < 1 || rowChosen > 8) {
-//                    System.out.println("Please enter a value from 1 to 8: ");
-//                    break;
-//                } else if (colChosen < 1 || colChosen > 8) {
-//                    System.out.println("Please enter a value from 1 to 8: ");
-//                    break;
-//                }
 
                 tileChosen = board.getBoard()[rowChosen-1][colChosen-1];
 
@@ -276,8 +282,34 @@ public class CommandLineGame {
 
             } while (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen));
 
-            currentPlayer.movePiece(pieceChosen, tileToMoveChosen);
-//            pieceChosen.moveToTile(tileToMoveChosen);
+            if (currentPlayer.equals(whitePlayer)) {
+                if (pieceChosen.getName().equals("wK") && tileToMoveChosen.equals(board.getBoard()[0][1])) {
+                    playerController.kingSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[0][0].getPiece());
+                    turn = turn + 1;
+                    System.out.println();
+                    continue;
+                } else if (pieceChosen.getName().equals("wK") && tileToMoveChosen.equals(board.getBoard()[0][5])) {
+                    playerController.queenSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[0][7].getPiece());
+                    turn = turn + 1;
+                    System.out.println();
+                    continue;
+                } else playerController.movePiece(pieceChosen, tileToMoveChosen);
+            } else if (currentPlayer.equals(blackPlayer)) {
+                if (pieceChosen.getName().equals("bK") && tileToMoveChosen.equals(board.getBoard()[7][2])) {
+                    playerController.kingSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[7][0].getPiece());
+                    turn = turn + 1;
+                    System.out.println();
+                    continue;
+                } else if (pieceChosen.getName().equals("bK") && tileToMoveChosen.equals(board.getBoard()[7][6])) {
+                    playerController.queenSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[7][7].getPiece());
+                    turn = turn + 1;
+                    System.out.println();
+                    continue;
+                } else playerController.movePiece(pieceChosen, tileToMoveChosen);
+            }
+
+//            if (currentPlayer.equals(whitePlayer)) whiteController.movePiece(pieceChosen, tileToMoveChosen);
+//            else blackController.movePiece(pieceChosen, tileToMoveChosen);
 
             turn = turn + 1;
             System.out.println();

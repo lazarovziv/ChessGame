@@ -1,7 +1,11 @@
 package com.zivlazarov.chessengine.controllers;
 
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.pieces.RookPiece;
+import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
-import com.zivlazarov.chessengine.ui.Player;
+import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.Player;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
@@ -10,33 +14,45 @@ import java.util.stream.Collectors;
 public class PlayerController {
 
     private Player player;
+    private Player opponentPlayer;
 
-    private Player whitePlayer;
-    private Player blackPlayer;
+    private Board board;
 
-    public PlayerController(Player player) {
+    // insert model and ui pointer (player and board)
+//
+//    public PlayerController(Player player) {
+//        this.player = player;
+//    }
+
+    public PlayerController() {}
+
+    public PlayerController(Player player, Player opponentPlayer) {
         this.player = player;
+        this.opponentPlayer = opponentPlayer;
     }
 
-//    public PlayerController(Player white, Player black) {
-//        whitePlayer = white;
-//        blackPlayer = black;
-//    }
-//
-//    public boolean movePiece(Piece piece, Tile targetTile) {
-//        if (piece.getPieceColor() == player.getPlayerColor()) {
-//            player.movePiece(piece, targetTile);
-//            return true;
-//        } else {
-//            throw new PieceError("Can't move " + player.getOpponentPlayer() + "'s pieces!");
-//        }
-//    }
+    public PlayerController(Player player, Player opponentPlayer, Board board) {
+        this.player = player;
+        this.opponentPlayer = opponentPlayer;
+        this.board = board;
+    }
 
-//    public void addAlivePieces(Piece[] pieces) {
-//        player.getAlivePieces().addAll(Arrays.stream(pieces)
-//        .filter(piece -> piece.getPieceColor() == player.getPlayerColor())
-//        .collect(Collectors.toList()));
-//    }
+    public void movePiece(Piece piece, Tile targetTile) {
+        player.movePiece(piece, targetTile);
+    }
+
+    public void kingSideCastle(KingPiece kingPiece, RookPiece rookPiece) {
+        player.kingSideCastle(kingPiece, rookPiece);
+    }
+
+    public void queenSideCastle(KingPiece kingPiece, RookPiece rookPiece) {
+        player.queenSideCastle(kingPiece, rookPiece);
+    }
+
+    public void updateStatusOfPiece(Piece piece, boolean isAlive) {
+        if (isAlive) player.updatePieceAsAlive(piece);
+        else player.updatePieceAsDead(piece);
+    }
 
     public void addAlivePieces(Piece[] pieces, Predicate<? super Piece> predicate) {
         player.getAlivePieces().addAll(Arrays.stream(pieces)
@@ -44,19 +60,13 @@ public class PlayerController {
         .collect(Collectors.toList()));
     }
 
-//    public void addDeadPiece(Piece piece) {
-//        player.getDeadPieces().add(piece);
-//    }
+    public void addAlivePieces(Piece[] pieces) {
+        player.addAlivePieces(pieces);
+    }
 
-//    public boolean movePiece(Piece piece, Tile targetTile) {
-//        if (piece.getPieceColor() == PieceColor.WHITE) {
-//            whitePlayer.movePiece(piece, targetTile);
-//        } else {
-//            blackPlayer.movePiece(piece, targetTile);
-//        }
-//        return true;
-//    }
-
+    public void addAlivePiecesToOpponent(Piece[] pieces) {
+        opponentPlayer.addAlivePieces(pieces);
+    }
 
     public Player getPlayer() {
         return player;
@@ -70,16 +80,13 @@ public class PlayerController {
         player.setName(name);
     }
 
-//    public void setPlayerName(Player player, String name) {
-//        if (player.getPlayerColor() == PieceColor.WHITE) whitePlayer.setName(name);
-//        else blackPlayer.setName(name);
-//    }
-//
-//    public Player getWhitePlayer() {
-//        return whitePlayer;
-//    }
-//
-//    public Player getBlackPlayer() {
-//        return blackPlayer;
-//    }
+    public void setOpponentPlayerName(String name) { opponentPlayer.setName(name); }
+
+    public void setOpponentPlayer(Player opponentPlayer) {
+        this.opponentPlayer = opponentPlayer;
+    }
+
+    public Player getOpponentPlayer() {
+        return opponentPlayer;
+    }
 }
