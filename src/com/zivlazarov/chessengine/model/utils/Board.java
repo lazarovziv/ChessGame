@@ -1,7 +1,6 @@
 package com.zivlazarov.chessengine.model.utils;
 
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
-import com.zivlazarov.chessengine.ui.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,26 +62,50 @@ public class Board {
     }
 
     public void checkBoard(Player currentPlayer) {
+        // resetting tiles threatened state before every check
+        for (Tile[] tiles : board) {
+            for (Tile tile : tiles) {
+                tile.setThreatenedByWhite(false);
+                tile.setThreatenedByBlack(false);
+            }
+        }
         PieceColor currentTurn = currentPlayer.getPlayerColor();
         for (Piece piece : whiteAlivePieces.values()) piece.refresh();
         for (Piece piece : blackAlivePieces.values()) piece.refresh();
 
-        List<Piece> threateningBlackPieces = new ArrayList<>();
-        List<Piece> threateningWhitePieces = new ArrayList<>();
-
-        if (currentTurn == PieceColor.WHITE) {
-            for (Piece blackPiece : blackAlivePieces.values()) {
-                if (blackPiece.getTilesToMoveTo().contains(whiteAlivePieces.get("wK").getCurrentTile())) {
-                    gameSituation = GameSituation.CHECK;
-                    // if king can't escape
-                    if (!canKingEscape((KingPiece) whiteAlivePieces.get("wK"))) {
-                        if (distanceBetweenPieces(blackPiece, whiteAlivePieces.get("wK")) > 1) {
-
-                        }
-                    }
-                }
+        // setting only relevant tiles as threatened
+        for (Piece piece : whiteAlivePieces.values()) {
+            for (Tile tile : piece.getTilesToMoveTo()) {
+                tile.setThreatenedByWhite(true);
+                tile.getPiece().setIsInDanger(true);
             }
         }
+        for (Piece piece : blackAlivePieces.values()) {
+            for (Tile tile : piece.getTilesToMoveTo()) {
+                tile.setThreatenedByBlack(true);
+                tile.getPiece().setIsInDanger(true);
+            }
+        }
+
+//        if (currentTurn == PieceColor.WHITE) {
+//            int piecesThreateningKing = 0;
+//            for (Piece blackPiece : blackAlivePieces.values()) {
+//                if (blackPiece.getTilesToMoveTo().contains(whiteAlivePieces.get("wK").getCurrentTile())) {
+//                    piecesThreateningKing += 1;
+//                    if (piecesThreateningKing >= 2) {
+//                        gameSituation = GameSituation.CHECKMATE;
+//                        return;
+//                    }
+//                    gameSituation = GameSituation.CHECK;
+//                    // if king can't escape
+//                    if (!canKingEscape((KingPiece) whiteAlivePieces.get("wK"))) {
+//                        if (distanceBetweenPieces(blackPiece, whiteAlivePieces.get("wK")) > 1) {
+//
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     public boolean canPieceGetInTheWayOfPiece(Piece defendingPiece, Piece threateningPiece) {
