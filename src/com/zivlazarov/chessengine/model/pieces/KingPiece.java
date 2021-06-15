@@ -12,11 +12,12 @@ import java.util.ArrayList;
 public class KingPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Piece> piecesUnderThreat;
     private final Board board;
     private String name;
     private boolean isAlive = true;
     private boolean isInDanger = false;
-    private boolean hasMoved = false;
+    private boolean hasMoved;
     private Tile currentTile;
     private PieceColor pieceColor;
 //    private ImageView imageIcon;
@@ -27,6 +28,9 @@ public class KingPiece implements Piece {
 //        name = 'K';
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<>();
+        piecesUnderThreat = new ArrayList<>();
+
+        hasMoved = false;
 
         currentTile = initTile;
         if (pieceColor == PieceColor.BLACK) {
@@ -91,7 +95,7 @@ public class KingPiece implements Piece {
         int x = currentTile.getRow();
         int y = currentTile.getCol();
 
-        boolean canCastle = !hasMoved;
+//        boolean canCastle = !hasMoved;
 
         for (int[] direction : directions) {
             int r = direction[0];
@@ -99,7 +103,40 @@ public class KingPiece implements Piece {
             if (x+r > board.getBoard().length - 1 || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
-                tilesToMoveTo.add(targetTile);
+                if (pieceColor == PieceColor.WHITE) {
+                    if (!targetTile.isThreatenedByBlack()) tilesToMoveTo.add(targetTile);
+                } else {
+                    if (!targetTile.isThreatenedByWhite()) tilesToMoveTo.add(targetTile);
+                }
+            }
+        }
+        // adding castling to tilesToMoveTo
+        int whiteRookKingSideColumn = 0;
+        int whiteRookQueenSideColumn = 7;
+        int blackRookKingSideColumn = 7;
+        int blackRookQueenSideColumn = 0;
+
+        if (pieceColor == PieceColor.WHITE) {
+            if (canKingSideCastle()) {
+                tilesToMoveTo.add(board.getBoard()[x][whiteRookKingSideColumn+1]);
+            }
+            if (canQueenSideCastle()) {
+                tilesToMoveTo.add(board.getBoard()[x][whiteRookQueenSideColumn-2]);
+            }
+        } else if (pieceColor == PieceColor.BLACK) {
+            if (canKingSideCastle()) {
+                tilesToMoveTo.add(board.getBoard()[x][blackRookKingSideColumn-1]);
+            }
+            if (canQueenSideCastle()) {
+                tilesToMoveTo.add(board.getBoard()[x][blackRookQueenSideColumn+2]);
+            }
+        }
+
+        for (Tile tile : tilesToMoveTo) {
+            if (!tile.isEmpty()) {
+                if (tile.getPiece().getPieceColor() != pieceColor) {
+                    piecesUnderThreat.add(tile.getPiece());
+                }
             }
         }
     }
@@ -229,6 +266,66 @@ public class KingPiece implements Piece {
 //        */
 //    }
 
+// castling rules
+// The king has not previously moved;
+// Your chosen rook has not previously moved;
+// There must be no pieces between the king and the chosen rook;
+// The king is not currently in check;
+// Your king must not pass through a square that is under attack by enemy pieces;
+// The king must not end up in check.
+
+    // king moves 2 tiles rook moves 2 tiles
+    public boolean canKingSideCastle() {
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
+
+        if (pieceColor == PieceColor.WHITE) {
+            // 0 is white king side rook column
+            for (int i = 1; y-i > 0; i++) {
+                if (!board.getBoard()[x][y-i].isEmpty() || hasMoved || board.getBoard()[x][0].getPiece().hasMoved()
+                        || isInDanger || board.getBoard()[x][y-i].isThreatenedByBlack()) return false;
+            }
+        } else {
+            // 7 is black king side rook column
+            for (int i = 1; y+i < 7; i++) {
+                if (!board.getBoard()[x][y+i].isEmpty() || hasMoved || board.getBoard()[x][7].getPiece().hasMoved()
+                        || isInDanger || board.getBoard()[x][y+i].isThreatenedByWhite()) return false;
+            }
+        }
+        // just move the 2 pieces
+        // logic will be handled on generateTilesToMoveTo() method
+        return true;
+//        tilesToMoveTo.add(board.getBoard()[x][y+2]);
+//        moveToTile(board.getBoard()[x][y+2]);
+//        rookPiece.moveToTile(board.getBoard()[x][rookPiece.getCurrentTile().getCol() - 2]);
+    }
+
+    // king moves 2 tiles rook moves 3 tiles
+    public boolean canQueenSideCastle() {
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
+
+        if (pieceColor == PieceColor.BLACK) {
+            // 0 is black queen side rook column
+            for (int i = 1; y-i > 0; i++) {
+                if (!board.getBoard()[x][y-i].isEmpty() || hasMoved || board.getBoard()[x][0].getPiece().hasMoved()
+                        || isInDanger || board.getBoard()[x][y-i].isThreatenedByWhite()) return false;
+            }
+        } else {
+            // 7 is white queen side rook column
+            for (int i = 1; y+i < 7; i++) {
+                if (!board.getBoard()[x][y+i].isEmpty() || hasMoved || board.getBoard()[x][7].getPiece().hasMoved()
+                        || isInDanger || board.getBoard()[x][y+i].isThreatenedByBlack()) return false;
+            }
+        }
+        // just move the 2 pieces
+        // logic will be handled on generateTilesToMoveTo() method
+        return true;
+//        tilesToMoveTo.add(board.getBoard()[x][y+2]);
+//        moveToTile(board.getBoard()[x][y-2]);
+//        rookPiece.moveToTile(board.getBoard()[x][rookPiece.getCurrentTile().getCol() + 3]);
+    }
+
     @Override
     public String getName() {
         return name;
@@ -313,6 +410,7 @@ public class KingPiece implements Piece {
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName());
                 }
+                tile.setPiece(null);
             }
             // change to selected tile
             currentTile = tile;
@@ -347,5 +445,10 @@ public class KingPiece implements Piece {
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return hasMoved;
     }
 }
