@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// make as Singleton (?)
 public class Board {
 
     public static final String ANSI_RESET = "\u001B[0m";

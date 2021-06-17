@@ -249,6 +249,11 @@ public class RookPiece implements Piece {
     public Tile getCurrentTile() {
         return currentTile;
     }
+    
+    @Override
+    public int getPieceCounter() {
+        return pieceCounter;
+    }
 
     @Override
     public boolean isThreatenedAtTile(Tile tile) {
