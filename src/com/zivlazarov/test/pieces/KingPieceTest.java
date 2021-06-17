@@ -93,6 +93,8 @@ public class KingPieceTest {
 //        kingPiece = new KingPiece(board, PieceColor.WHITE, board.getBoard()[0][3]);
         RookPiece rookPiece = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][7], 0);
         RookPiece rookPiece1 = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0], 1);
+        RookPiece blackRook0 = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][0], 0);
+        RookPiece blackRook1 = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][7], 1);
         board.checkBoard(player);
 
         List<Tile> tilesGenerated = kingPiece.getTilesToMoveTo();
@@ -103,11 +105,11 @@ public class KingPieceTest {
         Assertions.assertTrue(tilesGenerated.contains(board.getBoard()[0][1]));
         Assertions.assertTrue(tilesGenerated.contains(board.getBoard()[0][5]));
 
-        PlayerController controller = new PlayerController(player, new Player(board, PieceColor.BLACK));
+        PlayerController controller = new PlayerController(player, new Player(board, PieceColor.WHITE));
         controller.kingSideCastle(kingPiece, rookPiece1);
         board.checkBoard(player);
         board.printBoard();
-        System.out.println(kingPiece.getCurrentTile());
+
     }
 
 }

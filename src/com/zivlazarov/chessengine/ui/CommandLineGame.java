@@ -62,14 +62,14 @@ public class CommandLineGame {
 
         } while (whitePlayerName.equals("") || blackPlayerName.equals(""));
 
-        RookPiece whiteRook0 = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0], 0);
-//        whiteRook0.setImageIcon(createImageView("whiteRook"));
-        RookPiece whiteRook1 = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][7], 1);
-//        whiteRook1.setImageIcon(createImageView("whiteRook"));
-        RookPiece blackRook0 = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][0], 0);
-//        blackRook0.setImageIcon(createImageView("blackRook"));
-        RookPiece blackRook1 = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][7], 1);
-//        blackRook1.setImageIcon(createImageView("blackRook"));
+        RookPiece whiteRookKingSide = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0], 0);
+//        whiteRookKingSide.setImageIcon(createImageView("whiteRook"));
+        RookPiece whiteRookQueenSide = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][7], 1);
+//        whiteRookQueenSide.setImageIcon(createImageView("whiteRook"));
+        RookPiece blackRookQueenSide = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][0], 0);
+//        blackRookQueenSide.setImageIcon(createImageView("blackRook"));
+        RookPiece blackRookKingSide = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][7], 1);
+//        blackRookKingSide.setImageIcon(createImageView("blackRook"));
 
         KnightPiece whiteKnight0 = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][1], 0);
 //        whiteKnight0.setImageIcon(createImageView("whiteKnight"));
@@ -136,9 +136,9 @@ public class CommandLineGame {
 
         // when calling the refresh() method for every piece, first call for the pieces on the back row!!! because tiles in front of them aren't empty
 
-        allPieces = new Piece[] {whiteRook0, whiteKnight0, whiteBishop0, whiteQueen, whiteKing, whiteBishop1, whiteKnight1, whiteRook1,
+        allPieces = new Piece[] {whiteRookKingSide, whiteKnight0, whiteBishop0, whiteQueen, whiteKing, whiteBishop1, whiteKnight1, whiteRookQueenSide,
                 whitePawn0, whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7,
-                blackRook0, blackKnight0, blackBishop0, blackQueen, blackKing, blackBishop1, blackKnight1, blackRook1,
+                blackRookQueenSide, blackKnight0, blackBishop0, blackQueen, blackKing, blackBishop1, blackKnight1, blackRookKingSide,
                 blackPawn0, blackPawn1, blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7};
 
 //        String[] pn = new String[] {"wR", "wN", "wB", "wK", "wQ", "wP", "bR", "bN", "bK", "bQ", "bP"};

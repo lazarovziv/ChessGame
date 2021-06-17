@@ -77,13 +77,17 @@ public class Board {
         for (Piece piece : whiteAlivePieces.values()) {
             for (Tile tile : piece.getTilesToMoveTo()) {
                 tile.setThreatenedByWhite(true);
-                tile.getPiece().setIsInDanger(true);
+                if (!tile.isEmpty() && tile.getPiece().getPieceColor() == PieceColor.BLACK) {
+                    tile.getPiece().setIsInDanger(true);
+                }
             }
         }
         for (Piece piece : blackAlivePieces.values()) {
             for (Tile tile : piece.getTilesToMoveTo()) {
                 tile.setThreatenedByBlack(true);
-                tile.getPiece().setIsInDanger(true);
+                if (!tile.isEmpty() && tile.getPiece().getPieceColor() == PieceColor.WHITE) {
+                    tile.getPiece().setIsInDanger(true);
+                }
             }
         }
 
