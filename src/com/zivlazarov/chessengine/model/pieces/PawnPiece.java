@@ -1,4 +1,5 @@
 package com.zivlazarov.chessengine.model.pieces;
+import com.zivlazarov.chessengine.model.Pair;
 import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
 import com.zivlazarov.chessengine.model.utils.PieceColor;
@@ -8,6 +9,7 @@ import com.zivlazarov.chessengine.model.utils.Tile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
@@ -15,6 +17,7 @@ public class PawnPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
+    private final Stack<Pair<Tile, Tile>> historyMoves;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -32,6 +35,7 @@ public class PawnPiece implements Piece {
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
+        historyMoves = new Stack<>();
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -228,8 +232,7 @@ public class PawnPiece implements Piece {
     public Tile getCurrentTile() {
         return currentTile;
     }
-    
-    @Override
+
     public int getPieceCounter() {
         return pieceCounter;
     }
@@ -274,6 +277,7 @@ public class PawnPiece implements Piece {
 
     @Override
     public void moveToTile(Tile tile) {
+        Pair<Tile, Tile> tilesPair = null;
         if (tilesToMoveTo.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
@@ -286,12 +290,16 @@ public class PawnPiece implements Piece {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
                 tile.setPiece(null);
+                tilesPair = new Pair<>(currentTile, tile);
             }
             // change to selected tile
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
+            // add target tile to history of moves
+            historyMoves.add(tilesPair);
+
             hasMoved = true;
             generateTilesToMoveTo();
         }

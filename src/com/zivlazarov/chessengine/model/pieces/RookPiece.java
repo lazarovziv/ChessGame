@@ -1,4 +1,5 @@
 package com.zivlazarov.chessengine.model.pieces;
+import com.zivlazarov.chessengine.model.Pair;
 import com.zivlazarov.chessengine.model.utils.Board;
 import com.zivlazarov.chessengine.model.utils.Piece;
 import com.zivlazarov.chessengine.model.utils.PieceColor;
@@ -6,6 +7,7 @@ import com.zivlazarov.chessengine.model.utils.Tile;
 //import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
@@ -13,6 +15,7 @@ public class RookPiece implements Piece {
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
+    private final Stack<Pair<Tile, Tile>> historyMoves;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -30,6 +33,7 @@ public class RookPiece implements Piece {
         pieceColor = pc;
         tilesToMoveTo = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
+        historyMoves = new Stack<>();
 
         hasMoved = false;
 
@@ -249,8 +253,7 @@ public class RookPiece implements Piece {
     public Tile getCurrentTile() {
         return currentTile;
     }
-    
-    @Override
+
     public int getPieceCounter() {
         return pieceCounter;
     }
@@ -270,6 +273,7 @@ public class RookPiece implements Piece {
 
     @Override
     public void moveToTile(Tile tile) {
+        Pair<Tile, Tile> tilesPair = null;
         if (tilesToMoveTo.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
@@ -282,12 +286,15 @@ public class RookPiece implements Piece {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
                 tile.setPiece(null);
+                tilesPair = new Pair<>(currentTile, tile);
             }
             // change to selected tile
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
+            // add tile to history of moves
+            historyMoves.add(tilesPair);
 
             if (!hasMoved) hasMoved = true;
 

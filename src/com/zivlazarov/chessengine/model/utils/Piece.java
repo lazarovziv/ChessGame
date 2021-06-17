@@ -2,8 +2,8 @@ package com.zivlazarov.chessengine.model.utils;
 
 //import javafx.scene.image.ImageView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public interface Piece {
 
@@ -13,6 +13,7 @@ public interface Piece {
     final ArrayList<Tile> tilesToMoveTo = new ArrayList<>();
     PieceColor pieceColor = PieceColor.WHITE;
     final ArrayList<Piece> piecesUnderThreat = new ArrayList<>();
+    final Stack<Tile> historyMoves = new Stack<>();
 //    ImageView imageIcon = null;
 
     String getName();
