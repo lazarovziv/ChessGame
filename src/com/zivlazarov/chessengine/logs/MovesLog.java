@@ -1,27 +1,30 @@
 package com.zivlazarov.chessengine.logs;
 
-import com.zivlazarov.chessengine.model.utils.Piece;
-import com.zivlazarov.chessengine.model.utils.Player;
+import com.zivlazarov.chessengine.model.utils.Pair;
+import com.zivlazarov.chessengine.model.utils.player.Player;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
 
-import java.util.HashMap;
+import java.util.Stack;
 
-class MovesLog {
+public class MovesLog {
 
     // hashmap of <Piece, Tile> of piece moved and tile it moved to
-    final private HashMap<Player, Piece> log;
+    private static Stack<Pair<Player, Pair<Tile, Tile>>> movesLog;
 
     private static MovesLog instance;
 
     private MovesLog() {
-        log = new HashMap<>();
+        movesLog = new Stack<>();
     }
 
-    public MovesLog getInstance() {
-        if (instance == null) instance = new MovesLog();
+    public static MovesLog getInstance() {
+        if (instance == null) {
+            instance = new MovesLog();
+        }
         return instance;
     }
 
-    public HashMap<Player, Piece> getLog() {
-        return log;
+    public static Stack<Pair<Player, Pair<Tile, Tile>>> getMovesLog() {
+        return movesLog;
     }
 }

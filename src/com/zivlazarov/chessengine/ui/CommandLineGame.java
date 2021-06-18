@@ -1,25 +1,40 @@
 package com.zivlazarov.chessengine.ui;
 
 import com.zivlazarov.chessengine.controllers.PlayerController;
+import com.zivlazarov.chessengine.logs.MovesLog;
+import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.pieces.*;
-import com.zivlazarov.chessengine.model.utils.*;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.board.GameSituation;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Piece;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 
 import java.util.Scanner;
+import java.util.Stack;
 
 public class CommandLineGame {
 
     private static Board board = new Board();
     private static Piece[] allPieces = new Piece[32];
 
+    private static GameSituation gameSituation;
+
     public static void main(String[] args) {
 
         boolean gameStarted = false;
+
+        gameSituation = GameSituation.NORMAL;
 
         String whitePlayerName = "";
         String blackPlayerName = "";
 
         Player whitePlayer = new Player(board, PieceColor.WHITE);
         Player blackPlayer = new Player(board, PieceColor.BLACK);
+
+        MovesLog log = MovesLog.getInstance();
+        Stack<Pair<Player, Pair<Tile, Tile>>> movesLog = MovesLog.getMovesLog();
 
 //        PlayerController controller = new PlayerController(whitePlayer, blackPlayer);
         PlayerController playerController = new PlayerController();
@@ -59,86 +74,88 @@ public class CommandLineGame {
 //            blackPlayer.setName(blackPlayerName);
             playerController.setOpponentPlayerName(blackPlayerName);
             System.out.println();
+            System.out.println("It's a " + playerController.getPlayer().getName() + " vs. " + playerController.getOpponentPlayer().getName() + " SHOWDOWN!");
+            System.out.println();
 
         } while (whitePlayerName.equals("") || blackPlayerName.equals(""));
 
-        RookPiece whiteRookKingSide = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0], 0);
+        RookPiece whiteRookKingSide = new RookPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][0], 0);
 //        whiteRookKingSide.setImageIcon(createImageView("whiteRook"));
-        RookPiece whiteRookQueenSide = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][7], 1);
+        RookPiece whiteRookQueenSide = new RookPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][7], 1);
 //        whiteRookQueenSide.setImageIcon(createImageView("whiteRook"));
-        RookPiece blackRookQueenSide = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][0], 0);
+        RookPiece blackRookQueenSide = new RookPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][0], 0);
 //        blackRookQueenSide.setImageIcon(createImageView("blackRook"));
-        RookPiece blackRookKingSide = new RookPiece(board, PieceColor.BLACK, board.getBoard()[7][7], 1);
+        RookPiece blackRookKingSide = new RookPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][7], 1);
 //        blackRookKingSide.setImageIcon(createImageView("blackRook"));
 
-        KnightPiece whiteKnight0 = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][1], 0);
-//        whiteKnight0.setImageIcon(createImageView("whiteKnight"));
-        KnightPiece whiteKnight1 = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[0][6], 1);
-//        whiteKnight1.setImageIcon(createImageView("whiteKnight"));
-        KnightPiece blackKnight0 = new KnightPiece(board, PieceColor.BLACK, board.getBoard()[7][1], 0);
-//        blackKnight0.setImageIcon(createImageView("blackKnight"));
-        KnightPiece blackKnight1 = new KnightPiece(board, PieceColor.BLACK, board.getBoard()[7][6], 1);
-//        blackKnight1.setImageIcon(createImageView("blackKnight"));
+        KnightPiece whiteKnightKingSide = new KnightPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][1], 0);
+//        whiteKnightKingSide.setImageIcon(createImageView("whiteKnight"));
+        KnightPiece whiteKnightQueenSide = new KnightPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][6], 1);
+//        whiteKnightQueenSide.setImageIcon(createImageView("whiteKnight"));
+        KnightPiece blackKnightKingSide = new KnightPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][1], 0);
+//        blackKnightKingSide.setImageIcon(createImageView("blackKnight"));
+        KnightPiece blackKnightQueenSide = new KnightPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][6], 1);
+//        blackKnightQueenSide.setImageIcon(createImageView("blackKnight"));
 
-        BishopPiece whiteBishop0 = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[0][2], 0);
-//        whiteBishop0.setImageIcon(createImageView("whiteBishop"));
-        BishopPiece whiteBishop1 = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[0][5], 1);
-//        whiteBishop1.setImageIcon(createImageView("whiteBishop"));
-        BishopPiece blackBishop0 = new BishopPiece(board, PieceColor.BLACK, board.getBoard()[7][2], 0);
-//        blackBishop0.setImageIcon(createImageView("blackBishop"));
-        BishopPiece blackBishop1 = new BishopPiece(board, PieceColor.BLACK, board.getBoard()[7][5], 1);
-//        blackBishop1.setImageIcon(createImageView("blackBishop"));
+        BishopPiece whiteBishopKingSide = new BishopPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][2], 0);
+//        whiteBishopKingSide.setImageIcon(createImageView("whiteBishop"));
+        BishopPiece whiteBishopQueenSide = new BishopPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][5], 1);
+//        whiteBishopQueenSide.setImageIcon(createImageView("whiteBishop"));
+        BishopPiece blackBishopKingSide = new BishopPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][5], 0);
+//        blackBishopKingSide.setImageIcon(createImageView("blackBishop"));
+        BishopPiece blackBishopQueenSide = new BishopPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][2], 1);
+//        blackBishopQueenSide.setImageIcon(createImageView("blackBishop"));
 
-        QueenPiece whiteQueen = new QueenPiece(board, PieceColor.WHITE, board.getBoard()[0][4]);
+        QueenPiece whiteQueen = new QueenPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][4]);
 //        whiteQueen.setImageIcon(createImageView("whiteQueen"));
-        QueenPiece blackQueen = new QueenPiece(board, PieceColor.BLACK, board.getBoard()[7][3]);
+        QueenPiece blackQueen = new QueenPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][3]);
 //        blackQueen.setImageIcon(createImageView("blackQueen"));
 
-        KingPiece whiteKing = new KingPiece(board, PieceColor.WHITE, board.getBoard()[0][3]);
+        KingPiece whiteKing = new KingPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][3]);
 //        whiteKing.setImageIcon(createImageView("whiteKing"));
-        KingPiece blackKing = new KingPiece(board, PieceColor.BLACK, board.getBoard()[7][4]);
+        KingPiece blackKing = new KingPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][4]);
 //        blackKing.setImageIcon(createImageView("blackKing"));
-        PawnPiece whitePawn0 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0], 0);
+        PawnPiece whitePawn0 = new PawnPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
 //        whitePawn0.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn1 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][1], 1);
+        PawnPiece whitePawn1 = new PawnPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[1][1], 1);
 //        whitePawn1.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn2 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][2], 2);
+        PawnPiece whitePawn2 = new PawnPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[1][2], 2);
 //        whitePawn2.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn3 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][3], 3);
+        PawnPiece whitePawn3 = new PawnPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[1][3], 3);
 //        whitePawn3.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn4 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][4], 4);
+        PawnPiece whitePawn4 = new PawnPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[1][4], 4);
 //        whitePawn4.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn5 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][5], 5);
+        PawnPiece whitePawn5 = new PawnPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[1][5], 5);
 //        whitePawn5.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn6 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][6], 6);
+        PawnPiece whitePawn6 = new PawnPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[1][6], 6);
 //        whitePawn6.setImageIcon(createImageView("whitePawn"));
-        PawnPiece whitePawn7 = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][7], 7);
+        PawnPiece whitePawn7 = new PawnPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[1][7], 7);
 //        whitePawn7.setImageIcon(createImageView("whitePawn"));
 
-        PawnPiece blackPawn0 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][0], 0);
+        PawnPiece blackPawn0 = new PawnPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[6][0], 0);
 //        blackPawn0.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn1 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][1], 1);
+        PawnPiece blackPawn1 = new PawnPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[6][1], 1);
 //        blackPawn1.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn2 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][2], 2);
+        PawnPiece blackPawn2 = new PawnPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[6][2], 2);
 //        blackPawn2.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn3 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][3], 3);
+        PawnPiece blackPawn3 = new PawnPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[6][3], 3);
 //        blackPawn3.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn4 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][4], 4);
+        PawnPiece blackPawn4 = new PawnPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[6][4], 4);
 //        blackPawn4.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn5 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][5], 5);
+        PawnPiece blackPawn5 = new PawnPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[6][5], 5);
 //        blackPawn5.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn6 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][6], 6);
+        PawnPiece blackPawn6 = new PawnPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[6][6], 6);
 //        blackPawn6.setImageIcon(createImageView("blackPawn"));
-        PawnPiece blackPawn7 = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[6][7], 7);
+        PawnPiece blackPawn7 = new PawnPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[6][7], 7);
 //        blackPawn7.setImageIcon(createImageView("blackPawn"));
 
 //        board.printBoard();
 
         // when calling the refresh() method for every piece, first call for the pieces on the back row!!! because tiles in front of them aren't empty
 
-        allPieces = new Piece[] {whiteRookKingSide, whiteKnight0, whiteBishop0, whiteQueen, whiteKing, whiteBishop1, whiteKnight1, whiteRookQueenSide,
+        allPieces = new Piece[] {whiteRookKingSide, whiteKnightKingSide, whiteBishopKingSide, whiteQueen, whiteKing, whiteBishopQueenSide, whiteKnightQueenSide, whiteRookQueenSide,
                 whitePawn0, whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7,
-                blackRookQueenSide, blackKnight0, blackBishop0, blackQueen, blackKing, blackBishop1, blackKnight1, blackRookKingSide,
+                blackRookQueenSide, blackKnightKingSide, blackBishopQueenSide, blackQueen, blackKing, blackBishopKingSide, blackKnightQueenSide, blackRookKingSide,
                 blackPawn0, blackPawn1, blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7};
 
 //        String[] pn = new String[] {"wR", "wN", "wB", "wK", "wQ", "wP", "bR", "bN", "bK", "bQ", "bP"};
@@ -163,28 +180,51 @@ public class CommandLineGame {
 //        blackPlayer.getAlivePieces().addAll(
 //                Arrays.stream(allPieces)
 //                .filter(piece -> piece.getPieceColor() == PieceColor.BLACK)
-//                .collect(Collectors.toList()));
+//                .collect(Collectors.toList()))
 
         // white always starts first
         int turn = 0;
 //        playerController.setPlayer(whitePlayer);
 
         while (gameStarted) {
-            board.checkBoard();
 //            board.printBoard();
+
+            if (movesLog.size() != 0) {
+                System.out.println(movesLog.peek().getFirst() + " played: " + movesLog.peek().getSecond());
+                System.out.println();
+            }
 
             PieceColor currentTurn = playersColors[(turn + playersColors.length) % 2];
 
             Player currentPlayer = playerController.getPlayer();
+
+//            ArrayList<Piece> threateningKingPieces = (ArrayList<Piece>) currentPlayer.getAlivePieces().stream().filter(piece ->
+//                    piece.getPiecesUnderThreat().contains(
+//                            Arrays.asList(allPieces).stream().filter(p -> p.getName().contains("K"))
+//
+//            .collect(Collectors.toList())));
+
             if (turn != 0) {
                 if (currentTurn == whitePlayer.getPlayerColor()) {
                     currentPlayer = whitePlayer;
-                } else currentPlayer = blackPlayer;
-                playerController.setPlayer(currentPlayer);
+                    playerController.setPlayer(currentPlayer);
+                    playerController.setOpponentPlayer(blackPlayer);
+                } else {
+                    currentPlayer = blackPlayer;
+                    playerController.setPlayer(currentPlayer);
+                    playerController.setOpponentPlayer(whitePlayer);
+                }
             }
 
+            board.checkBoard(currentPlayer);
+
             if (board.getGameSituation() == GameSituation.CHECKMATE) {
-                System.out.println("Checkmate! " + currentPlayer.getName() + " wins!");
+                System.out.println("Checkmate! " + currentPlayer.getOpponentPlayer().getName() + " wins!");
+                currentPlayer.getOpponentPlayer().setHasWonGame(true);
+                System.out.println("Moves from the match: ");
+                for (int i = 0; i < movesLog.size(); i++) {
+                    System.out.println(movesLog.pop().getFirst() + " played: " + movesLog.pop().getSecond());
+                }
                 break;
             } else if (board.getGameSituation() == GameSituation.DRAW) {
                 System.out.println("Draw! ");
@@ -285,34 +325,54 @@ public class CommandLineGame {
             if (currentPlayer.equals(whitePlayer)) {
                 if (pieceChosen.getName().equals("wK") && tileToMoveChosen.equals(board.getBoard()[0][1])) {
                     playerController.kingSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[0][0].getPiece());
+                    // adding move to moves log
+//                    movesLog.push(new Pair<Player, Pair<Tile, Tile>>(currentPlayer, pieceChosen.getLastMove()));
                     turn = turn + 1;
                     System.out.println();
                     continue;
                 } else if (pieceChosen.getName().equals("wK") && tileToMoveChosen.equals(board.getBoard()[0][5])) {
                     playerController.queenSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[0][7].getPiece());
+                    // adding move to moves log
+//                    movesLog.push(new Pair<Player, Pair<Tile, Tile>>(currentPlayer, pieceChosen.getLastMove()));
                     turn = turn + 1;
                     System.out.println();
                     continue;
-                } else playerController.movePiece(pieceChosen, tileToMoveChosen);
+                } else {
+                    playerController.movePiece(pieceChosen, tileToMoveChosen);
+                    // adding move to moves log
+//                    movesLog.push(new Pair<Player, Pair<Tile, Tile>>(currentPlayer, pieceChosen.getLastMove()));
+                }
             } else if (currentPlayer.equals(blackPlayer)) {
                 if (pieceChosen.getName().equals("bK") && tileToMoveChosen.equals(board.getBoard()[7][2])) {
                     playerController.kingSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[7][0].getPiece());
+                    // adding move to moves log
+//                    movesLog.push(new Pair<Player, Pair<Tile, Tile>>(currentPlayer, pieceChosen.getLastMove()));
                     turn = turn + 1;
                     System.out.println();
                     continue;
                 } else if (pieceChosen.getName().equals("bK") && tileToMoveChosen.equals(board.getBoard()[7][6])) {
                     playerController.queenSideCastle((KingPiece) pieceChosen, (RookPiece) board.getBoard()[7][7].getPiece());
+                    // adding move to moves log
+//                    movesLog.push(new Pair<Player, Pair<Tile, Tile>>(currentPlayer, pieceChosen.getLastMove()));
                     turn = turn + 1;
                     System.out.println();
                     continue;
-                } else playerController.movePiece(pieceChosen, tileToMoveChosen);
+                } else {
+                    playerController.movePiece(pieceChosen, tileToMoveChosen);
+                    // adding move to moves log
+//                    movesLog.push(new Pair<Player, Pair<Tile, Tile>>(currentPlayer, pieceChosen.getLastMove()));
+                }
             }
 
 //            if (currentPlayer.equals(whitePlayer)) whiteController.movePiece(pieceChosen, tileToMoveChosen);
 //            else blackController.movePiece(pieceChosen, tileToMoveChosen);
 
+            movesLog.push(new Pair<>(playerController.getPlayer(), playerController.getPlayer().getLastMove()));
+
             turn = turn + 1;
             System.out.println();
+
+            // insert last move here from movesLog
         }
     }
 
