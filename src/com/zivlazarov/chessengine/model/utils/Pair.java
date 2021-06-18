@@ -2,6 +2,8 @@ package com.zivlazarov.chessengine.model.utils;
 
 import com.zivlazarov.chessengine.model.utils.board.Tile;
 
+import java.util.Objects;
+
 public class Pair<T, V> {
 
     private T first;
@@ -33,5 +35,9 @@ public class Pair<T, V> {
         } else if (second != null && first == null) {
             return second.toString();
         } else return "!!!";
+    }
+
+    public boolean equals(Pair<Tile, Tile> pair) {
+        return pair.getFirst().equals(first) && pair.getSecond().equals(second);
     }
 }

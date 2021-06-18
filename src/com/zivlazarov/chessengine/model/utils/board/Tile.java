@@ -99,7 +99,7 @@ public class Tile {
 	}
 
 	public boolean equals(Tile tile) {
-		return row == tile.row && col == tile.col;
+		return row == tile.getRow() && col == tile.getCol();
 	}
 
 //	public void setTileImageView(ImageView tileImageView) {

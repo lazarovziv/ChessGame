@@ -24,6 +24,8 @@ public class Player {
     private List<Piece> deadPieces;
     private boolean hasWonGame;
 
+    private int playerDirection;
+
     private Pair<Tile, Tile> lastMove;
 
     public Player(Board b, PieceColor pc) {
@@ -32,6 +34,11 @@ public class Player {
         alivePieces = new ArrayList();
         deadPieces = new ArrayList();
         hasWonGame = false;
+
+        // setting player direction, white goes up the board, black goes down (specifically to pawn pieces and for checking pawn promotion)
+        if (playerColor == PieceColor.WHITE) {
+            playerDirection = 1;
+        } else playerDirection = -1;
     }
     
     public Player(Board b, PieceColor pc, String name) {
@@ -158,5 +165,9 @@ public class Player {
 
     public Pair<Tile, Tile> getLastMove() {
         return lastMove;
+    }
+
+    public int getPlayerDirection() {
+        return playerDirection;
     }
 }
