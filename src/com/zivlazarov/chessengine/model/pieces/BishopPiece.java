@@ -1,10 +1,12 @@
 package com.zivlazarov.chessengine.model.pieces;
 
-import com.zivlazarov.chessengine.model.Pair;
-import com.zivlazarov.chessengine.model.utils.Board;
-import com.zivlazarov.chessengine.model.utils.Piece;
-import com.zivlazarov.chessengine.model.utils.PieceColor;
-import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.Observer;
+import com.zivlazarov.chessengine.model.utils.Pair;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.player.Piece;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 //import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -12,7 +14,9 @@ import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
-public class BishopPiece implements Piece {
+public class BishopPiece implements Piece, Observer {
+
+    private Player player;
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
@@ -26,7 +30,8 @@ public class BishopPiece implements Piece {
     private PieceColor pieceColor;
 //    private ImageView imageIcon;
 
-    public BishopPiece(Board board, PieceColor pc, Tile initTile, int pieceCounter) {
+    public BishopPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
+        this.player = player;
         this.board = board;
 
 //        name = "B";
@@ -52,30 +57,6 @@ public class BishopPiece implements Piece {
         // need to be called after all pieces have been initialized
 //        generateTilesToMoveTo();
     }
-
-//    public BishopPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
-//        this.board = board;
-//
-////        name = "B";
-//        pieceColor = pc;
-//        tilesToMoveTo = new ArrayList<Tile>();
-//
-//        currentTile = initTile;
-//        if (pieceColor == PieceColor.BLACK) {
-//            name = "bB";
-//            board.getBlackAlivePieces().put(name, this);
-//        }
-//        if (pieceColor == PieceColor.WHITE) {
-//            name = "wB";
-//            board.getWhiteAlivePieces().put(name, this);
-//        }
-//
-//        currentTile.setPiece(this);
-//        imageIcon = imageView;
-//        currentTile.setPieceImageView(imageIcon);
-//
-////        generateTilesToMoveTo();
-//    }
 
     @Override
     public void refresh() {
@@ -233,7 +214,22 @@ public class BishopPiece implements Piece {
         this.pieceColor = pieceColor;
     }
 
-//    @Override
+    @Override
+    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
+        return historyMoves;
+    }
+
+    @Override
+    public Pair<Tile, Tile> getLastMove() {
+        return historyMoves.peek();
+    }
+
+    @Override
+    public ArrayList<Piece> getPiecesUnderThreat() {
+        return piecesUnderThreat;
+    }
+
+    //    @Override
 //    public void setImageIcon(ImageView imageIcon) {
 //        this.imageIcon = imageIcon;
 //    }
@@ -308,5 +304,10 @@ public class BishopPiece implements Piece {
     @Override
     public boolean hasMoved() {
         return false;
+    }
+
+    @Override
+    public void update() {
+
     }
 }

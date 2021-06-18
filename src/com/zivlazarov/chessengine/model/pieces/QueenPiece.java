@@ -1,9 +1,10 @@
 package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.Pair;
-import com.zivlazarov.chessengine.model.utils.Board;
-import com.zivlazarov.chessengine.model.utils.Piece;
-import com.zivlazarov.chessengine.model.utils.PieceColor;
-import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.Pair;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.player.Piece;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 //import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import java.util.Stack;
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
 public class QueenPiece implements Piece {
+
+    private Player player;
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
@@ -24,7 +27,8 @@ public class QueenPiece implements Piece {
     private PieceColor pieceColor;
 //    private ImageView imageIcon;
 
-    public QueenPiece(Board board, PieceColor pc, Tile initTile) {
+    public QueenPiece(Player player, Board board, PieceColor pc, Tile initTile) {
+        this.player = player;
         this.board = board;
 
 //        name = 'Q';
@@ -287,6 +291,21 @@ public class QueenPiece implements Piece {
     @Override
     public void setPieceColor(PieceColor pieceColor) {
         this.pieceColor = pieceColor;
+    }
+
+    @Override
+    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
+        return historyMoves;
+    }
+
+    @Override
+    public Pair<Tile, Tile> getLastMove() {
+        return historyMoves.peek();
+    }
+
+    @Override
+    public ArrayList<Piece> getPiecesUnderThreat() {
+        return piecesUnderThreat;
     }
 
 //    @Override

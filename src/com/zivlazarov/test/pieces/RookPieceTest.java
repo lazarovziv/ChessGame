@@ -2,9 +2,10 @@ package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;
-import com.zivlazarov.chessengine.model.utils.Board;
-import com.zivlazarov.chessengine.model.utils.PieceColor;
-import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,13 +19,17 @@ public class RookPieceTest {
     private static RookPiece rookPiece;
     private static PawnPiece pawnPiece;
     private static PawnPiece opponentPawnPiece;
+    private static Player player;
+    private static Player opponent;
 
     @BeforeAll
     public static void setup() {
         board = new Board();
-        rookPiece = new RookPiece(board, PieceColor.WHITE, board.getBoard()[0][0], 0);
-        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0], 0);
-        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[0][3], 0);
+        player = new Player(board, PieceColor.WHITE);
+        opponent = new Player(board, PieceColor.BLACK);
+        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], 0);
+        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[0][3], 0);
         board.checkBoard();
     }
 
@@ -66,7 +71,7 @@ public class RookPieceTest {
     @Test
     public void testWhatTilesAreBeingGenerated() {
         rookPiece.getCurrentTile().setPiece(null);
-        rookPiece = new RookPiece(board, PieceColor.WHITE, board.getBoard()[3][3], 0);
+        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3], 0);
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 

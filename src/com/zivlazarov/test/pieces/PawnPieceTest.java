@@ -2,9 +2,10 @@ package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.pieces.KnightPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
-import com.zivlazarov.chessengine.model.utils.Board;
-import com.zivlazarov.chessengine.model.utils.PieceColor;
-import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,13 +19,17 @@ public class PawnPieceTest {
     private static PawnPiece pawnPiece;
     private static KnightPiece knightPiece;
     private static PawnPiece opponentPawnPiece;
+    private static Player player;
+    private static Player opponent;
 
     @BeforeAll
     public static void setup() {
         board = new Board();
-        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][0], 0);
-        knightPiece = new KnightPiece(board, PieceColor.WHITE, board.getBoard()[3][0], 0);
-        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[2][0], 0);
+        player = new Player(board, PieceColor.WHITE);
+        opponent = new Player(board, PieceColor.BLACK);
+        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
+        knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[3][0], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][0], 0);
         board.checkBoard();
     }
 

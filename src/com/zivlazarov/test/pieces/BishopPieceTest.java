@@ -2,10 +2,11 @@ package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.pieces.BishopPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
-import com.zivlazarov.chessengine.model.pieces.RookPiece;
-import com.zivlazarov.chessengine.model.utils.Board;
-import com.zivlazarov.chessengine.model.utils.PieceColor;
-import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Piece;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,13 +20,17 @@ public class BishopPieceTest {
     private static PawnPiece pawnPiece;
     private static PawnPiece opponentPawnPiece;
     private static Board board;
+    private static Player player;
+    private static Player opponent;
 
     @BeforeAll
     public static void setup() {
         board = new Board();
-        bishopPiece = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[0][2], 0);
-        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[1][3], 0);
-        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[1][1], 0);
+        player = new Player(board, PieceColor.WHITE);
+        opponent = new Player(board, PieceColor.BLACK);
+        bishopPiece = new BishopPiece(player, board, PieceColor.WHITE, board.getBoard()[0][2], 0);
+        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][3], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][1], 0);
         board.checkBoard();
     }
 
@@ -88,7 +93,7 @@ public class BishopPieceTest {
     @Test
     public void testWhatTilesAreBeingGenerated() {
         bishopPiece.getCurrentTile().setPiece(null);
-        bishopPiece = new BishopPiece(board, PieceColor.WHITE, board.getBoard()[3][3], 0);
+        bishopPiece = new BishopPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3], 0);
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 

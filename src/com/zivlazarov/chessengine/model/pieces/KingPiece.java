@@ -1,9 +1,10 @@
 package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.Pair;
-import com.zivlazarov.chessengine.model.utils.Board;
-import com.zivlazarov.chessengine.model.utils.Piece;
-import com.zivlazarov.chessengine.model.utils.PieceColor;
-import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.Pair;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.player.Piece;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 //import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import java.util.Stack;
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
 public class KingPiece implements Piece {
+
+    private Player player;
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
@@ -25,7 +28,8 @@ public class KingPiece implements Piece {
     private PieceColor pieceColor;
 //    private ImageView imageIcon;
 
-    public KingPiece(Board board, PieceColor pc, Tile initTile) {
+    public KingPiece(Player player, Board board, PieceColor pc, Tile initTile) {
+        this.player = player;
         this.board = board;
 
 //        name = 'K';
@@ -145,131 +149,6 @@ public class KingPiece implements Piece {
         }
     }
 
-//    @Override
-//    public void assadgenerateTilesToMoveTo() {
-//        int x = currentTile.getRow();
-//        int y = currentTile.getCol();
-//
-//        // checking the board for threats before adding moves to tilesToMoveTo
-//        // TODO: checking the board after every turn instead of every generation of moves to each piece to save memory
-//        // board.checkBoard();
-//        // checking if King's legal game steps are possible and adding it to tilesToMoveTo
-//        if (x + 1 < board.getBoard().length) {
-//            if (board.getBoard()[x + 1][y].isEmpty()) {
-//                if (!isThreatenedAtTile(board.getBoard()[x + 1][y])) {
-//                    tilesToMoveTo.add(board.getBoard()[x + 1][y]);
-//                }
-//            } else {
-//                if (board.getBoard()[x+1][y].getPiece().getPieceColor() != pieceColor) {
-//                    if (!isThreatenedAtTile(board.getBoard()[x + 1][y])) {
-//                        tilesToMoveTo.add(board.getBoard()[x + 1][y]);
-//                    }
-//                }
-//            }
-//        }
-//        if (x - 1 >= 0) {
-//            if (board.getBoard()[x - 1][y].isEmpty()) {
-//                if (!isThreatenedAtTile(board.getBoard()[x - 1][y])) {
-//                    tilesToMoveTo.add(board.getBoard()[x - 1][y]);
-//                }
-//            } else {
-//                if (board.getBoard()[x - 1][y].getPiece().getPieceColor() != pieceColor) {
-//                    if (!isThreatenedAtTile(board.getBoard()[x - 1][y])) {
-//                        tilesToMoveTo.add(board.getBoard()[x - 1][y]);
-//                    }
-//                }
-//            }
-//        }
-//        if (y + 1 < board.getBoard().length) {
-//            if (board.getBoard()[x][y + 1].isEmpty()) {
-//                if (!isThreatenedAtTile(board.getBoard()[x][y + 1])) {
-//                    tilesToMoveTo.add(board.getBoard()[x][y + 1]);
-//                }
-//            } else {
-//                if (board.getBoard()[x][y + 1].getPiece().getPieceColor() != pieceColor) {
-//                    if (!isThreatenedAtTile(board.getBoard()[x][y + 1])) {
-//                        tilesToMoveTo.add(board.getBoard()[x][y + 1]);
-//                    }
-//                }
-//            }
-//        }
-//        if (y - 1 >= 0) {
-//            if (board.getBoard()[x][y - 1].isEmpty()) {
-//                if (!isThreatenedAtTile(board.getBoard()[x][y - 1])) {
-//                    tilesToMoveTo.add(board.getBoard()[x][y - 1]);
-//                }
-//            } else {
-//                if (board.getBoard()[x][y - 1].getPiece().getPieceColor() != pieceColor) {
-//                    if (!isThreatenedAtTile(board.getBoard()[x][y - 1])) {
-//                        tilesToMoveTo.add(board.getBoard()[x][y - 1]);
-//                    }
-//                }
-//            }
-//        }
-//        if (x + 1 < board.getBoard().length && y + 1 < board.getBoard().length) {
-//            if (board.getBoard()[x + 1][y + 1].isEmpty()) {
-//                if (!isThreatenedAtTile(board.getBoard()[x + 1][y + 1])) {
-//                    tilesToMoveTo.add(board.getBoard()[x + 1][y + 1]);
-//                }
-//            } else {
-//                if (board.getBoard()[x + 1][y + 1].getPiece().getPieceColor() != pieceColor) {
-//                    if (!isThreatenedAtTile(board.getBoard()[x + 1][y + 1])) {
-//                        tilesToMoveTo.add(board.getBoard()[x + 1][y + 1]);
-//                    }
-//                }
-//            }
-//        }
-//        if (x + 1 < board.getBoard().length && y - 1 >= 0) {
-//            if (board.getBoard()[x + 1][y - 1].isEmpty()) {
-//                if (!isThreatenedAtTile(board.getBoard()[x + 1][y - 1])) {
-//                    tilesToMoveTo.add(board.getBoard()[x + 1][y - 1]);
-//                }
-//            } else {
-//                if (board.getBoard()[x + 1][y - 1].getPiece().getPieceColor() != pieceColor) {
-//                    if (!isThreatenedAtTile(board.getBoard()[x + 1][y - 1])) {
-//                        tilesToMoveTo.add(board.getBoard()[x + 1][y - 1]);
-//                    }
-//                }
-//            }
-//        }
-//        if (x - 1 >= 0 && y + 1 < board.getBoard().length) {
-//            if (board.getBoard()[x - 1][y + 1].isEmpty()) {
-//                if (!isThreatenedAtTile(board.getBoard()[x - 1][y + 1])) {
-//                    tilesToMoveTo.add(board.getBoard()[x - 1][y + 1]);
-//                }
-//            } else {
-//                if (board.getBoard()[x - 1][y + 1].getPiece().getPieceColor() != pieceColor) {
-//                    if (!isThreatenedAtTile(board.getBoard()[x - 1][y + 1])) {
-//                        tilesToMoveTo.add(board.getBoard()[x - 1][y + 1]);
-//                    }
-//                }
-//            }
-//        }
-//        if (x - 1 >= 0 && y - 1 >= 0) {
-//            if (board.getBoard()[x - 1][y - 1].isEmpty()) {
-//                if (!isThreatenedAtTile(board.getBoard()[x - 1][y - 1])) {
-//                    tilesToMoveTo.add(board.getBoard()[x - 1][y - 1]);
-//                }
-//            } else {
-//                if (board.getBoard()[x - 1][y - 1].getPiece().getPieceColor() != pieceColor) {
-//                    if (!isThreatenedAtTile(board.getBoard()[x - 1][y - 1])) {
-//                        tilesToMoveTo.add(board.getBoard()[x - 1][y - 1]);
-//                    }
-//                }
-//            }
-//        }
-//        /*
-//        for (Tile tile : tilesToMoveTo) {
-//            // setting every possible move for king as tile threatened by king's piece color
-//            if (pieceColor == PieceColor.WHITE) {
-//                if (tile.isThreatenedByWhite()) return; else tile.setThreatenedByWhite(true);
-//            } else if (pieceColor == PieceColor.BLACK) {
-//                if (tile.isThreatenedByBlack()) return; else tile.setThreatenedByBlack(true);
-//            }
-//        }
-//        */
-//    }
-
 // castling rules
 // The king has not previously moved;
 // Your chosen rook has not previously moved;
@@ -381,6 +260,21 @@ public class KingPiece implements Piece {
     @Override
     public void setPieceColor(PieceColor pieceColor) {
         this.pieceColor = pieceColor;
+    }
+
+    @Override
+    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
+        return historyMoves;
+    }
+
+    @Override
+    public Pair<Tile, Tile> getLastMove() {
+        return historyMoves.peek();
+    }
+
+    @Override
+    public ArrayList<Piece> getPiecesUnderThreat() {
+        return piecesUnderThreat;
     }
 
     @Override

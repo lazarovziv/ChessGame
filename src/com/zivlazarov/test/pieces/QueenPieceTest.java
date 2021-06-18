@@ -1,11 +1,11 @@
 package com.zivlazarov.test.pieces;
 
-import com.zivlazarov.chessengine.model.pieces.BishopPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.QueenPiece;
-import com.zivlazarov.chessengine.model.utils.Board;
-import com.zivlazarov.chessengine.model.utils.PieceColor;
-import com.zivlazarov.chessengine.model.utils.Tile;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,13 +19,17 @@ public class QueenPieceTest {
     private static QueenPiece queenPiece;
     private static PawnPiece pawnPiece;
     private static PawnPiece opponentPawnPiece;
+    private static Player player;
+    private static Player opponent;
 
     @BeforeAll
     public static void setup() {
         board = new Board();
-        queenPiece = new QueenPiece(board, PieceColor.WHITE, board.getBoard()[3][3]);
-        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[4][3], 0);
-        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[5][3], 0);
+        player = new Player(board, PieceColor.WHITE);
+        opponent = new Player(board, PieceColor.BLACK);
+        queenPiece = new QueenPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3]);
+        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[4][3], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[5][3], 0);
         board.checkBoard();
     }
 
@@ -106,7 +110,7 @@ public class QueenPieceTest {
     @Test
     public void testWhatTilesAreBeingGenerated() {
         queenPiece.getCurrentTile().setPiece(null);
-        queenPiece = new QueenPiece(board, PieceColor.WHITE, board.getBoard()[3][3]);
+        queenPiece = new QueenPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3]);
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 
