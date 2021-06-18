@@ -1,7 +1,11 @@
-package com.zivlazarov.chessengine.model.utils;
+package com.zivlazarov.chessengine.model.utils.player;
 
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;
+import com.zivlazarov.chessengine.model.utils.Pair;
+import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +15,7 @@ import java.util.stream.Collectors;
 public class Player {
 
     private Player opponentPlayer;
+
     private Board board;
     
     private PieceColor playerColor;
@@ -18,7 +23,8 @@ public class Player {
     private List<Piece> alivePieces;
     private List<Piece> deadPieces;
     private boolean hasWonGame;
-    private boolean startsGame;
+
+    private Pair<Tile, Tile> lastMove;
 
     public Player(Board b, PieceColor pc) {
         board = b;
@@ -26,7 +32,6 @@ public class Player {
         alivePieces = new ArrayList();
         deadPieces = new ArrayList();
         hasWonGame = false;
-        this.startsGame = startsGame;
     }
     
     public Player(Board b, PieceColor pc, String name) {
@@ -36,7 +41,6 @@ public class Player {
         alivePieces = new ArrayList();
         deadPieces = new ArrayList();
         hasWonGame = false;
-        this.startsGame = startsGame;
     }
 
     public void updatePieceAsDead(Piece piece) {
@@ -50,8 +54,11 @@ public class Player {
     }
     
     public void movePiece(Piece piece, Tile targetTile) {
+        Tile currentTile = piece.getCurrentTile();
         if (alivePieces.contains(piece)) {
             piece.moveToTile(targetTile);
+            lastMove = null;
+            lastMove = new Pair<>(currentTile, targetTile);
         }
     }
 
@@ -96,6 +103,13 @@ public class Player {
         .filter(piece -> piece.getPieceColor() == playerColor)
         .collect(Collectors.toList()));
     }
+
+    public KingPiece getKing() {
+        for (Piece piece : alivePieces) {
+            if (piece.getName().contains("K")) return (KingPiece) piece;
+        }
+        return null;
+    }
     
     public PieceColor getPlayerColor() {
         return playerColor;
@@ -127,5 +141,22 @@ public class Player {
 
     public boolean equals(Player other) {
         return playerColor == other.getPlayerColor();
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public boolean hasWonGame() {
+        return hasWonGame;
+    }
+
+    public void setHasWonGame(boolean hasWonGame) {
+        this.hasWonGame = hasWonGame;
+    }
+
+    public Pair<Tile, Tile> getLastMove() {
+        return lastMove;
     }
 }
