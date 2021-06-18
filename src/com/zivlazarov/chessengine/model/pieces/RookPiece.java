@@ -263,6 +263,10 @@ public class RookPiece implements Piece {
         return piecesUnderThreat;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
 //    @Override
 //    public void setImageIcon(ImageView imageView) {
 //        this.imageIcon = imageView;

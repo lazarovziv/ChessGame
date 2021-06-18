@@ -273,6 +273,10 @@ public class QueenPiece implements Piece {
         return currentTile;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     @Override
     public void setName(String name) {
         this.name = name;

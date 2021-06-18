@@ -122,61 +122,6 @@ public class KnightPiece implements Piece {
         }
     }
 
-//    @Override
-//    public void asdagenerateTilesToMoveTo() {
-//        int x = currentTile.getRow();
-//        int y = currentTile.getCol();
-//
-//        // 1 right 2 up
-//        if (x + 2 < board.getBoard().length && y + 1 < board.getBoard().length) {
-//            if (isTileAvailable(board.getBoard()[x+2][y+1])) {
-//                tilesToMoveTo.add(board.getBoard()[x+2][y+1]);
-//            }
-//        }
-//        // 1 right 2 down
-//        if (x - 2 >= 0 && y + 1 < board.getBoard().length) {
-//            if (isTileAvailable(board.getBoard()[x-2][y+1])) {
-//                tilesToMoveTo.add(board.getBoard()[x-2][y+1]);
-//            }
-//        }
-//        // 1 left 2 up
-//        if (x + 2 < board.getBoard().length && y - 1 >= 0) {
-//            if (isTileAvailable(board.getBoard()[x+2][y-1])) {
-//                tilesToMoveTo.add(board.getBoard()[x+2][y-1]);
-//            }
-//        }
-//        // 1 left 2 down
-//        if (x - 2 >= 0 && y - 1 >= 0) {
-//            if (isTileAvailable(board.getBoard()[x-2][y-1])) {
-//                tilesToMoveTo.add(board.getBoard()[x-2][y-1]);
-//            }
-//        }
-//        // 2 right 1 up
-//        if (x + 1 < board.getBoard().length && y + 2 < board.getBoard().length) {
-//            if (isTileAvailable(board.getBoard()[x+1][y+2])) {
-//                tilesToMoveTo.add(board.getBoard()[x+1][y+2]);
-//            }
-//        }
-//        // 2 right 1 down
-//        if (x - 1 >= 0 && y + 2 < board.getBoard().length) {
-//            if (isTileAvailable(board.getBoard()[x-1][y+2])) {
-//                tilesToMoveTo.add(board.getBoard()[x-1][y+2]);
-//            }
-//        }
-//        // 2 left 1 up
-//        if (x + 1 < board.getBoard().length && y - 2 >= 0) {
-//            if (isTileAvailable(board.getBoard()[x+1][y-2])) {
-//                tilesToMoveTo.add(board.getBoard()[x+1][y-2]);
-//            }
-//        }
-//        // 2 left 1 down
-//        if (x - 1 >= 0 && y - 2 >= 0) {
-//            if (isTileAvailable(board.getBoard()[x-1][y-2])) {
-//                tilesToMoveTo.add(board.getBoard()[x-1][y-2]);
-//            }
-//        }
-//    }
-
     @Override
     public String getName() {
         return name;
@@ -254,6 +199,10 @@ public class KnightPiece implements Piece {
     @Override
     public ArrayList<Piece> getPiecesUnderThreat() {
         return piecesUnderThreat;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     @Override

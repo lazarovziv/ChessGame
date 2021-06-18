@@ -257,6 +257,10 @@ public class KingPiece implements Piece {
         return currentTile;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     @Override
     public void setPieceColor(PieceColor pieceColor) {
         this.pieceColor = pieceColor;

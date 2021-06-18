@@ -1,4 +1,5 @@
 package com.zivlazarov.chessengine.model.pieces;
+
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.utils.board.Board;
 import com.zivlazarov.chessengine.model.utils.player.Piece;
@@ -16,12 +17,11 @@ import java.util.Stack;
 
 public class PawnPiece implements Piece {
 
-    private Player player;
-
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Pair<Tile, Tile>> historyMoves;
     private final Board board;
+    private Player player;
     private String name;
     private int pieceCounter;
     private boolean isAlive = true;
@@ -71,7 +71,7 @@ public class PawnPiece implements Piece {
         Map<PieceColor, Integer> map = new HashMap<>();
         map.put(PieceColor.WHITE, 1);
         map.put(PieceColor.BLACK, -1);
-        int[] eatingDirections = new int[] {-1, 1};
+        int[] eatingDirections = new int[]{-1, 1};
 
         int x = currentTile.getRow();
         int y = currentTile.getCol();
@@ -81,37 +81,47 @@ public class PawnPiece implements Piece {
         int direction = map.get(pieceColor);
         int longDirection = direction * 2;
 
-        if (x + map.get(pieceColor) > board.getBoard().length - 1 ||  x + map.get(pieceColor) < 0) return;
+        if (x + map.get(pieceColor) > board.getBoard().length - 1 || x + map.get(pieceColor) < 0) return;
 
-        if (board.getBoard()[x+direction][y].isEmpty()) {
-            tilesToMoveTo.add(board.getBoard()[x+direction][y]);
+        if (board.getBoard()[x + direction][y].isEmpty()) {
+            tilesToMoveTo.add(board.getBoard()[x + direction][y]);
             if (canMoveFurther) {
                 if (x + longDirection < 0 || x + longDirection > board.getBoard().length - 1) return;
-                if (board.getBoard()[x+longDirection][y].isEmpty()) {
-                    tilesToMoveTo.add(board.getBoard()[x+longDirection][y]);
+                if (board.getBoard()[x + longDirection][y].isEmpty()) {
+                    tilesToMoveTo.add(board.getBoard()[x + longDirection][y]);
                 }
             }
         }
         for (int d : eatingDirections) {
             if (y + d > board.getBoard().length - 1 || y + d < 0) return;
-            if (!board.getBoard()[x+direction][y+d].isEmpty() &&
-                    board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
-                tilesToMoveTo.add(board.getBoard()[x+direction][y+d]);
-                piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
+            if (!board.getBoard()[x + direction][y + d].isEmpty() &&
+                    board.getBoard()[x + direction][y + d].getPiece().getPieceColor() != pieceColor) {
+                tilesToMoveTo.add(board.getBoard()[x + direction][y + d]);
+                piecesUnderThreat.add(board.getBoard()[x + direction][y + d].getPiece());
+            }
+
+            // insert en passant
+            if (canEnPassant(d)) {
+                tilesToMoveTo.add(board.getBoard()[x+player.getPlayerDirection()][y+d]);
             }
         }
 
     }
 
-    public boolean canEnPassant(PawnPiece pawnPiece) {
-        // checking for same rank (row)
-        if (pawnPiece.getCurrentTile().getRow() == currentTile.getRow()) {
-            // checking if distance between 2 pawns is 1 in the row
-            if (Math.abs(pawnPiece.getCurrentTile().getCol() - currentTile.getCol()) == 1) {
-                // checking if players' last move's pair of tiles contains current pawn's tile
-                if (pawnPiece.player.getLastMove().getSecond().equals(pawnPiece.getCurrentTile())) {
-                    return board.getBoard()[pawnPiece.getCurrentTile().getRow() - 1][pawnPiece.getCurrentTile().getCol()].isEmpty();
-                }
+    public boolean canEnPassant(int eatingDirection) {
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
+
+        if (y + eatingDirection < 0 || y + eatingDirection > board.getBoard().length - 1) return false;
+        // checking if piece next to pawn is of type pawn and is opponent's piece
+        if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece &&
+                board.getBoard()[x][y + eatingDirection].getPiece().getPieceColor() != pieceColor) {
+            Piece pawn = board.getBoard()[x][y + eatingDirection].getPiece();
+            // checking to see if opponent's last move is pawn's move 2 tiles forward
+            if (pawn.getPlayer().getLastMove().equals(new Pair<Tile, Tile>(
+                    board.getBoard()[x + 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
+                    pawn.getCurrentTile()))) {
+                return board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection].isEmpty();
             }
         }
         return false;
@@ -123,13 +133,33 @@ public class PawnPiece implements Piece {
     }
 
     @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
     public boolean getIsAlive() {
         return isAlive;
     }
 
     @Override
+    public void setIsAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
+
+    @Override
     public boolean getIsInDanger() {
         return false;
+    }
+
+//    @Override
+//    public ImageView getImageIcon() {
+//        return imageIcon;
+//    }
+
+    @Override
+    public void setIsInDanger(boolean isInDanger) {
+        this.isInDanger = isInDanger;
     }
 
     @Override
@@ -142,10 +172,10 @@ public class PawnPiece implements Piece {
         return pieceColor;
     }
 
-//    @Override
-//    public ImageView getImageIcon() {
-//        return imageIcon;
-//    }
+    @Override
+    public void setPieceColor(PieceColor pieceColor) {
+        this.pieceColor = pieceColor;
+    }
 
     @Override
     public Tile getCurrentTile() {
@@ -156,24 +186,8 @@ public class PawnPiece implements Piece {
         return pieceCounter;
     }
 
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void setIsAlive(boolean isAlive) {
-        this.isAlive = isAlive;
-    }
-
-    @Override
-    public void setIsInDanger(boolean isInDanger) {
-        this.isInDanger = isInDanger;
-    }
-
-    @Override
-    public void setPieceColor(PieceColor pieceColor) {
-        this.pieceColor = pieceColor;
+    public Player getPlayer() {
+        return player;
     }
 
     @Override

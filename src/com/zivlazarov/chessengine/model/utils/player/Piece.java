@@ -30,6 +30,7 @@ public interface Piece {
     Stack<Pair<Tile, Tile>> getHistoryMoves();
     Pair<Tile, Tile> getLastMove();
     ArrayList<Piece> getPiecesUnderThreat();
+    Player getPlayer();
     boolean canMove();
 
     void setName(String name);

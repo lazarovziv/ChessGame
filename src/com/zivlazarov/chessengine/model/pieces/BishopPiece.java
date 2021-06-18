@@ -229,6 +229,10 @@ public class BishopPiece implements Piece, Observer {
         return piecesUnderThreat;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     //    @Override
 //    public void setImageIcon(ImageView imageIcon) {
 //        this.imageIcon = imageIcon;
