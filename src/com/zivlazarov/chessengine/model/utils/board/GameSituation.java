@@ -1,4 +1,4 @@
-package com.zivlazarov.chessengine.model.utils;
+package com.zivlazarov.chessengine.model.utils.board;
 
 public enum GameSituation {
 

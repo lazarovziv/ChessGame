@@ -1,6 +1,8 @@
-package com.zivlazarov.chessengine.model.utils;
+package com.zivlazarov.chessengine.model.utils.board;
 
 //import javafx.scene.image.ImageView;
+
+import com.zivlazarov.chessengine.model.utils.player.Piece;
 
 public class Tile {
 

@@ -1,8 +1,10 @@
-package com.zivlazarov.chessengine.model.utils;
+package com.zivlazarov.chessengine.model.utils.player;
 
 //import javafx.scene.image.ImageView;
 
-import com.zivlazarov.chessengine.model.Pair;
+import com.zivlazarov.chessengine.model.utils.Pair;
+import com.zivlazarov.chessengine.model.utils.board.PieceColor;
+import com.zivlazarov.chessengine.model.utils.board.Tile;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -25,6 +27,9 @@ public interface Piece {
     PieceColor getPieceColor();
 //    ImageView getImageIcon();
     Tile getCurrentTile();
+    Stack<Pair<Tile, Tile>> getHistoryMoves();
+    Pair<Tile, Tile> getLastMove();
+    ArrayList<Piece> getPiecesUnderThreat();
     boolean canMove();
 
     void setName(String name);

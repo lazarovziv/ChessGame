@@ -1,6 +1,10 @@
-package com.zivlazarov.chessengine.model.utils;
+package com.zivlazarov.chessengine.model.utils.board;
 
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.utils.Observable;
+import com.zivlazarov.chessengine.model.utils.Observer;
+import com.zivlazarov.chessengine.model.utils.player.Piece;
+import com.zivlazarov.chessengine.model.utils.player.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 // make as Singleton (?)
-public class Board {
+public class Board implements Observable {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -26,10 +30,14 @@ public class Board {
     private final Map<String, Piece> whiteAlivePieces;
     private GameSituation gameSituation;
 
+    private List<Observer> observers;
+
     public Board() {
         board = new Tile[8][8];
         blackAlivePieces = new HashMap<>();
         whiteAlivePieces = new HashMap<>();
+
+        observers = new ArrayList<>();
 
         TileColor[] colors = { TileColor.WHITE, TileColor.BLACK };
 
@@ -92,25 +100,15 @@ public class Board {
             }
         }
 
-//        if (currentTurn == PieceColor.WHITE) {
-//            int piecesThreateningKing = 0;
-//            for (Piece blackPiece : blackAlivePieces.values()) {
-//                if (blackPiece.getTilesToMoveTo().contains(whiteAlivePieces.get("wK").getCurrentTile())) {
-//                    piecesThreateningKing += 1;
-//                    if (piecesThreateningKing >= 2) {
-//                        gameSituation = GameSituation.CHECKMATE;
-//                        return;
-//                    }
-//                    gameSituation = GameSituation.CHECK;
-//                    // if king can't escape
-//                    if (!canKingEscape((KingPiece) whiteAlivePieces.get("wK"))) {
-//                        if (distanceBetweenPieces(blackPiece, whiteAlivePieces.get("wK")) > 1) {
-//
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        int threatsCounter = 0;
+
+        for (Piece piece : currentPlayer.getAlivePieces()) {
+            if (piece.getPiecesUnderThreat().contains(currentPlayer.getOpponentPlayer().getKing())) {
+                threatsCounter += 1;
+                if (threatsCounter == 1) gameSituation = GameSituation.CHECK;
+                else if (threatsCounter >= 2) gameSituation = GameSituation.CHECKMATE;
+            }
+        }
     }
 
     public boolean canPieceGetInTheWayOfPiece(Piece defendingPiece, Piece threateningPiece) {
@@ -255,4 +253,19 @@ public class Board {
     }
 
     public GameSituation getGameSituation() { return gameSituation; }
+
+    @Override
+    public void updateAll() {
+
+    }
+
+    @Override
+    public void attach() {
+
+    }
+
+    @Override
+    public void detach() {
+
+    }
 }
