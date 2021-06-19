@@ -30,6 +30,8 @@ public class PawnPiece implements Piece {
     private Tile currentTile;
     private PieceColor pieceColor;
     private boolean hasMoved = false;
+
+    private Tile enPassantTile;
 //    private ImageView imageIcon;
 
     public PawnPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
@@ -125,6 +127,7 @@ public class PawnPiece implements Piece {
             if (pawn.getPlayer().getLastMove().equals(new Pair<Tile, Tile>(
                     board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
                     pawn.getCurrentTile()))) {
+                enPassantTile = board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection];
                 return board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection].isEmpty();
             }
         }
@@ -233,6 +236,20 @@ public class PawnPiece implements Piece {
         if (tilesToMoveTo.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
+
+            if (enPassantTile != null) {
+                if (tile.equals(enPassantTile)) {
+                    tilesPair = new Pair<>(currentTile, tile);
+                    currentTile = tile;
+                    currentTile.setPiece(this);
+                    tilesToMoveTo.clear();
+                    historyMoves.add(tilesPair);
+                    board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].setPiece(null);
+                    generateTilesToMoveTo();
+                    return;
+                }
+            }
+
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
                 tile.getPiece().setIsAlive(false);
