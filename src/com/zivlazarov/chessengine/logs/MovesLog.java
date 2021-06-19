@@ -8,7 +8,6 @@ import java.util.Stack;
 
 public class MovesLog {
 
-    // hashmap of <Piece, Tile> of piece moved and tile it moved to
     private static Stack<Pair<Player, Pair<Tile, Tile>>> movesLog;
 
     private static MovesLog instance;
