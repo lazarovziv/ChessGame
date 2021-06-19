@@ -89,6 +89,9 @@ public class Board implements Observable {
                 if (!tile.isEmpty() && tile.getPiece().getPieceColor() == PieceColor.BLACK) {
                     tile.getPiece().setIsInDanger(true);
                 }
+                if (tile.getPiece() == blackAlivePieces.get("bK")) {
+                    gameSituation = GameSituation.BLACK_IN_CHECK;
+                }
             }
         }
         for (Piece piece : blackAlivePieces.values()) {
@@ -97,16 +100,9 @@ public class Board implements Observable {
                 if (!tile.isEmpty() && tile.getPiece().getPieceColor() == PieceColor.WHITE) {
                     tile.getPiece().setIsInDanger(true);
                 }
-            }
-        }
-
-        int threatsCounter = 0;
-
-        for (Piece piece : currentPlayer.getAlivePieces()) {
-            if (piece.getPiecesUnderThreat().contains(currentPlayer.getOpponentPlayer().getKing())) {
-                threatsCounter += 1;
-                if (threatsCounter == 1) gameSituation = GameSituation.CHECK;
-                else if (threatsCounter >= 2) gameSituation = GameSituation.CHECKMATE;
+                if (tile.getPiece() == whiteAlivePieces.get("wK")) {
+                    gameSituation = GameSituation.WHITE_IN_CHECK;
+                }
             }
         }
     }
