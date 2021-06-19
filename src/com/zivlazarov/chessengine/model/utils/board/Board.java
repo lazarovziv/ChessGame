@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // make as Singleton (?)
 public class Board implements Observable {
@@ -78,7 +79,6 @@ public class Board implements Observable {
                 tile.setThreatenedByBlack(false);
             }
         }
-        PieceColor currentTurn = currentPlayer.getPlayerColor();
         for (Piece piece : whiteAlivePieces.values()) piece.refresh();
         for (Piece piece : blackAlivePieces.values()) piece.refresh();
 
@@ -105,6 +105,42 @@ public class Board implements Observable {
                 }
             }
         }
+    }
+
+    public Board simulateSituations(Board board, Player currentPlayer, int numOfFutureTurns) {
+        if (numOfFutureTurns == 0) return board;
+        KingPiece kingPiece = currentPlayer.getKing();
+        if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
+            List<Piece> threateningPieces = blackAlivePieces.values().stream().filter(
+                    piece -> piece.getPiecesUnderThreat().contains(kingPiece)
+            ).collect(Collectors.toList());
+            // checking what happens if king eats threatening piece
+            for (Piece piece : threateningPieces) {
+                if (kingPiece.getPiecesUnderThreat().contains(piece)) {
+                    kingPiece.moveToTile(piece.getCurrentTile());
+                    board.checkBoard(currentPlayer.getOpponentPlayer());
+                    if (board.getGameSituation() == GameSituation.WHITE_IN_CHECK) {
+                        return board;
+                    }
+                }
+            }
+            // checking if king is being protected
+
+        } else {
+            List<Piece> threateningPieces = whiteAlivePieces.values().stream().filter(
+                    piece -> piece.getPiecesUnderThreat().contains(kingPiece)
+            ).collect(Collectors.toList());
+            for (Piece piece : threateningPieces) {
+                if (kingPiece.getPiecesUnderThreat().contains(piece)) {
+                    kingPiece.moveToTile(piece.getCurrentTile());
+                    board.checkBoard(currentPlayer.getOpponentPlayer());
+                    if (board.getGameSituation() == GameSituation.BLACK_IN_CHECK) {
+                        return board;
+                    }
+                }
+            }
+        }
+        return board;
     }
 
     public boolean canPieceGetInTheWayOfPiece(Piece defendingPiece, Piece threateningPiece) {
