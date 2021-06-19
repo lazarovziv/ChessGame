@@ -57,30 +57,6 @@ public class RookPiece implements Piece {
 //        generateTilesToMoveTo();
     }
 
-//    public RookPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
-//        this.board = board;
-//
-////        name = 'R';
-//        pieceColor = pc;
-//        tilesToMoveTo = new ArrayList<Tile>();
-//
-//        currentTile = initTile;
-//        if (pieceColor == PieceColor.BLACK) {
-//            name = "bR";
-//            board.getBlackAlivePieces().put(name, this);
-//        }
-//        if (pieceColor == PieceColor.WHITE) {
-//            name = "wR";
-//            board.getWhiteAlivePieces().put(name, this);
-//        }
-//
-//        currentTile.setPiece(this);
-//        imageIcon = imageView;
-//        currentTile.setPieceImageView(imageIcon);
-//
-////        generateTilesToMoveTo();
-//    }
-
     @Override
     public void refresh() {
         if (tilesToMoveTo.size() != 0) {

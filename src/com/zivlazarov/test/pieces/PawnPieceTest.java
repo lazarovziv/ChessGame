@@ -1,10 +1,13 @@
 package com.zivlazarov.test.pieces;
 
+import com.zivlazarov.chessengine.controllers.PlayerController;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.KnightPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.utils.board.Board;
 import com.zivlazarov.chessengine.model.utils.board.PieceColor;
 import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.utils.player.Piece;
 import com.zivlazarov.chessengine.model.utils.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -56,5 +59,35 @@ public class PawnPieceTest {
         tilesTrue.add(board.getBoard()[3][0]);
 
         Assertions.assertEquals(tilesTrue, tilesGenerated);
+    }
+
+    @Test
+    public void testEnPassant() {
+        board = new Board();
+        player = new Player(board, PieceColor.WHITE);
+        opponent = new Player(board, PieceColor.BLACK);
+
+        PawnPiece pawn = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][3], 0);
+        PawnPiece opponentPawn = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[6][3], 0);
+//        KingPiece whiteKing = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0]);
+//        KingPiece blackKing = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7]);
+
+        board.checkBoard();
+        PlayerController controller = new PlayerController();
+        controller.setPlayer(player);
+        controller.setOpponentPlayer(opponent);
+        controller.addPieceToAlive(pawn);
+        controller.movePiece(pawn, board.getBoard()[3][3]);
+        board.checkBoard();
+        board.printBoard();
+        controller.setPlayer(opponent);
+        controller.addPieceToAlive(opponentPawn);
+        controller.movePiece(opponentPawn, board.getBoard()[4][3]);
+        board.checkBoard();
+        board.printBoard();
+        controller.setPlayer(player);
+        board.checkBoard();
+
+        pawn.getTilesToMoveTo().forEach(tile -> System.out.print(tile + ","));
     }
 }

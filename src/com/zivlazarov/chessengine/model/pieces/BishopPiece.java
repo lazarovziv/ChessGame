@@ -106,55 +106,6 @@ public class BishopPiece implements Piece, Observer {
         }
     }
 
-//    @Override
-//    public void generateTilesToMoveTo() {
-//        int x = currentTile.getRow();
-//        int y = currentTile.getCol();
-//
-//        // TODO: use 1 loop in each iteration, maybe use a local variable outside of loop and zero it right before each one executes
-//
-//        int[][] directions = new int[][]{ {1,1}, {-1,-1}, {1,-1}, {-1,1} };
-//
-////        for (int i = 0; i < directions.length; i++) {
-////            int row = 0, col = 1;
-////        }
-//
-//        // "going down and right diagonally"
-//        for (int i = x + 1, j = y + 1; i < board.getBoard().length && j < board.getBoard().length; i++, j++) {
-//            if (board.getBoard()[i][j].isEmpty()) {
-//                tilesToMoveTo.add(board.getBoard()[i][j]);
-//            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
-//                tilesToMoveTo.add(board.getBoard()[i][j]);
-//            } else break;
-//        }
-//        // "going up and left diagonally"
-//        for (int i = x - 1, j = y - 1; i >= 0 && j >=0; i--, j--) {
-//            if (board.getBoard()[i][j].isEmpty()) {
-//                tilesToMoveTo.add(board.getBoard()[i][j]);
-//            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
-//                tilesToMoveTo.add(board.getBoard()[i][j]);
-//            } else break;
-//        }
-//
-//        // "going down and left diagonally"
-//        for (int i = x + 1, j = y - 1; i < board.getBoard().length && j >= 0; i++, j--) {
-//            if (board.getBoard()[i][j].isEmpty()) {
-//                tilesToMoveTo.add(board.getBoard()[i][j]);
-//            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
-//                tilesToMoveTo.add(board.getBoard()[i][j]);
-//            } else break;
-//        }
-//
-//        // "going up and right diagonally"
-//        for (int i = x - 1, j = y + 1; i >= 0 && j < board.getBoard().length; i--, j++) {
-//            if (board.getBoard()[i][j].isEmpty()) {
-//                tilesToMoveTo.add(board.getBoard()[i][j]);
-//            } else if (board.getBoard()[i][j].getPiece().getPieceColor() != pieceColor) {
-//                tilesToMoveTo.add(board.getBoard()[i][j]);
-//            } else break;
-//        }
-//    }
-
     @Override
     public String getName() {
         return name;
