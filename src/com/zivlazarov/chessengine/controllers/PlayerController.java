@@ -1,6 +1,7 @@
 package com.zivlazarov.chessengine.controllers;
 
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.utils.player.Piece;
 import com.zivlazarov.chessengine.model.utils.player.Player;
@@ -28,6 +29,10 @@ public class PlayerController {
         player.queenSideCastle(kingPiece, rookPiece);
     }
 
+    public void promotePawn(PawnPiece pawnPiece, String pieceName) {
+        player.promotePawn(pawnPiece, pieceName);
+    }
+
     public void updateStatusOfPiece(Piece piece, boolean isAlive) {
         if (isAlive) player.updatePieceAsAlive(piece);
         else player.updatePieceAsDead(piece);
@@ -37,6 +42,14 @@ public class PlayerController {
         player.getAlivePieces().addAll(Arrays.stream(pieces)
         .filter(predicate)
         .collect(Collectors.toList()));
+    }
+
+    public void addPieceToAlive(Piece piece) {
+        player.addPieceToAlive(piece);
+    }
+
+    public void clearTileFromPiece(Tile tile) {
+        player.clearTileFromPiece(tile);
     }
 
     public void addAlivePieces(Piece[] pieces) {
@@ -67,5 +80,61 @@ public class PlayerController {
 
     public Player getOpponentPlayer() {
         return player.getOpponentPlayer();
+    }
+
+    public void setNumOfKings(int num) {
+        player.setNumOfKings(num);
+    }
+
+    public void setNumOfQueens(int num) {
+        player.setNumOfQueens(num);
+    }
+
+    public void setNumOfBishops(int num) {
+        player.setNumOfBishops(num);
+    }
+
+    public void setNumOfKnights(int num) {
+        player.setNumOfKnights(num);
+    }
+
+    public void setNumOfRooks(int num) {
+        player.setNumOfRooks(num);
+    }
+
+    public void setNumOfPawns(int num) {
+        player.setNumOfPawns(num);
+    }
+
+    public int getNumOfKings() {
+        return player.getNumOfKings();
+    }
+
+    public int getNumOfQueens() {
+        return player.getNumOfQueens();
+    }
+
+    public int getNumOfBishops() {
+        return player.getNumOfBishops();
+    }
+
+    public int getNumOfKnights() {
+        return player.getNumOfKnights();
+    }
+
+    public int getNumOfRooks() {
+        return player.getNumOfRooks();
+    }
+
+    public int getNumOfPawns() {
+        return player.getNumOfPawns();
+    }
+
+    public boolean hasPlayerPlayedThisTurn() {
+        return player.hasPlayedThisTurn();
+    }
+
+    public void setHasPlayerPlayedThisTurn(boolean played) {
+        player.setHasPlayedThisTurn(played);
     }
 }
