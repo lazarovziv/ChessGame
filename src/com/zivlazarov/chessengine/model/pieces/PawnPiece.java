@@ -104,6 +104,9 @@ public class PawnPiece implements Piece {
             // insert en passant
             if (canEnPassant(d)) {
                 tilesToMoveTo.add(board.getBoard()[x+player.getPlayerDirection()][y+d]);
+                // setting the adjacent pawn piece as under threat
+                // only move in chess where piece can be eaten without moving to it's tile
+                piecesUnderThreat.add(board.getBoard()[x][y+d].getPiece());
             }
         }
 
@@ -122,7 +125,6 @@ public class PawnPiece implements Piece {
             if (pawn.getPlayer().getLastMove().equals(new Pair<Tile, Tile>(
                     board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
                     pawn.getCurrentTile()))) {
-                System.out.println("YES!!!!!");
                 return board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection].isEmpty();
             }
         }
@@ -250,7 +252,7 @@ public class PawnPiece implements Piece {
             // add target tile to history of moves
             historyMoves.add(tilesPair);
 
-            hasMoved = true;
+            if (!hasMoved) hasMoved = true;
             generateTilesToMoveTo();
         }
     }
