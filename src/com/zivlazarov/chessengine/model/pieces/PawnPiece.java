@@ -1,5 +1,6 @@
 package com.zivlazarov.chessengine.model.pieces;
 
+import com.zivlazarov.chessengine.logs.MovesLog;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.utils.board.Board;
 import com.zivlazarov.chessengine.model.utils.player.Piece;
@@ -116,11 +117,12 @@ public class PawnPiece implements Piece {
         // checking if piece next to pawn is of type pawn and is opponent's piece
         if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece &&
                 board.getBoard()[x][y + eatingDirection].getPiece().getPieceColor() != pieceColor) {
-            Piece pawn = board.getBoard()[x][y + eatingDirection].getPiece();
+            PawnPiece pawn = (PawnPiece) board.getBoard()[x][y + eatingDirection].getPiece();
             // checking to see if opponent's last move is pawn's move 2 tiles forward
             if (pawn.getPlayer().getLastMove().equals(new Pair<Tile, Tile>(
-                    board.getBoard()[x + 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
+                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
                     pawn.getCurrentTile()))) {
+                System.out.println("YES!!!!!");
                 return board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection].isEmpty();
             }
         }
