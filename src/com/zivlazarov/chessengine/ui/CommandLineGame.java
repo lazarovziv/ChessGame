@@ -1,5 +1,6 @@
 package com.zivlazarov.chessengine.ui;
 
+import com.zivlazarov.chessengine.controllers.BoardController;
 import com.zivlazarov.chessengine.controllers.PlayerController;
 import com.zivlazarov.chessengine.logs.MovesLog;
 import com.zivlazarov.chessengine.model.utils.Pair;
@@ -31,12 +32,12 @@ public class CommandLineGame {
         Player blackPlayer = new Player(board, PieceColor.BLACK);
 
         MovesLog log = MovesLog.getInstance();
-        movesLog = MovesLog.getMovesLog();
+        movesLog = log.getMovesLog();
 
-//        PlayerController controller = new PlayerController(whitePlayer, blackPlayer);
         PlayerController playerController = new PlayerController();
-//        PlayerController whiteController = new PlayerController(whitePlayer, blackPlayer);
-//        PlayerController blackController = new PlayerController(blackPlayer, whitePlayer);
+
+        BoardController boardController = new BoardController();
+        boardController.setBoard(board);
 
         PieceColor[] playersColors = {PieceColor.WHITE, PieceColor.BLACK};
 
@@ -60,16 +61,13 @@ public class CommandLineGame {
             System.out.println("Who plays white? ");
 
             whitePlayerName = scanner.nextLine();
-//            whiteController.setPlayerName(whitePlayerName);
-//            whitePlayer.setName(whitePlayerName);
             playerController.setPlayerName(whitePlayerName);
 
             System.out.println("Who plays black? ");
 
             blackPlayerName = scanner.nextLine();
-//            blackController.setPlayerName(blackPlayerName);
-//            blackPlayer.setName(blackPlayerName);
             playerController.setOpponentPlayerName(blackPlayerName);
+
             System.out.println();
             System.out.println("It's a " + playerController.getPlayer().getName() + " vs. " + playerController.getOpponentPlayer().getName() + " SHOWDOWN!");
             System.out.println();
@@ -85,10 +83,8 @@ public class CommandLineGame {
 
         // white always starts first
         int turn = 0;
-//        playerController.setPlayer(whitePlayer);
 
         while (gameStarted) {
-//            board.printBoard();
 
             if (movesLog.size() != 0) {
                 System.out.println(movesLog.peek().getFirst() + " played: " + movesLog.peek().getSecond());
@@ -98,12 +94,6 @@ public class CommandLineGame {
             PieceColor currentTurn = playersColors[(turn + playersColors.length) % 2];
 
             Player currentPlayer = playerController.getPlayer();
-
-//            ArrayList<Piece> threateningKingPieces = (ArrayList<Piece>) currentPlayer.getAlivePieces().stream().filter(piece ->
-//                    piece.getPiecesUnderThreat().contains(
-//                            Arrays.asList(allPieces).stream().filter(p -> p.getName().contains("K"))
-//
-//            .collect(Collectors.toList())));
 
             if (turn != 0) {
                 if (currentTurn == whitePlayer.getPlayerColor()) {
@@ -119,14 +109,14 @@ public class CommandLineGame {
 
             playerController.setHasPlayerPlayedThisTurn(false);
 
-            board.checkBoard(currentPlayer);
+            boardController.checkBoard(currentPlayer);
 
             // handle game situations
             handleGameSituations(currentPlayer, whitePlayer, blackPlayer, turn);
 
             // show board to player from his side of view
-            if (turn % 2 == 0) board.printBoardUpsideDown();
-            else board.printBoard();
+            if (turn % 2 == 0) boardController.printBoardUpsideDown();
+            else boardController.printBoard();
 
             int rowChosen;
             int colChosen;
@@ -170,8 +160,8 @@ public class CommandLineGame {
                     || !tileChosen.getPiece().canMove());
 
             // show board to player from his side of view
-            if (turn % 2 == 0) board.printBoardUpsideDown(tileChosen);
-            else board.printBoard(tileChosen);
+            if (turn % 2 == 0) boardController.printBoardUpsideDown(tileChosen);
+            else boardController.printBoard(tileChosen);
 
             Piece pieceChosen = null;
 
@@ -198,7 +188,7 @@ public class CommandLineGame {
                 System.out.print("Column: ");
                 colToMoveChosen = scanner.nextInt();
 
-                tileToMoveChosen = board.getBoard()[rowToMoveChosen-1][colToMoveChosen-1];
+                tileToMoveChosen = boardController.getBoard().getBoard()[rowToMoveChosen-1][colToMoveChosen-1];
 
                 if (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen)) {
                     System.out.println("Piece cannot move to " + tileToMoveChosen + " !");
@@ -216,8 +206,6 @@ public class CommandLineGame {
                 playerController.movePiece(pieceChosen, tileToMoveChosen);
             }
 
-//            if (currentPlayer.equals(whitePlayer)) whiteController.movePiece(pieceChosen, tileToMoveChosen);
-//            else blackController.movePiece(pieceChosen, tileToMoveChosen);
             Pair<Player, Pair<Tile, Tile>> lastMove =
                     new Pair<Player, Pair<Tile, Tile>>(playerController.getPlayer(), playerController.getPlayer().getLastMove());
             movesLog.push(lastMove);

@@ -39,7 +39,7 @@ public class KingPieceTest {
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
         kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4]);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
-        board.checkBoard(player);
+        board.checkBoard();
         List<Tile> tilesGenerated = kingPiece.getTilesToMoveTo();
         board.printBoard();
 
@@ -65,7 +65,7 @@ public class KingPieceTest {
 //        pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
 //        opponentPawnPiece.moveToTile(board.getBoard()[opponentPawnPiece.getCurrentTile().getRow() - 1][opponentPawnPiece.getCurrentTile().getCol()]);
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = kingPiece.getTilesToMoveTo();
         board.printBoard();
@@ -96,7 +96,7 @@ public class KingPieceTest {
         RookPiece rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], 1);
         RookPiece blackRook0 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][0], 0);
         RookPiece blackRook1 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7], 1);
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = kingPiece.getTilesToMoveTo();
         board.printBoard();
@@ -109,7 +109,7 @@ public class KingPieceTest {
         PlayerController controller = new PlayerController();
         controller.setPlayer(player);
         controller.kingSideCastle(kingPiece, rookPiece1);
-        board.checkBoard(player);
+        board.checkBoard();
         board.printBoard();
 
     }

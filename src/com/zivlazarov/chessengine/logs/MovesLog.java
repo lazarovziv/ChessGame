@@ -23,7 +23,7 @@ public class MovesLog {
         return instance;
     }
 
-    public static Stack<Pair<Player, Pair<Tile, Tile>>> getMovesLog() {
+    public Stack<Pair<Player, Pair<Tile, Tile>>> getMovesLog() {
         return movesLog;
     }
 }

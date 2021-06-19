@@ -138,7 +138,6 @@ public class Player {
                 clearTileFromPiece(pawnPiece.getCurrentTile());
                 numOfKnights++;
                 piece = new KnightPiece(this, board, playerColor, targetTile,numOfKnights - 1);
-
             }
         }
         if (piece != null) {
