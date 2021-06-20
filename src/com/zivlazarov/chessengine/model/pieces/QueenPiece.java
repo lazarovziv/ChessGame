@@ -19,6 +19,7 @@ public class QueenPiece implements Piece {
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Pair<Tile, Tile>> historyMoves;
+    private Stack<Pair<Piece, Tile>> piecesEaten;
     private final Board board;
     private String name;
     private boolean isAlive = true;
@@ -36,6 +37,7 @@ public class QueenPiece implements Piece {
         tilesToMoveTo = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
+        piecesEaten = new Stack<>();
 
         currentTile = initTile;
         if (pieceColor == PieceColor.BLACK) {
@@ -46,6 +48,7 @@ public class QueenPiece implements Piece {
             name = "wQ";
             board.getWhiteAlivePieces().put(name, this);
         }
+        player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
 
@@ -288,6 +291,11 @@ public class QueenPiece implements Piece {
         return piecesUnderThreat;
     }
 
+    @Override
+    public void setCurrentTile(Tile currentTile) {
+        this.currentTile = currentTile;
+    }
+
 //    @Override
 //    public void setImageIcon(ImageView imageIcon) {
 //        this.imageIcon = imageIcon;
@@ -314,23 +322,46 @@ public class QueenPiece implements Piece {
             currentTile.setPiece(null);
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
+                piecesEaten.push(new Pair<Piece, Tile>(tile.getPiece(), tile));
                 tile.getPiece().setIsAlive(false);
                 if (pieceColor == PieceColor.BLACK) {
                     board.getWhiteAlivePieces().remove(tile.getPiece().getName());
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName());
                 }
+                player.getOpponentPlayer().addPieceToDead(tile.getPiece());
                 tile.setPiece(null);
-                tilesPair = new Pair<>(currentTile, tile);
             }
             // change to selected tile
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
+            tilesPair = new Pair<>(currentTile, tile);
             historyMoves.add(tilesPair);
             generateTilesToMoveTo();
         }
+    }
+
+    @Override
+    public void unmakeLastMove() {
+        if (historyMoves.size() == 0) return;
+        Tile previousTile = historyMoves.pop().getFirst();
+        // checking if piece really ate opponent's piece last turn
+        if (piecesEaten.size() != 0) {
+            Pair<Piece, Tile> lastPair = piecesEaten.pop();
+            if (lastPair.getSecond().equals(currentTile)) {
+                // if so, setting the eaten piece at this piece's current tile and this piece at it's previous tile
+                currentTile.setPiece(lastPair.getFirst());
+                lastPair.getFirst().setIsAlive(true);
+            }
+        } else {
+            currentTile.setPiece(null);
+        }
+        currentTile = previousTile;
+        currentTile.setPiece(this);
+        tilesToMoveTo.clear();
+        generateTilesToMoveTo();
     }
 
     @Override
@@ -360,5 +391,10 @@ public class QueenPiece implements Piece {
     @Override
     public boolean hasMoved() {
         return false;
+    }
+
+    @Override
+    public Piece lastPieceEaten() {
+        return piecesEaten.pop().getFirst();
     }
 }

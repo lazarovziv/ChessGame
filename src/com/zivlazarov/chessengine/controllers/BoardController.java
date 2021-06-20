@@ -37,4 +37,12 @@ public class BoardController {
     public Board getBoard() {
         return board;
     }
+
+    public void setWhitePlayer(Player whitePlayer) {
+        board.setWhitePlayer(whitePlayer);
+    }
+
+    public void setBlackPlayer(Player blackPlayer) {
+        board.setBlackPlayer(blackPlayer);
+    }
 }

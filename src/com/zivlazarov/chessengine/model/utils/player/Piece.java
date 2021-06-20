@@ -37,9 +37,14 @@ public interface Piece {
     void setIsAlive(boolean isAlive);
     void setIsInDanger(boolean isInDanger);
     void setPieceColor(PieceColor pieceColor);
+    void setCurrentTile(Tile tile);
 //    void setImageIcon(ImageView imageView);
 
     void moveToTile(Tile tile);
+
+    void unmakeLastMove();
+
+    Piece lastPieceEaten();
 
     void generateTilesToMoveTo();
 

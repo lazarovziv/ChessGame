@@ -21,6 +21,7 @@ public class PawnPiece implements Piece {
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Pair<Tile, Tile>> historyMoves;
+    private Stack<Pair<Piece, Tile>> piecesEaten;
     private final Board board;
     private Player player;
     private String name;
@@ -43,6 +44,7 @@ public class PawnPiece implements Piece {
         tilesToMoveTo = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
+        piecesEaten = new Stack<>();
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -55,6 +57,7 @@ public class PawnPiece implements Piece {
             name = "wP";
             board.getWhiteAlivePieces().put(name + pieceCounter, this);
         }
+        player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
 
@@ -212,6 +215,11 @@ public class PawnPiece implements Piece {
         return piecesUnderThreat;
     }
 
+    @Override
+    public void setCurrentTile(Tile currentTile) {
+        this.currentTile = currentTile;
+    }
+
 //    @Override
 //    public void setImageIcon(ImageView imageIcon) {
 //        this.imageIcon = imageIcon;
@@ -244,6 +252,9 @@ public class PawnPiece implements Piece {
                     currentTile.setPiece(this);
                     tilesToMoveTo.clear();
                     historyMoves.add(tilesPair);
+                    piecesEaten.push(new Pair<Piece, Tile>(
+                            board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].getPiece(),
+                            board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()]));
                     board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].setPiece(null);
                     generateTilesToMoveTo();
                     return;
@@ -252,14 +263,15 @@ public class PawnPiece implements Piece {
 
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
+                piecesEaten.push(new Pair<Piece, Tile>(tile.getPiece(), tile));
                 tile.getPiece().setIsAlive(false);
                 if (pieceColor == PieceColor.BLACK) {
                     board.getWhiteAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                player.getOpponentPlayer().addPieceToDead(tile.getPiece());
                 tile.setPiece(null);
-                tilesPair = new Pair<>(currentTile, tile);
             }
             // change to selected tile
             currentTile = tile;
@@ -267,11 +279,34 @@ public class PawnPiece implements Piece {
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
             // add target tile to history of moves
+            tilesPair = new Pair<>(currentTile, tile);
             historyMoves.add(tilesPair);
 
             if (!hasMoved) hasMoved = true;
             generateTilesToMoveTo();
         }
+    }
+
+    @Override
+    public void unmakeLastMove() {
+        if (historyMoves.size() == 0) return;
+        Tile previousTile = historyMoves.pop().getFirst();
+        // checking if piece really ate opponent's piece last turn
+        if (piecesEaten.size() != 0) {
+            Pair<Piece, Tile> lastPair = piecesEaten.pop();
+            // handle en passant tile
+            if (lastPair.getSecond().equals(currentTile)) {
+                // if so, setting the eaten piece at this piece's current tile and this piece at it's previous tile
+                currentTile.setPiece(lastPair.getFirst());
+                lastPair.getFirst().setIsAlive(true);
+            }
+        } else {
+            currentTile.setPiece(null);
+        }
+        currentTile = previousTile;
+        currentTile.setPiece(this);
+        tilesToMoveTo.clear();
+        generateTilesToMoveTo();
     }
 
     @Override
@@ -302,5 +337,10 @@ public class PawnPiece implements Piece {
     @Override
     public boolean hasMoved() {
         return false;
+    }
+
+    @Override
+    public Piece lastPieceEaten() {
+        return piecesEaten.pop().getFirst();
     }
 }

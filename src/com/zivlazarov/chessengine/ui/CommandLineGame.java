@@ -19,11 +19,13 @@ public class CommandLineGame {
 
     private static Board board = new Board();
     private static Piece[] allPieces = new Piece[32];
-    private static Stack<Pair<Player, Pair<Tile, Tile>>> movesLog;
+    private static Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> movesLog;
 
     public static void main(String[] args) {
 
         boolean gameStarted = false;
+
+        boolean legalMove = false;
 
         String whitePlayerName = "";
         String blackPlayerName = "";
@@ -38,6 +40,8 @@ public class CommandLineGame {
 
         BoardController boardController = new BoardController();
         boardController.setBoard(board);
+        boardController.setWhitePlayer(whitePlayer);
+        boardController.setBlackPlayer(blackPlayer);
 
         PieceColor[] playersColors = {PieceColor.WHITE, PieceColor.BLACK};
 
@@ -78,13 +82,15 @@ public class CommandLineGame {
         initPieces(whitePlayer, blackPlayer);
 
         // adding players' alive pieces
-        playerController.addAlivePieces(allPieces);
-        playerController.addAlivePiecesToOpponent(allPieces);
+//        playerController.addAlivePieces(allPieces);
+//        playerController.addAlivePiecesToOpponent(allPieces);
 
         // white always starts first
         int turn = 0;
 
         while (gameStarted) {
+
+            legalMove = false;
 
             if (movesLog.size() != 0) {
                 System.out.println(movesLog.peek().getFirst() + " played: " + movesLog.peek().getSecond());
@@ -194,7 +200,18 @@ public class CommandLineGame {
                     System.out.println("Piece cannot move to " + tileToMoveChosen + " !");
                 }
 
-            } while (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen));
+                // checking if the tile chosen is applicable to current game situation
+                if (currentPlayer.equals(whitePlayer)) {
+                    if (board.getGameSituation() == GameSituation.WHITE_IN_CHECK) {
+                        legalMove = board.getWhiteLegalTilesToMoveTo().contains(tileToMoveChosen);
+                    } if (board.getGameSituation() == GameSituation.NORMAL) legalMove = true;
+                } else if (currentPlayer.equals(blackPlayer)) {
+                    if (board.getGameSituation() == GameSituation.BLACK_IN_CHECK) {
+                        legalMove = board.getBlackLegalTilesToMoveTo().contains(tileToMoveChosen);
+                    } if (board.getGameSituation() == GameSituation.NORMAL) legalMove = true;
+                }
+
+            } while (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen) || !legalMove);
 
             // handle castling
             handleCastling(currentPlayer, whitePlayer, blackPlayer, pieceChosen, tileToMoveChosen, playerController);
@@ -203,11 +220,12 @@ public class CommandLineGame {
             handlePawnPromotion(pieceChosen, currentPlayer, playerController, scanner);
 
             if (!playerController.hasPlayerPlayedThisTurn()) {
-                playerController.movePiece(pieceChosen, tileToMoveChosen);
+                if (legalMove) playerController.movePiece(pieceChosen, tileToMoveChosen);
             }
 
-            Pair<Player, Pair<Tile, Tile>> lastMove =
-                    new Pair<Player, Pair<Tile, Tile>>(playerController.getPlayer(), playerController.getPlayer().getLastMove());
+            Pair<Pair<Player, Piece>, Pair<Tile, Tile>> lastMove =
+                    new Pair<Pair<Player, Piece>, Pair<Tile, Tile>>(new Pair<Player, Piece>(playerController.getPlayer(), pieceChosen),
+                            playerController.getPlayer().getLastMove());
             movesLog.push(lastMove);
 
             turn = turn + 1;
@@ -338,7 +356,7 @@ public class CommandLineGame {
 
     private static void handleGameSituations(Player currentPlayer, Player whitePlayer, Player blackPlayer, int turn) {
         if (currentPlayer.equals(whitePlayer)) {
-            if (board.getGameSituation() == GameSituation.WHITE_CHECKMATE) {
+            if (board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
                 System.out.println("Checkmate! " + currentPlayer.getOpponentPlayer().getName() + " wins!");
                 currentPlayer.getOpponentPlayer().setHasWonGame(true);
                 System.out.println("Moves from the match: ");
@@ -358,7 +376,7 @@ public class CommandLineGame {
                 }
             }
         } else if (currentPlayer.equals(blackPlayer)) {
-            if (board.getGameSituation() == GameSituation.BLACK_CHECKMATE) {
+            if (board.getGameSituation() == GameSituation.BLACK_CHECKMATED) {
                 System.out.println("Checkmate! " + currentPlayer.getOpponentPlayer().getName() + " wins!");
                 currentPlayer.getOpponentPlayer().setHasWonGame(true);
                 System.out.println("Moves from the match: ");
@@ -378,5 +396,9 @@ public class CommandLineGame {
                 }
             }
         }
+    }
+
+    public void receiveInputForMove(Player currentPlayer, int rowChosen, int colChosen) {
+
     }
 }

@@ -31,6 +31,7 @@ public class KingPieceTest {
         opponent = new Player(board, PieceColor.BLACK);
 //        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[3][4], 0);
         kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3]);
+        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][3], 0);
 //        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[2][4], 0);
 //        board.checkBoard();
     }
@@ -112,6 +113,18 @@ public class KingPieceTest {
         board.checkBoard();
         board.printBoard();
 
+    }
+
+    @Test
+    public void testUnmakeMove() {
+        board.printBoard();
+        board.checkBoard();
+        kingPiece.moveToTile(board.getBoard()[1][3]);
+        board.printBoard();
+        kingPiece.unmakeLastMove();
+        board.printBoard();
+        board.checkBoard();
+        for (Tile tile : kingPiece.getTilesToMoveTo()) System.out.println(tile);
     }
 
 }

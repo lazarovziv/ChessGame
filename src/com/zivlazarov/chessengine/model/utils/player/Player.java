@@ -24,6 +24,8 @@ public class Player {
     private boolean hasWonGame;
     private boolean hasPlayedThisTurn;
 
+    private List<Tile> legalMoves;
+
     private int numOfPawns;
     private int numOfKnights;
     private int numOfBishops;
@@ -42,6 +44,7 @@ public class Player {
         deadPieces = new ArrayList();
         hasWonGame = false;
         hasPlayedThisTurn = false;
+        legalMoves = new ArrayList<>();
 
         // setting player direction, white goes up the board, black goes down (specifically to pawn pieces and for checking pawn promotion)
         if (playerColor == PieceColor.WHITE) {
@@ -149,12 +152,17 @@ public class Player {
     public void addPieceToAlive(Piece piece) {
         if (piece.getPieceColor() == playerColor) {
             alivePieces.add(piece);
+            if (deadPieces.contains(piece)) {
+                deadPieces.remove(piece);
+            }
         }
     }
 
     public void addPieceToDead(Piece piece) {
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
+            alivePieces.remove(piece);
+            piece.setCurrentTile(null);
         }
     }
 
@@ -282,5 +290,15 @@ public class Player {
 
     public void setHasPlayedThisTurn(boolean played) {
         hasPlayedThisTurn = played;
+    }
+
+    public List<Tile> getLegalMoves() {
+        return legalMoves;
+    }
+
+    public void updateLegalMoves() {
+        for (Piece piece : alivePieces) {
+            legalMoves.addAll(piece.getTilesToMoveTo());
+        }
     }
 }

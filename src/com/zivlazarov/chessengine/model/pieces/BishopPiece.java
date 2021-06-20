@@ -21,6 +21,7 @@ public class BishopPiece implements Piece, Observer {
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Pair<Tile, Tile>> historyMoves;
+    private Stack<Pair<Piece, Tile>> piecesEaten;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -39,6 +40,7 @@ public class BishopPiece implements Piece, Observer {
         tilesToMoveTo = new ArrayList<>();
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
+        piecesEaten = new Stack<>();
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
@@ -51,6 +53,7 @@ public class BishopPiece implements Piece, Observer {
             name = "wB";
             board.getWhiteAlivePieces().put(name + pieceCounter, this);
         }
+        player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
 
@@ -171,17 +174,17 @@ public class BishopPiece implements Piece, Observer {
     }
 
     @Override
-    public Pair<Tile, Tile> getLastMove() {
-        return historyMoves.peek();
-    }
-
-    @Override
     public ArrayList<Piece> getPiecesUnderThreat() {
         return piecesUnderThreat;
     }
 
     public Player getPlayer() {
         return player;
+    }
+
+    @Override
+    public void setCurrentTile(Tile currentTile) {
+        this.currentTile = currentTile;
     }
 
     //    @Override
@@ -210,14 +213,15 @@ public class BishopPiece implements Piece, Observer {
             currentTile.setPiece(null);
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
+                piecesEaten.push(new Pair<Piece, Tile>(tile.getPiece(), tile));
                 tile.getPiece().setIsAlive(false);
                 if (pieceColor == PieceColor.BLACK) {
                     board.getWhiteAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 } else if (pieceColor == PieceColor.WHITE) {
                     board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
                 }
+                player.getOpponentPlayer().addPieceToDead(tile.getPiece());
                 tile.setPiece(null);
-                tilesPair = new Pair<>(currentTile, tile);
             }
             // change to selected tile
             currentTile = tile;
@@ -225,12 +229,33 @@ public class BishopPiece implements Piece, Observer {
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
             // add target tile to history of moves
+            tilesPair = new Pair<>(currentTile, tile);
             historyMoves.add(tilesPair);
 
             generateTilesToMoveTo();
-        } else throw new RuntimeException("Cannot move to [" + tile.getRow() + ", " + tile.getCol() + "] !!!");
+        }
     }
 
+    @Override
+    public void unmakeLastMove() {
+        if (historyMoves.size() == 0) return;
+        Tile previousTile = historyMoves.pop().getFirst();
+        // checking if piece really ate opponent's piece last turn
+        if (piecesEaten.size() != 0) {
+            Pair<Piece, Tile> lastPair = piecesEaten.pop();
+            if (lastPair.getSecond().equals(currentTile)) {
+                // if so, setting the eaten piece at this piece's current tile and this piece at it's previous tile
+                currentTile.setPiece(lastPair.getFirst());
+                lastPair.getFirst().setIsAlive(true);
+            }
+        } else {
+            currentTile.setPiece(null);
+        }
+        currentTile = previousTile;
+        currentTile.setPiece(this);
+        tilesToMoveTo.clear();
+        generateTilesToMoveTo();
+    }
 
     @Override
     public boolean isTileAvailable(Tile tile) {
@@ -259,6 +284,18 @@ public class BishopPiece implements Piece, Observer {
     @Override
     public boolean hasMoved() {
         return false;
+    }
+
+    @Override
+    public Piece lastPieceEaten() {
+        if (piecesEaten.size() == 0) return null;
+        return piecesEaten.pop().getFirst();
+    }
+
+    @Override
+    public Pair<Tile, Tile> getLastMove() {
+        if (historyMoves.size() == 0) return null;
+        else return historyMoves.peek();
     }
 
     @Override

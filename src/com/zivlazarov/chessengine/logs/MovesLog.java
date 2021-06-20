@@ -1,6 +1,7 @@
 package com.zivlazarov.chessengine.logs;
 
 import com.zivlazarov.chessengine.model.utils.Pair;
+import com.zivlazarov.chessengine.model.utils.player.Piece;
 import com.zivlazarov.chessengine.model.utils.player.Player;
 import com.zivlazarov.chessengine.model.utils.board.Tile;
 
@@ -8,7 +9,7 @@ import java.util.Stack;
 
 public class MovesLog {
 
-    private static Stack<Pair<Player, Pair<Tile, Tile>>> movesLog;
+    private static Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> movesLog;
 
     private static MovesLog instance;
 
@@ -23,7 +24,7 @@ public class MovesLog {
         return instance;
     }
 
-    public Stack<Pair<Player, Pair<Tile, Tile>>> getMovesLog() {
+    public Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> getMovesLog() {
         return movesLog;
     }
 }

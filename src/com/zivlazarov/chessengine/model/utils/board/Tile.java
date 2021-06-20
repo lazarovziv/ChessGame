@@ -98,6 +98,11 @@ public class Tile {
 		isThreatenedByBlack = threatenedByBlack;
 	}
 
+	public void setThreatenedByColor(PieceColor pieceColor, boolean isThreatened) {
+		if (pieceColor == PieceColor.WHITE) isThreatenedByWhite = isThreatened;
+		if (pieceColor == PieceColor.BLACK) isThreatenedByBlack = isThreatened;
+	}
+
 	public boolean equals(Tile tile) {
 		return row == tile.getRow() && col == tile.getCol();
 	}
