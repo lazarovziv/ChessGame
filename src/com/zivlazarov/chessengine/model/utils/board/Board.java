@@ -115,14 +115,18 @@ public class Board implements Observable {
             }
         }
         // clearing the list from previous turn
-        whiteLegalTilesToMoveTo.clear();
-        blackLegalTilesToMoveTo.clear();
-//      currentPlayer.getLegalMoves().clear();
+    currentPlayer.getLegalMoves().clear();
 
         for (Piece piece : currentPlayer.getAlivePieces()) {
             piece.refresh();
             currentPlayer.getLegalMoves().addAll(piece.getTilesToMoveTo());
         }
+        
+    if (currentPlayer.equals(whitePlayer)) {
+    whiteLegalTilesToMoveTo.addAll(currentPlayer.getLegalMoves());
+    } else if (currentPlayer.equals(blackPlayer)) {
+    blackLegalTilesToMoveTo.addAll(currentPlayer.getLegalMoves());
+    }
 
 //        for (Piece piece : whitePlayer.getAlivePieces()) {
 //            piece.refresh();
