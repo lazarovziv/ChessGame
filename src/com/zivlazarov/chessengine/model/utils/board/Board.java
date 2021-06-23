@@ -1,8 +1,6 @@
 package com.zivlazarov.chessengine.model.utils.board;
 
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
-import com.zivlazarov.chessengine.model.utils.Observable;
-import com.zivlazarov.chessengine.model.utils.Observer;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.utils.player.Piece;
 import com.zivlazarov.chessengine.model.utils.player.Player;
