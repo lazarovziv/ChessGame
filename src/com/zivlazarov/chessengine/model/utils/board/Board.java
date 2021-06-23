@@ -35,8 +35,8 @@ public class Board implements Observable {
     private final Map<String, Piece> whiteAlivePieces;
     private GameSituation gameSituation;
 
-    private final List<Tile> whiteLegalTilesToMoveTo;
-    private final List<Tile> blackLegalTilesToMoveTo;
+    private final List<Tile> whiteLegalTilesToMoveToWhenInCheck;
+    private final List<Tile> blackLegalTilesToMoveToWhenInCheck;
 
     private final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
 
@@ -48,8 +48,8 @@ public class Board implements Observable {
         whiteAlivePieces = new HashMap<>();
 
         observers = new ArrayList<>();
-        whiteLegalTilesToMoveTo = new ArrayList<>();
-        blackLegalTilesToMoveTo = new ArrayList<>();
+        whiteLegalTilesToMoveToWhenInCheck = new ArrayList<>();
+        blackLegalTilesToMoveToWhenInCheck = new ArrayList<>();
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
 
@@ -63,47 +63,15 @@ public class Board implements Observable {
         gameSituation = GameSituation.NORMAL;
     }
 
-    // thorough check on every tile to see if it's threatened by black and/or white, which pieces are alive etc.
-    // TODO: check for "Check" and/or "Checkmate" and/or "Draw" situation
-    public void checkBoard() {
-        // call refresh() method after every turn instead
-        for (Piece piece : whitePlayer.getAlivePieces()) piece.refresh();
-        for (Piece piece : blackPlayer.getAlivePieces()) piece.refresh();
-//        for (Piece piece : whiteAlivePieces.values()) piece.refresh();
-//        for (Piece piece : blackAlivePieces.values()) piece.refresh();
-/*
-        if (blackAlivePieces.get('K').getIsInDanger()) {
-            // TODO: add (perhaps new method for Piece interface?) if other pieces of same pieceColor can change the game situation
-            if (blackAlivePieces.get('K').getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
-            else gameSituation = GameSituation.CHECK;
-        }
-
-        if (whiteAlivePieces.get('K').getIsInDanger()) {
-            // TODO: add (perhaps new method for Piece interface?) if other pieces of same pieceColor can change the game situation
-            if (whiteAlivePieces.get('K').getTilesToMoveTo().size() == 0) gameSituation = GameSituation.CHECKMATE;
-            else gameSituation = GameSituation.CHECK;
-        }
-        */
-    }
-
     public void refreshPieces(Player currentPlayer) {
+    for (Piece piece : currentPlayer.getOpponentPlayer().getAlivePieces()) {
+        piece.refresh();
+        currentPlayer.getOpponentPlayer().getLegalMoves().addAll(piece.getTilesToMoveTo());
+    }
         for (Piece piece : currentPlayer.getAlivePieces()) {
             piece.refresh();
             currentPlayer.getLegalMoves().addAll(piece.getTilesToMoveTo());
         }
-
-//        for (Piece piece : whitePlayer.getAlivePieces()) {
-//            piece.refresh();
-//            if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
-//                whiteLegalTilesToMoveTo.addAll(piece.getTilesToMoveTo());
-//            }
-//        }
-//        for (Piece piece : blackPlayer.getAlivePieces()){
-//            piece.refresh();
-//            if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
-//                blackLegalTilesToMoveTo.addAll(piece.getTilesToMoveTo());
-//            }
-//        }
     }
 
     public void checkBoard(Player currentPlayer) {
@@ -121,25 +89,6 @@ public class Board implements Observable {
             piece.refresh();
             currentPlayer.getLegalMoves().addAll(piece.getTilesToMoveTo());
         }
-        
-    if (currentPlayer.equals(whitePlayer)) {
-    whiteLegalTilesToMoveTo.addAll(currentPlayer.getLegalMoves());
-    } else if (currentPlayer.equals(blackPlayer)) {
-    blackLegalTilesToMoveTo.addAll(currentPlayer.getLegalMoves());
-    }
-
-//        for (Piece piece : whitePlayer.getAlivePieces()) {
-//            piece.refresh();
-//            if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
-//                whiteLegalTilesToMoveTo.addAll(piece.getTilesToMoveTo());
-//            }
-//        }
-//        for (Piece piece : blackPlayer.getAlivePieces()){
-//            piece.refresh();
-//            if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
-//                blackLegalTilesToMoveTo.addAll(piece.getTilesToMoveTo());
-//            }
-//        }
 
         for (Tile tile : currentPlayer.getLegalMoves()) {
             tile.setThreatenedByColor(currentPlayer.getPlayerColor(), true);
@@ -153,40 +102,6 @@ public class Board implements Observable {
         } else {
             gameSituation = GameSituation.NORMAL;
         }
-
-//        // setting only relevant tiles as threatened
-//        for (Piece piece : whitePlayer.getAlivePieces()) {
-//            for (Tile tile : whiteLegalTilesToMoveTo) {
-//                tile.setThreatenedByWhite(true);
-//                if (!tile.isEmpty() && tile.getPiece().getPieceColor() == PieceColor.BLACK) {
-//                    tile.getPiece().setIsInDanger(true);
-//                }
-//                if (tile.getPiece() == blackPlayer.getKing()) {
-//                    gameSituation = GameSituation.BLACK_IN_CHECK;
-//                    calculateLegalMovesWhenInCheck(this, currentPlayer);
-//                }
-//            }
-//        }
-//        for (Piece piece : blackPlayer.getAlivePieces()) {
-//            for (Tile tile : blackLegalTilesToMoveTo) {
-//                tile.setThreatenedByBlack(true);
-//                if (!tile.isEmpty() && tile.getPiece().getPieceColor() == PieceColor.WHITE) {
-//                    tile.getPiece().setIsInDanger(true);
-//                }
-//                if (tile.getPiece() == whitePlayer.getKing()) {
-//                    gameSituation = GameSituation.WHITE_IN_CHECK;
-//                    calculateLegalMovesWhenInCheck(this, currentPlayer);
-//                }
-//            }
-//        }
-
-//        if (legalTilesToMoveToInCheckSituation.size() == 0) {
-//            if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
-//                if (legalTilesToMoveToInCheckSituation.size() == 0) gameSituation = GameSituation.WHITE_CHECKMATED;
-//            } else {
-//                if (legalTilesToMoveToInCheckSituation.size() == 0) gameSituation = GameSituation.BLACK_CHECKMATED;
-//            }
-//        }
     }
 
     public void calculateLegalMovesWhenInCheck(Player currentPlayer) {
@@ -194,36 +109,30 @@ public class Board implements Observable {
 //                piece -> piece.getPiecesUnderThreat().contains(currentPlayer.getKing())
 //        ).collect(Collectors.toList());
         if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
+        
             for (Piece piece : currentPlayer.getAlivePieces()) {
                 if (piece.getTilesToMoveTo().stream().noneMatch(whiteLegalTilesToMoveTo::contains)) continue;
-                for (Tile tile : whiteLegalTilesToMoveTo) {
-                    if (piece.getTilesToMoveTo().contains(tile)) {
-                        piece.moveToTile(tile);
+                
+                for (Tile tile : piece.getTilesToMoveTo()) {
+                piece.moveToTile(tile);
                         refreshPieces(currentPlayer);
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
                         if (piecesThreateningKing.size() == 0) whiteLegalTilesToMoveTo.add(tile);
                         piece.unmakeLastMove();
-                    }
+                        refreshPieces(currentPlayer);
+                
                 }
-//                for (Tile tile : piece.getTilesToMoveTo()) {
-//                    piece.moveToTile(tile);
-//                    board.checkBoard();
-//                    List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
-//                            .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
-//                            .collect(Collectors.toList());
-//                    if (piecesThreateningKing.size() == 0) whiteLegalTilesToMoveTo.add(tile);
-//                    piece.unmakeLastMove();
-//                }
             }
             if (whiteLegalTilesToMoveTo.size() == 0) gameSituation = GameSituation.WHITE_CHECKMATED;
             else checkBoard(currentPlayer);
-        } else {
+        } else if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
+        
             for (Piece piece : currentPlayer.getAlivePieces()) {
                 if (piece.getTilesToMoveTo().stream().noneMatch(blackLegalTilesToMoveTo::contains)) continue;
-                for (Tile tile : blackLegalTilesToMoveTo) {
-                    if (piece.getTilesToMoveTo().contains(tile)) {
+                
+                for (Tile tile : piece.getTilesToMove()) {
                         piece.moveToTile(tile);
                         refreshPieces(currentPlayer);
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
@@ -231,18 +140,9 @@ public class Board implements Observable {
                                 .collect(Collectors.toList());
                         if (piecesThreateningKing.size() == 0) blackLegalTilesToMoveTo.add(tile);
                         piece.unmakeLastMove();
-                    }
+                        refreshPieces(currentPlayer);
                 }
-//                for (Tile tile : piece.getTilesToMoveTo()) {
-//                    piece.moveToTile(tile);
-//                    board.checkBoard();
-//                    List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
-//                            .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
-//                            .collect(Collectors.toList());
-//                    if (piecesThreateningKing.size() == 0) whiteLegalTilesToMoveTo.add(tile);
-//                    piece.unmakeLastMove();
-//                }
-            }
+          }
             if (blackLegalTilesToMoveTo.size() == 0) gameSituation = GameSituation.BLACK_CHECKMATED;
             else checkBoard(currentPlayer);
         }
