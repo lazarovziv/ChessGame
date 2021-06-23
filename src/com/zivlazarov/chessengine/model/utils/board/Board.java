@@ -124,7 +124,6 @@ public class Board implements Observable {
                 }
             }
             if (whiteLegalTilesToMoveToWhenInCheck.size() == 0) gameSituation = GameSituation.WHITE_CHECKMATED;
-            else checkBoard(currentPlayer);
         } else if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
         
             for (Piece piece : currentPlayer.getAlivePieces()) {
@@ -142,7 +141,6 @@ public class Board implements Observable {
                 }
           }
             if (blackLegalTilesToMoveToWhenInCheck.size() == 0) gameSituation = GameSituation.BLACK_CHECKMATED;
-            else checkBoard(currentPlayer);
         }
 
     }
