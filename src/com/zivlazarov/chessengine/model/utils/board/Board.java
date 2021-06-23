@@ -111,7 +111,7 @@ public class Board implements Observable {
         if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
         
             for (Piece piece : currentPlayer.getAlivePieces()) {
-                if (piece.getTilesToMoveTo().stream().noneMatch(whiteLegalTilesToMoveTo::contains)) continue;
+                if (piece.getTilesToMoveTo().stream().noneMatch(whiteLegalTilesToMoveToWhenInCheck::contains)) continue;
                 
                 for (Tile tile : piece.getTilesToMoveTo()) {
                 piece.moveToTile(tile);
@@ -119,18 +119,18 @@ public class Board implements Observable {
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
-                        if (piecesThreateningKing.size() == 0) whiteLegalTilesToMoveTo.add(tile);
+                        if (piecesThreateningKing.size() == 0) whiteLegalTilesToMoveToWhenInCheck.add(tile);
                         piece.unmakeLastMove();
                         refreshPieces(currentPlayer);
                 
                 }
             }
-            if (whiteLegalTilesToMoveTo.size() == 0) gameSituation = GameSituation.WHITE_CHECKMATED;
+            if (whiteLegalTilesToMoveToWhenInCheck.size() == 0) gameSituation = GameSituation.WHITE_CHECKMATED;
             else checkBoard(currentPlayer);
         } else if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
         
             for (Piece piece : currentPlayer.getAlivePieces()) {
-                if (piece.getTilesToMoveTo().stream().noneMatch(blackLegalTilesToMoveTo::contains)) continue;
+                if (piece.getTilesToMoveTo().stream().noneMatch(blackLegalTilesToMoveToWhenInCheck::contains)) continue;
                 
                 for (Tile tile : piece.getTilesToMove()) {
                         piece.moveToTile(tile);
@@ -138,12 +138,12 @@ public class Board implements Observable {
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
-                        if (piecesThreateningKing.size() == 0) blackLegalTilesToMoveTo.add(tile);
+                        if (piecesThreateningKing.size() == 0) blackLegalTilesToMoveToWhenInCheck.add(tile);
                         piece.unmakeLastMove();
                         refreshPieces(currentPlayer);
                 }
           }
-            if (blackLegalTilesToMoveTo.size() == 0) gameSituation = GameSituation.BLACK_CHECKMATED;
+            if (blackLegalTilesToMoveToWhenInCheck.size() == 0) gameSituation = GameSituation.BLACK_CHECKMATED;
             else checkBoard(currentPlayer);
         }
 
