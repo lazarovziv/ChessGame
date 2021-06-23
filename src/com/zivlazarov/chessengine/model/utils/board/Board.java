@@ -50,8 +50,8 @@ public class Board implements Observable {
         observers = new ArrayList<>();
         whiteLegalTilesToMoveTo = new ArrayList<>();
         blackLegalTilesToMoveTo = new ArrayList<>();
-        checkSituations.put(PieceColor.BLACK, GameSituation.WHITE_IN_CHECK);
-        checkSituations.put(PieceColor.WHITE, GameSituation.BLACK_IN_CHECK);
+        checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
+        checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
 
         TileColor[] colors = { TileColor.WHITE, TileColor.BLACK };
 
