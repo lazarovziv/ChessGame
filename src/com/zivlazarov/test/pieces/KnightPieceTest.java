@@ -30,7 +30,7 @@ public class KnightPieceTest {
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[0][1], 0);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[2][2], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][3], 0);
-        board.checkBoard();
+        board.checkBoard(player);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class KnightPieceTest {
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
         pawnPiece.moveToTile(board.getBoard()[3][2]);
         opponentPawnPiece.getCurrentTile().setPiece(null);
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesGenerated = knightPiece.getTilesToMoveTo();
         board.printBoard();

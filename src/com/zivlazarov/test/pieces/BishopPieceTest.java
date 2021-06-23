@@ -31,7 +31,7 @@ public class BishopPieceTest {
         bishopPiece = new BishopPiece(player, board, PieceColor.WHITE, board.getBoard()[0][2], 0);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][3], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][1], 0);
-        board.checkBoard();
+        board.checkBoard(player);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class BishopPieceTest {
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
         pawnPiece.moveToTile(board.getBoard()[2][3]);
         opponentPawnPiece.getCurrentTile().setPiece(null);
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
         for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
@@ -83,7 +83,7 @@ public class BishopPieceTest {
         opponentPawnPiece.getCurrentTile().setPiece(null);
         pawnPiece.getCurrentTile().setPiece(null);
         bishopPiece.moveToTile(board.getBoard()[3][5]);
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
         for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
@@ -97,7 +97,7 @@ public class BishopPieceTest {
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
 

@@ -30,7 +30,7 @@ public class QueenPieceTest {
         queenPiece = new QueenPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3]);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[4][3], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[5][3], 0);
-        board.checkBoard();
+        board.checkBoard(player);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class QueenPieceTest {
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesGenerated = queenPiece.getTilesToMoveTo();
         board.printBoard();
@@ -114,7 +114,7 @@ public class QueenPieceTest {
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesGenerated = queenPiece.getTilesToMoveTo();
 

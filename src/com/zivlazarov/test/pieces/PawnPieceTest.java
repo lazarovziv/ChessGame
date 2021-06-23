@@ -33,7 +33,7 @@ public class PawnPieceTest {
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[3][0], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][0], 0);
-        board.checkBoard();
+        board.checkBoard(player);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class PawnPieceTest {
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
         knightPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesGenerated = pawnPiece.getTilesToMoveTo();
         board.printBoard();
@@ -72,21 +72,21 @@ public class PawnPieceTest {
 //        KingPiece whiteKing = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0]);
 //        KingPiece blackKing = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7]);
 
-        board.checkBoard();
+        board.checkBoard(player);
         PlayerController controller = new PlayerController();
         controller.setPlayer(player);
         controller.setOpponentPlayer(opponent);
         controller.addPieceToAlive(pawn);
         controller.movePiece(pawn, board.getBoard()[3][3]);
-        board.checkBoard();
+        board.checkBoard(player);
         board.printBoard();
         controller.setPlayer(opponent);
         controller.addPieceToAlive(opponentPawn);
         controller.movePiece(opponentPawn, board.getBoard()[4][3]);
-        board.checkBoard();
+        board.checkBoard(player);
         board.printBoard();
         controller.setPlayer(player);
-        board.checkBoard();
+        board.checkBoard(player);
 
         pawn.getTilesToMoveTo().forEach(tile -> System.out.print(tile + ","));
     }

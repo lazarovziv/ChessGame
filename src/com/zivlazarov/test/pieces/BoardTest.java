@@ -37,7 +37,7 @@ public class BoardTest {
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[3][4], 0);
         opponentPawnPiece1 = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[5][0], 1);
         opponentBishopPiece = new BishopPiece(opponent, board, PieceColor.BLACK, board.getBoard()[4][0], 0);
-        board.checkBoard();
+        board.checkBoard(player);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class BoardTest {
         board.printBoard();
         rookPiece1.moveToTile(board.getBoard()[4][0]);
         board.printBoard();
-        board.checkBoard();
+        board.checkBoard(player);
         board.unmakeLastMove(rookPiece1);
         board.printBoard();
     }

@@ -30,7 +30,7 @@ public class RookPieceTest {
         rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], 0);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[0][3], 0);
-        board.checkBoard();
+        board.checkBoard(player);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class RookPieceTest {
 
         pawnPiece.moveToTile(board.getBoard()[3][0]);
         opponentPawnPiece.getCurrentTile().setPiece(null);
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesTrue = new ArrayList<>();
         tilesTrue.add(board.getBoard()[0][1]);
@@ -75,7 +75,7 @@ public class RookPieceTest {
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 
-        board.checkBoard();
+        board.checkBoard(player);
 
         List<Tile> tilesGenerated = rookPiece.getTilesToMoveTo();
 
