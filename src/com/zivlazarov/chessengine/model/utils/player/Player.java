@@ -3,6 +3,7 @@ package com.zivlazarov.chessengine.model.utils.player;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.utils.board.Board;
+import com.zivlazarov.chessengine.model.utils.board.GameSituation;
 import com.zivlazarov.chessengine.model.utils.board.PieceColor;
 import com.zivlazarov.chessengine.model.utils.board.Tile;
 
@@ -178,7 +179,7 @@ public class Player {
 
     public KingPiece getKing() {
         for (Piece piece : alivePieces) {
-            if (piece.getName().contains("K")) return (KingPiece) piece;
+            if (piece instanceof KingPiece) return (KingPiece) piece;
         }
         return null;
     }
@@ -300,5 +301,10 @@ public class Player {
         for (Piece piece : alivePieces) {
             legalMoves.addAll(piece.getTilesToMoveTo());
         }
+    }
+
+    public boolean isInCheck() {
+        if (playerColor == PieceColor.WHITE) return board.getGameSituation() == GameSituation.WHITE_IN_CHECK;
+        else return board.getGameSituation() == GameSituation.BLACK_IN_CHECK;
     }
 }
