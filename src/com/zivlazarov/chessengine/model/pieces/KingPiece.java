@@ -58,30 +58,6 @@ public class KingPiece implements Piece {
 //        generateTilesToMoveTo();
     }
 
-//    public KingPiece(Board board, PieceColor pc, Tile initTile, ImageView imageView) {
-//        this.board = board;
-//
-////        name = 'K';
-//        pieceColor = pc;
-//        tilesToMoveTo = new ArrayList<>();
-//
-//        currentTile = initTile;
-//        if (pieceColor == PieceColor.BLACK) {
-//            name = "bK";
-//            board.getBlackAlivePieces().put(name, this);
-//        }
-//        if (pieceColor == PieceColor.WHITE) {
-//            name = "wK";
-//            board.getWhiteAlivePieces().put(name, this);
-//        }
-//
-//        currentTile.setPiece(this);
-//        imageIcon = imageView;
-//        currentTile.setPieceImageView(imageIcon);
-//
-////        generateTilesToMoveTo();
-//    }
-
     @Override
     public void refresh() {
         if (tilesToMoveTo.size() != 0) {
@@ -114,11 +90,7 @@ public class KingPiece implements Piece {
             if (x+r > board.getBoard().length - 1 || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
-                if (pieceColor == PieceColor.WHITE) {
-                    if (!targetTile.isThreatenedByBlack()) tilesToMoveTo.add(targetTile);
-                } else {
-                    if (!targetTile.isThreatenedByWhite()) tilesToMoveTo.add(targetTile);
-                }
+                if (!isThreatenedAtTile(targetTile)) tilesToMoveTo.add(targetTile);
             }
         }
         // adding castling to tilesToMoveTo
@@ -238,7 +210,7 @@ public class KingPiece implements Piece {
 
     @Override
     public boolean getIsInDanger() {
-        return isInDanger;
+        return isThreatenedAtTile(currentTile);
     }
 
     @Override
@@ -296,12 +268,10 @@ public class KingPiece implements Piece {
     @Override
     public boolean isThreatenedAtTile(Tile tile) {
         if (pieceColor == PieceColor.WHITE) {
-            if (tile.isThreatenedByBlack()) return true;
-            else return false;
+            return tile.isThreatenedByBlack();
         }
         if (pieceColor == PieceColor.BLACK) {
-            if (tile.isThreatenedByWhite()) return true;
-            else return false;
+            return tile.isThreatenedByWhite();
         }
         return false;
     }

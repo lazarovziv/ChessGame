@@ -229,6 +229,7 @@ public class KnightPiece implements Piece {
             tilesPair = new Pair<Tile, Tile>(currentTile, tile);
             historyMoves.add(tilesPair);
             generateTilesToMoveTo();
+            // call refresh() here ??
         }
     }
 
