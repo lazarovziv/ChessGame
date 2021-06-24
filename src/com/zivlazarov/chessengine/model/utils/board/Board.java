@@ -5,14 +5,11 @@ import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.utils.player.Piece;
 import com.zivlazarov.chessengine.model.utils.player.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // make as Singleton (?)
-public class Board implements Observable {
+public class Board extends Observable {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -36,6 +33,8 @@ public class Board implements Observable {
     private final List<Tile> whiteLegalTilesToMoveToWhenInCheck;
     private final List<Tile> blackLegalTilesToMoveToWhenInCheck;
 
+    private final Map<PieceColor, List<Tile>> legalMovesWhenInCheck;
+
     private final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
 
     private List<Observer> observers;
@@ -46,8 +45,12 @@ public class Board implements Observable {
         whiteAlivePieces = new HashMap<>();
 
         observers = new ArrayList<>();
+
         whiteLegalTilesToMoveToWhenInCheck = new ArrayList<>();
         blackLegalTilesToMoveToWhenInCheck = new ArrayList<>();
+
+        legalMovesWhenInCheck = new HashMap<>();
+
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
 
@@ -62,13 +65,23 @@ public class Board implements Observable {
     }
 
     public void refreshPieces(Player currentPlayer) {
-    for (Piece piece : currentPlayer.getOpponentPlayer().getAlivePieces()) {
-        piece.refresh();
-        currentPlayer.getOpponentPlayer().getLegalMoves().addAll(piece.getTilesToMoveTo());
-    }
+        currentPlayer.getOpponentPlayer().getLegalMoves().clear();
+        currentPlayer.getLegalMoves().clear();
+        for (Piece piece : currentPlayer.getOpponentPlayer().getAlivePieces()) {
+            piece.refresh();
+            currentPlayer.getOpponentPlayer().getLegalMoves().addAll(piece.getTilesToMoveTo());
+        }
         for (Piece piece : currentPlayer.getAlivePieces()) {
             piece.refresh();
             currentPlayer.getLegalMoves().addAll(piece.getTilesToMoveTo());
+        }
+    }
+
+    public void refreshPiecesOfPlayer(Player player) {
+        player.getLegalMoves().clear();
+        for (Piece piece : player.getAlivePieces()) {
+            piece.refresh();
+            player.getLegalMoves().addAll(piece.getTilesToMoveTo());
         }
     }
 
@@ -80,21 +93,25 @@ public class Board implements Observable {
                 tile.setThreatenedByBlack(false);
             }
         }
-        // clearing the list from previous turn
-    currentPlayer.getLegalMoves().clear();
+        refreshPiecesOfPlayer(currentPlayer);
+        refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
 
-        for (Piece piece : currentPlayer.getAlivePieces()) {
-            piece.refresh();
-            currentPlayer.getLegalMoves().addAll(piece.getTilesToMoveTo());
-        }
-
+        // for each player's legal move's target piece, that piece is in danger of being eaten
         for (Tile tile : currentPlayer.getLegalMoves()) {
             tile.setThreatenedByColor(currentPlayer.getPlayerColor(), true);
             if (!tile.isEmpty() && tile.getPiece().getPieceColor() == currentPlayer.getOpponentPlayer().getPlayerColor()) {
                 tile.getPiece().setIsInDanger(true);
             }
         }
+        for (Tile tile : currentPlayer.getOpponentPlayer().getLegalMoves()) {
+            tile.setThreatenedByColor(currentPlayer.getOpponentPlayer().getPlayerColor(), true);
+            if (!tile.isEmpty() && tile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
+                tile.getPiece().setIsInDanger(true);
+            }
+        }
+
         if (currentPlayer.getKing().getIsInDanger()) {
+            legalMovesWhenInCheck.clear();
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
             calculateLegalMovesWhenInCheck(currentPlayer);
         } else {
@@ -103,62 +120,63 @@ public class Board implements Observable {
     }
 
     public void calculateLegalMovesWhenInCheck(Player currentPlayer) {
-//        List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces().stream().filter(
-//                piece -> piece.getPiecesUnderThreat().contains(currentPlayer.getKing())
-//        ).collect(Collectors.toList());
         if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
-        
-            for (Piece piece : currentPlayer.getAlivePieces()) {
-                if (piece.getTilesToMoveTo().stream().noneMatch(whiteLegalTilesToMoveToWhenInCheck::contains)) continue;
-                
-                for (Tile tile : piece.getTilesToMoveTo()) {
-                piece.moveToTile(tile);
-                        refreshPieces(currentPlayer);
+            Runnable whiteRunnable = () -> {
+                for (Piece piece : currentPlayer.getAlivePieces()) {
+                    // problem is in tiles for loop
+                    for (Tile tile : piece.getTilesToMoveTo()) {
+                        piece.moveToTile(tile);
+                        refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
                         if (piecesThreateningKing.size() == 0) whiteLegalTilesToMoveToWhenInCheck.add(tile);
                         piece.unmakeLastMove();
-                        refreshPieces(currentPlayer);
-                
+                        refreshPiecesOfPlayer(currentPlayer);
+                    }
                 }
-            }
-            if (whiteLegalTilesToMoveToWhenInCheck.size() == 0) gameSituation = GameSituation.WHITE_CHECKMATED;
+                legalMovesWhenInCheck.put(PieceColor.WHITE, whiteLegalTilesToMoveToWhenInCheck);
+                if (legalMovesWhenInCheck.get(PieceColor.WHITE).size() == 0) gameSituation = GameSituation.WHITE_CHECKMATED;
+            };
+            new Thread(whiteRunnable).start();
         } else if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
-        
-            for (Piece piece : currentPlayer.getAlivePieces()) {
-                if (piece.getTilesToMoveTo().stream().noneMatch(blackLegalTilesToMoveToWhenInCheck::contains)) continue;
-                
-                for (Tile tile : piece.getTilesToMove()) {
+            Runnable blackRunnable = () -> {
+                for (Piece piece : currentPlayer.getAlivePieces()) {
+                    // problem is in tiles for loop
+                    for (Tile tile : piece.getTilesToMoveTo()) {
                         piece.moveToTile(tile);
-                        refreshPieces(currentPlayer);
+
+                        refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
                         if (piecesThreateningKing.size() == 0) blackLegalTilesToMoveToWhenInCheck.add(tile);
                         piece.unmakeLastMove();
                         refreshPieces(currentPlayer);
+                    }
                 }
-          }
-            if (blackLegalTilesToMoveToWhenInCheck.size() == 0) gameSituation = GameSituation.BLACK_CHECKMATED;
+                legalMovesWhenInCheck.put(PieceColor.BLACK, blackLegalTilesToMoveToWhenInCheck);
+                if (legalMovesWhenInCheck.get(PieceColor.BLACK).size() == 0) gameSituation = GameSituation.BLACK_CHECKMATED;
+            };
+            new Thread(blackRunnable).start();
         }
-
     }
 
     public void unmakeLastMove(Piece piece) {
 //        Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> log =  MovesLog.getInstance().getMovesLog();
 //        Pair<Player, Piece> playerPiecePair = log.peek().getFirst();
 //        Pair<Tile, Tile> tilesPair = log.peek().getSecond();
-
         Piece eatenPiece = piece.lastPieceEaten();
         Pair<Tile, Tile> lastPairOfTiles = piece.getLastMove();
 
         if (lastPairOfTiles == null || lastPairOfTiles.getFirst() == null || lastPairOfTiles.getSecond() == null) return;
 
-        if (lastPairOfTiles.getSecond().equals(eatenPiece.getLastMove().getSecond())) {
-            lastPairOfTiles.getFirst().setPiece(piece);
-            lastPairOfTiles.getSecond().setPiece(eatenPiece);
-            eatenPiece.setIsAlive(true);
+        if (eatenPiece != null) {
+            if (lastPairOfTiles.getSecond().equals(eatenPiece.getLastMove().getSecond())) {
+                lastPairOfTiles.getFirst().setPiece(piece);
+                lastPairOfTiles.getSecond().setPiece(eatenPiece);
+                eatenPiece.setIsAlive(true);
+            }
         } else {
             lastPairOfTiles.getFirst().setPiece(piece);
             lastPairOfTiles.getSecond().setPiece(null);
@@ -313,11 +331,11 @@ public class Board implements Observable {
     }
 
     public List<Tile> getWhiteLegalTilesToMoveTo() {
-        return whiteLegalTilesToMoveTo;
+        return whiteLegalTilesToMoveToWhenInCheck;
     }
 
     public List<Tile> getBlackLegalTilesToMoveTo() {
-        return blackLegalTilesToMoveTo;
+        return blackLegalTilesToMoveToWhenInCheck;
     }
 
     public void setWhitePlayer(Player whitePlayer) {
@@ -328,18 +346,27 @@ public class Board implements Observable {
         this.blackPlayer = blackPlayer;
     }
 
-    @Override
-    public void updateAll() {
-
+    public Map<PieceColor, List<Tile>> getLegalMovesWhenInCheck() {
+        return legalMovesWhenInCheck;
     }
 
     @Override
-    public void attach() {
-
+    public synchronized void addObserver(Observer o) {
+        super.addObserver(o);
+        observers.add(o);
     }
 
     @Override
-    public void detach() {
+    public synchronized void deleteObserver(Observer o) {
+        super.deleteObserver(o);
+        observers.remove(o);
+    }
 
+    @Override
+    public void notifyObservers() {
+        super.notifyObservers();
+        for (Observer observer : observers) {
+            observer.notify();
+        }
     }
 }
