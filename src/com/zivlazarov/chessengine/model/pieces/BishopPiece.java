@@ -1,6 +1,5 @@
 package com.zivlazarov.chessengine.model.pieces;
 
-import com.zivlazarov.chessengine.model.utils.Observer;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.utils.board.Board;
 import com.zivlazarov.chessengine.model.utils.player.Piece;
@@ -10,6 +9,8 @@ import com.zivlazarov.chessengine.model.utils.player.Player;
 //import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
@@ -299,7 +300,7 @@ public class BishopPiece implements Piece, Observer {
     }
 
     @Override
-    public void update() {
+    public void update(Observable o, Object arg) {
 
     }
 }
