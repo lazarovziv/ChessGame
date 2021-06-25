@@ -12,7 +12,7 @@ import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
-public class QueenPiece implements Piece {
+public class QueenPiece implements Piece, Cloneable {
 
     private Player player;
 
@@ -65,6 +65,7 @@ public class QueenPiece implements Piece {
 
     @Override
     public void generateTilesToMoveTo() {
+        if (!isAlive) return;
         int[][] directions = {
                 {1, 0},
                 {-1, 0},
@@ -396,5 +397,10 @@ public class QueenPiece implements Piece {
     @Override
     public Piece lastPieceEaten() {
         return piecesEaten.pop().getFirst();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

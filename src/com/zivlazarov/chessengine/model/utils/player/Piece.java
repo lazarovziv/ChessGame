@@ -9,7 +9,7 @@ import com.zivlazarov.chessengine.model.utils.board.Tile;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public interface Piece {
+public interface Piece extends Cloneable {
 
     String name = "";
     boolean isAlive = true;
@@ -57,4 +57,6 @@ public interface Piece {
     void refresh();
 
     boolean hasMoved();
+
+
 }

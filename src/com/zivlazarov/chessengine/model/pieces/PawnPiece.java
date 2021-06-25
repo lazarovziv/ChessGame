@@ -16,7 +16,7 @@ import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
-public class PawnPiece implements Piece {
+public class PawnPiece implements Piece, Cloneable {
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
@@ -74,6 +74,7 @@ public class PawnPiece implements Piece {
 
     @Override
     public void generateTilesToMoveTo() {
+        if (!isAlive) return;
         Map<PieceColor, Integer> map = new HashMap<>();
         map.put(PieceColor.WHITE, 1);
         map.put(PieceColor.BLACK, -1);
@@ -342,5 +343,10 @@ public class PawnPiece implements Piece {
     @Override
     public Piece lastPieceEaten() {
         return piecesEaten.pop().getFirst();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

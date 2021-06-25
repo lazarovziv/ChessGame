@@ -15,7 +15,7 @@ import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
-public class BishopPiece implements Piece, Observer {
+public class BishopPiece implements Piece, Observer, Cloneable {
 
     private Player player;
 
@@ -72,6 +72,7 @@ public class BishopPiece implements Piece, Observer {
 
     @Override
     public void generateTilesToMoveTo() {
+        if (!isAlive) return;
         int[][] directions = {
                 {1, 1},
                 {1, -1},
@@ -302,5 +303,10 @@ public class BishopPiece implements Piece, Observer {
     @Override
     public void update(Observable o, Object arg) {
 
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
