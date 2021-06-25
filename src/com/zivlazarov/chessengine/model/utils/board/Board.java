@@ -1,6 +1,7 @@
 package com.zivlazarov.chessengine.model.utils.board;
 
-import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.logs.MovesLog;
+import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.utils.player.Piece;
 import com.zivlazarov.chessengine.model.utils.player.Player;
@@ -20,23 +21,16 @@ public class Board extends Observable {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
-
-    private Tile[][] board;
-
-    private Player whitePlayer;
-    private Player blackPlayer;
-
     private final Map<String, Piece> blackAlivePieces;
     private final Map<String, Piece> whiteAlivePieces;
-    private GameSituation gameSituation;
-
     private final List<Tile> whiteLegalTilesToMoveToWhenInCheck;
     private final List<Tile> blackLegalTilesToMoveToWhenInCheck;
-
     private final Map<PieceColor, List<Tile>> legalMovesWhenInCheck;
-
     private final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
-
+    private Tile[][] board;
+    private Player whitePlayer;
+    private Player blackPlayer;
+    private GameSituation gameSituation;
     private List<Observer> observers;
 
     public Board() {
@@ -54,11 +48,11 @@ public class Board extends Observable {
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
 
-        TileColor[] colors = { TileColor.WHITE, TileColor.BLACK };
+        TileColor[] colors = {TileColor.WHITE, TileColor.BLACK};
 
         for (int r = 0; r < board.length; r++) {
             for (int c = 0; c < board.length; c++) {
-                board[r][c] = new Tile(r, c, colors[(r+c) % colors.length]);
+                board[r][c] = new Tile(r, c, colors[(r + c) % colors.length]);
             }
         }
         gameSituation = GameSituation.NORMAL;
@@ -124,63 +118,67 @@ public class Board extends Observable {
             Runnable whiteRunnable = () -> {
                 for (Piece piece : currentPlayer.getAlivePieces()) {
                     // problem is in tiles for loop
-                    for (Tile tile : piece.getTilesToMoveTo()) {
+                    List<Tile> clonedMoves = (List<Tile>) piece.getTilesToMoveTo().clone();
+                    Tile[][] clonedBoard = board.clone();
+                    for (Tile tile : clonedMoves) {
                         piece.moveToTile(tile);
                         refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
                         if (piecesThreateningKing.size() == 0) whiteLegalTilesToMoveToWhenInCheck.add(tile);
-                        piece.unmakeLastMove();
+//                        piece.unmakeLastMove();
+                        board = clonedBoard;
                         refreshPiecesOfPlayer(currentPlayer);
                     }
                 }
                 legalMovesWhenInCheck.put(PieceColor.WHITE, whiteLegalTilesToMoveToWhenInCheck);
-                if (legalMovesWhenInCheck.get(PieceColor.WHITE).size() == 0) gameSituation = GameSituation.WHITE_CHECKMATED;
+                if (legalMovesWhenInCheck.get(PieceColor.WHITE).size() == 0)
+                    gameSituation = GameSituation.WHITE_CHECKMATED;
             };
             new Thread(whiteRunnable).start();
         } else if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
             Runnable blackRunnable = () -> {
                 for (Piece piece : currentPlayer.getAlivePieces()) {
                     // problem is in tiles for loop
-                    for (Tile tile : piece.getTilesToMoveTo()) {
+                    List<Tile> clonedMoves = (List<Tile>) piece.getTilesToMoveTo().clone();
+                    Tile[][] clonedBoard = board.clone();
+                    for (Tile tile : clonedMoves) {
                         piece.moveToTile(tile);
-
                         refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
                         if (piecesThreateningKing.size() == 0) blackLegalTilesToMoveToWhenInCheck.add(tile);
-                        piece.unmakeLastMove();
+//                        piece.unmakeLastMove();
+                        board = clonedBoard;
                         refreshPieces(currentPlayer);
                     }
                 }
                 legalMovesWhenInCheck.put(PieceColor.BLACK, blackLegalTilesToMoveToWhenInCheck);
-                if (legalMovesWhenInCheck.get(PieceColor.BLACK).size() == 0) gameSituation = GameSituation.BLACK_CHECKMATED;
+                if (legalMovesWhenInCheck.get(PieceColor.BLACK).size() == 0)
+                    gameSituation = GameSituation.BLACK_CHECKMATED;
             };
             new Thread(blackRunnable).start();
         }
     }
 
     public void unmakeLastMove(Piece piece) {
-//        Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> log =  MovesLog.getInstance().getMovesLog();
-//        Pair<Player, Piece> playerPiecePair = log.peek().getFirst();
-//        Pair<Tile, Tile> tilesPair = log.peek().getSecond();
-        Piece eatenPiece = piece.lastPieceEaten();
-        Pair<Tile, Tile> lastPairOfTiles = piece.getLastMove();
+        if (piece.getHistoryMoves().size() == 0) return;
+        Tile previousTile = piece.getHistoryMoves().pop();
 
-        if (lastPairOfTiles == null || lastPairOfTiles.getFirst() == null || lastPairOfTiles.getSecond() == null) return;
-
-        if (eatenPiece != null) {
-            if (lastPairOfTiles.getSecond().equals(eatenPiece.getLastMove().getSecond())) {
-                lastPairOfTiles.getFirst().setPiece(piece);
-                lastPairOfTiles.getSecond().setPiece(eatenPiece);
+        if (piece.getLastPieceEaten() != null) {
+            if (piece.getLastPieceEaten().getHistoryMoves().peek().equals(piece.getCurrentTile())) {
+                Piece eatenPiece = piece.getLastPieceEaten();
+                piece.getCurrentTile().setPiece(eatenPiece);
                 eatenPiece.setIsAlive(true);
+                eatenPiece.getPlayer().getOpponentPlayer().addPieceToAlive(eatenPiece);
             }
-        } else {
-            lastPairOfTiles.getFirst().setPiece(piece);
-            lastPairOfTiles.getSecond().setPiece(null);
-        }
+        } else piece.getCurrentTile().setPiece(null);
+
+        piece.setCurrentTile(previousTile);
+        piece.getCurrentTile().setPiece(piece);
+        piece.refresh();
     }
 
     public boolean canPieceGetInTheWayOfPiece(Piece defendingPiece, Piece threateningPiece) {
@@ -220,6 +218,11 @@ public class Board extends Observable {
 
     public boolean canKingEscape(KingPiece kingPiece) {
         return kingPiece.canMove();
+    }
+
+    public void removePieceFromBoard(Piece piece) {
+        piece.setIsAlive(false);
+        piece.setCurrentTile(null);
     }
 
     public void printBoard() {
@@ -324,7 +327,9 @@ public class Board extends Observable {
         return whiteAlivePieces;
     }
 
-    public GameSituation getGameSituation() { return gameSituation; }
+    public GameSituation getGameSituation() {
+        return gameSituation;
+    }
 
     public void setGameSituation(GameSituation situation) {
         this.gameSituation = situation;
@@ -368,5 +373,10 @@ public class Board extends Observable {
         for (Observer observer : observers) {
             observer.notify();
         }
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
