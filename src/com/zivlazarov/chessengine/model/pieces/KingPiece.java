@@ -18,8 +18,8 @@ public class KingPiece implements Piece, Cloneable {
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
-    private final Stack<Pair<Tile, Tile>> historyMoves;
-    private Stack<Pair<Piece, Tile>> piecesEaten;
+    private final Stack<Tile> historyMoves;
+    private Stack<Piece> piecesEaten;
     private final Board board;
     private String name;
     private boolean isAlive = true;
@@ -54,7 +54,7 @@ public class KingPiece implements Piece, Cloneable {
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
-
+        historyMoves.push(currentTile);
 //        generateTilesToMoveTo();
     }
 
@@ -91,7 +91,12 @@ public class KingPiece implements Piece, Cloneable {
             if (x+r > board.getBoard().length - 1 || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
-                if (!isThreatenedAtTile(targetTile)) tilesToMoveTo.add(targetTile);
+                if (!isThreatenedAtTile(targetTile)) {
+                    tilesToMoveTo.add(targetTile);
+                    if (!targetTile.isEmpty()) {
+                        if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
+                    }
+                }
             }
         }
         // adding castling to tilesToMoveTo
@@ -247,13 +252,14 @@ public class KingPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
+    public Stack<Tile> getHistoryMoves() {
         return historyMoves;
     }
 
     @Override
     public Pair<Tile, Tile> getLastMove() {
-        return historyMoves.peek();
+        if (historyMoves.size() == 0) return null;
+        return new Pair<Tile, Tile>(historyMoves.peek(), currentTile);
     }
 
     @Override
@@ -284,13 +290,12 @@ public class KingPiece implements Piece, Cloneable {
 
     @Override
     public void moveToTile(Tile tile) {
-        Pair<Tile, Tile> tilesPair = null;
         if (tilesToMoveTo.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
-                piecesEaten.push(new Pair<Piece, Tile>(tile.getPiece(), tile));
+                piecesEaten.push(tile.getPiece());
                 tile.getPiece().setIsAlive(false);
                 if (pieceColor == PieceColor.BLACK) {
                     board.getWhiteAlivePieces().remove(tile.getPiece().getName());
@@ -305,8 +310,7 @@ public class KingPiece implements Piece, Cloneable {
             // set the piece at selected tile
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
-            tilesPair = new Pair<>(currentTile, tile);
-            historyMoves.add(tilesPair);
+            historyMoves.push(currentTile);
             if (!hasMoved) hasMoved = true;
 
             generateTilesToMoveTo();
@@ -316,18 +320,17 @@ public class KingPiece implements Piece, Cloneable {
     @Override
     public void unmakeLastMove() {
         if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop().getFirst();
-        // checking if piece really ate opponent's piece last turn
-        if (piecesEaten.size() != 0) {
-            Pair<Piece, Tile> lastPair = piecesEaten.pop();
-            if (lastPair.getSecond().equals(currentTile)) {
-                // if so, setting the eaten piece at this piece's current tile and this piece at it's previous tile
-                currentTile.setPiece(lastPair.getFirst());
-                lastPair.getFirst().setIsAlive(true);
+        Tile previousTile = historyMoves.pop();
+
+        if (piecesEaten.size() > 0) {
+            if (piecesEaten.peek().getHistoryMoves().peek().equals(currentTile)) {
+                Piece piece = piecesEaten.pop();
+                currentTile.setPiece(piece);
+                piece.setIsAlive(true);
+                player.getOpponentPlayer().addPieceToAlive(piece);
             }
-        } else {
-            currentTile.setPiece(null);
-        }
+        } else currentTile.setPiece(null);
+
         currentTile = previousTile;
         currentTile.setPiece(this);
         tilesToMoveTo.clear();
@@ -341,18 +344,6 @@ public class KingPiece implements Piece, Cloneable {
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
 
-//    @Override
-//    public void setOnClickListener() {
-////        if (!isAlive) return;
-//        if (imageIcon == null) return;
-//        imageIcon.setOnMouseClicked(mouseEvent -> {
-//            if (tilesToMoveTo.size() == 0) return;
-//            for (Tile tile : tilesToMoveTo) {
-//                tile.setTileImageView(createImageView("redTile"));
-//            }
-//        });
-//    }
-
     @Override
     public boolean canMove() {
         return tilesToMoveTo.size() != 0;
@@ -364,8 +355,9 @@ public class KingPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Piece lastPieceEaten() {
-        return piecesEaten.pop().getFirst();
+    public Piece getLastPieceEaten() {
+        if (piecesEaten.size() == 0) return null;
+        return piecesEaten.peek();
     }
 
     @Override

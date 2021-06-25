@@ -27,7 +27,7 @@ public interface Piece extends Cloneable {
     PieceColor getPieceColor();
 //    ImageView getImageIcon();
     Tile getCurrentTile();
-    Stack<Pair<Tile, Tile>> getHistoryMoves();
+    Stack<Tile> getHistoryMoves();
     Pair<Tile, Tile> getLastMove();
     ArrayList<Piece> getPiecesUnderThreat();
     Player getPlayer();
@@ -44,7 +44,7 @@ public interface Piece extends Cloneable {
 
     void unmakeLastMove();
 
-    Piece lastPieceEaten();
+    Piece getLastPieceEaten();
 
     void generateTilesToMoveTo();
 

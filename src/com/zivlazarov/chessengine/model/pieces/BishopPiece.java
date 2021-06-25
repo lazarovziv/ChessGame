@@ -21,8 +21,8 @@ public class BishopPiece implements Piece, Observer, Cloneable {
 
     private final ArrayList<Tile> tilesToMoveTo;
     private final ArrayList<Piece> piecesUnderThreat;
-    private final Stack<Pair<Tile, Tile>> historyMoves;
-    private Stack<Pair<Piece, Tile>> piecesEaten;
+    private final Stack<Tile> historyMoves;
+    private Stack<Piece> piecesEaten;
     private final Board board;
     private String name;
     private int pieceCounter;
@@ -57,7 +57,7 @@ public class BishopPiece implements Piece, Observer, Cloneable {
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
-
+        historyMoves.push(currentTile);
         // need to be called after all pieces have been initialized
 //        generateTilesToMoveTo();
     }
@@ -96,17 +96,10 @@ public class BishopPiece implements Piece, Observer, Cloneable {
                     tilesToMoveTo.add(targetTile);
                 } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
                     tilesToMoveTo.add(targetTile);
+                    piecesUnderThreat.add(targetTile.getPiece());
                     break;
                 }
                 if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
-            }
-        }
-
-        for (Tile tile : tilesToMoveTo) {
-            if (!tile.isEmpty()) {
-                if (tile.getPiece().getPieceColor() != pieceColor) {
-                    piecesUnderThreat.add(tile.getPiece());
-                }
             }
         }
     }
@@ -171,7 +164,7 @@ public class BishopPiece implements Piece, Observer, Cloneable {
     }
 
     @Override
-    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
+    public Stack<Tile> getHistoryMoves() {
         return historyMoves;
     }
 
@@ -189,11 +182,6 @@ public class BishopPiece implements Piece, Observer, Cloneable {
         this.currentTile = currentTile;
     }
 
-    //    @Override
-//    public void setImageIcon(ImageView imageIcon) {
-//        this.imageIcon = imageIcon;
-//    }
-
     @Override
     public boolean isThreatenedAtTile(Tile tile) {
         if (pieceColor == PieceColor.WHITE) {
@@ -209,13 +197,12 @@ public class BishopPiece implements Piece, Observer, Cloneable {
 
     @Override
     public void moveToTile(Tile tile) {
-        Pair<Tile, Tile> tilesPair = null;
         if (tilesToMoveTo.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
-                piecesEaten.push(new Pair<Piece, Tile>(tile.getPiece(), tile));
+                piecesEaten.push(tile.getPiece());
                 tile.getPiece().setIsAlive(false);
                 if (pieceColor == PieceColor.BLACK) {
                     board.getWhiteAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
@@ -231,8 +218,7 @@ public class BishopPiece implements Piece, Observer, Cloneable {
             currentTile.setPiece(this);
             tilesToMoveTo.clear();
             // add target tile to history of moves
-            tilesPair = new Pair<>(currentTile, tile);
-            historyMoves.add(tilesPair);
+            historyMoves.push(currentTile);
 
             generateTilesToMoveTo();
         }
@@ -241,18 +227,17 @@ public class BishopPiece implements Piece, Observer, Cloneable {
     @Override
     public void unmakeLastMove() {
         if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop().getFirst();
-        // checking if piece really ate opponent's piece last turn
-        if (piecesEaten.size() != 0) {
-            Pair<Piece, Tile> lastPair = piecesEaten.pop();
-            if (lastPair.getSecond().equals(currentTile)) {
-                // if so, setting the eaten piece at this piece's current tile and this piece at it's previous tile
-                currentTile.setPiece(lastPair.getFirst());
-                lastPair.getFirst().setIsAlive(true);
+        Tile previousTile = historyMoves.pop();
+
+        if (piecesEaten.size() > 0) {
+            if (piecesEaten.peek().getHistoryMoves().peek().equals(currentTile)) {
+                Piece piece = piecesEaten.pop();
+                currentTile.setPiece(piece);
+                piece.setIsAlive(true);
+                player.getOpponentPlayer().addPieceToAlive(piece);
             }
-        } else {
-            currentTile.setPiece(null);
-        }
+        } else currentTile.setPiece(null);
+
         currentTile = previousTile;
         currentTile.setPiece(this);
         tilesToMoveTo.clear();
@@ -289,15 +274,15 @@ public class BishopPiece implements Piece, Observer, Cloneable {
     }
 
     @Override
-    public Piece lastPieceEaten() {
+    public Piece getLastPieceEaten() {
         if (piecesEaten.size() == 0) return null;
-        return piecesEaten.pop().getFirst();
+        return piecesEaten.peek();
     }
 
     @Override
     public Pair<Tile, Tile> getLastMove() {
         if (historyMoves.size() == 0) return null;
-        else return historyMoves.peek();
+        return new Pair<Tile, Tile>(historyMoves.peek(), currentTile);
     }
 
     @Override
