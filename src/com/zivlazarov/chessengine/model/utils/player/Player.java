@@ -153,9 +153,7 @@ public class Player {
     public void addPieceToAlive(Piece piece) {
         if (piece.getPieceColor() == playerColor) {
             alivePieces.add(piece);
-            if (deadPieces.contains(piece)) {
-                deadPieces.remove(piece);
-            }
+            deadPieces.remove(piece);
         }
     }
 
@@ -163,7 +161,9 @@ public class Player {
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
             alivePieces.remove(piece);
+            clearTileFromPiece(piece.getCurrentTile());
             piece.setCurrentTile(null);
+            piece.setIsAlive(false);
         }
     }
 
@@ -304,7 +304,8 @@ public class Player {
     }
 
     public boolean isInCheck() {
-        if (playerColor == PieceColor.WHITE) return board.getGameSituation() == GameSituation.WHITE_IN_CHECK;
-        else return board.getGameSituation() == GameSituation.BLACK_IN_CHECK;
+        return getKing().getIsInDanger();
+//        if (playerColor == PieceColor.WHITE) return board.getGameSituation() == GameSituation.WHITE_IN_CHECK;
+//        else return board.getGameSituation() == GameSituation.BLACK_IN_CHECK;
     }
 }

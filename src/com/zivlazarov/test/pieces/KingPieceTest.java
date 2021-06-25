@@ -1,9 +1,12 @@
 package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.controllers.PlayerController;
+import com.zivlazarov.chessengine.logs.MovesLog;
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.pieces.KnightPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;
+import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.utils.board.Board;
 import com.zivlazarov.chessengine.model.utils.board.PieceColor;
 import com.zivlazarov.chessengine.model.utils.player.Player;
@@ -19,8 +22,10 @@ public class KingPieceTest {
 
     private static Board board;
     private static KingPiece kingPiece;
+    private static KingPiece opponentKingPiece;
     private static PawnPiece pawnPiece;
     private static PawnPiece opponentPawnPiece;
+    private static KnightPiece opponentKnightPiece;
     private static Player player;
     private static Player opponent;
 
@@ -29,10 +34,14 @@ public class KingPieceTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
+        opponent.setOpponentPlayer(player);
+        player.setOpponentPlayer(opponent);
 //        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[3][4], 0);
         kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3]);
+        opponentKingPiece = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][4]);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][3], 0);
-//        pawnPiece = new PawnPiece(board, PieceColor.WHITE, board.getBoard()[2][4], 0);
+        opponentKnightPiece = new KnightPiece(opponent, board, PieceColor.BLACK, board.getBoard()[4][1], 0);
+        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][1], 0);
 //        board.checkBoard();
     }
 
@@ -125,6 +134,19 @@ public class KingPieceTest {
         board.printBoard();
         board.checkBoard(player);
         for (Tile tile : kingPiece.getTilesToMoveTo()) System.out.println(tile);
+    }
+
+    @Test
+    public void testCheckSituation() {
+        board.removePieceFromBoard(opponentPawnPiece);
+        board.checkBoard(opponent);
+        board.printBoard();
+
+        opponentKnightPiece.moveToTile(board.getBoard()[2][2]);
+        MovesLog.getInstance().getMovesLog().add(new Pair<>(new Pair<>(opponent, opponentKnightPiece), opponentKnightPiece.getLastMove()));
+        board.checkBoard(player);
+        if (player.getKing().getIsInDanger()) System.out.println("Check! ");
+        board.printBoard();
     }
 
 }

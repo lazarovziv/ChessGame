@@ -87,7 +87,7 @@ public class Tile {
 
 	public void setPiece(Piece p) {
 		piece = p;
-		isEmpty = piece == null;
+		isEmpty = piece == null || !piece.getIsAlive();
 	}
 
 	public void setThreatenedByWhite(boolean threatenedByWhite) {
