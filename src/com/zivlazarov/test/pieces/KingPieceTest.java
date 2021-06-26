@@ -7,10 +7,10 @@ import com.zivlazarov.chessengine.model.pieces.KnightPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.board.Board;
-import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-import com.zivlazarov.chessengine.model.utils.player.Player;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.board.Tile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -143,9 +143,11 @@ public class KingPieceTest {
         board.printBoard();
 
         opponentKnightPiece.moveToTile(board.getBoard()[2][2]);
-        MovesLog.getInstance().getMovesLog().add(new Pair<>(new Pair<>(opponent, opponentKnightPiece), opponentKnightPiece.getLastMove()));
         board.checkBoard(player);
-        if (player.getKing().getIsInDanger()) System.out.println("Check! ");
+        if (player.isInCheck()) System.out.println("Check! ");
+        board.printBoard();
+        pawnPiece.moveToTile(board.getBoard()[2][2]);
+        board.checkBoard(opponent);
         board.printBoard();
     }
 

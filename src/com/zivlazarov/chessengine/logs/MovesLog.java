@@ -1,9 +1,9 @@
 package com.zivlazarov.chessengine.logs;
 
 import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.player.Piece;
-import com.zivlazarov.chessengine.model.utils.player.Player;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.board.Tile;
 
 import java.util.Stack;
 

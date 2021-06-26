@@ -7,10 +7,10 @@ public class Game {
 //package com.zivlazarov.chessengine.ui;
 //
 //import com.zivlazarov.chessengine.model.pieces.*;
-//import com.zivlazarov.chessengine.model.utils.board.Board;
-//import com.zivlazarov.chessengine.model.utils.player.Piece;
-//import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-//import com.zivlazarov.chessengine.model.utils.board.Tile;
+//import com.zivlazarov.chessengine.model.board.Board;
+//import com.zivlazarov.chessengine.model.player.Piece;
+//import com.zivlazarov.chessengine.model.board.PieceColor;
+//import com.zivlazarov.chessengine.model.board.Tile;
 //import javafx.application.Application;
 //import javafx.scene.Scene;
 //import javafx.scene.image.Image;

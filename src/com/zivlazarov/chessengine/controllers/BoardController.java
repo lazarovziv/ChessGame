@@ -1,8 +1,8 @@
 package com.zivlazarov.chessengine.controllers;
 
-import com.zivlazarov.chessengine.model.utils.board.Board;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
-import com.zivlazarov.chessengine.model.utils.player.Player;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Player;
 
 public class BoardController {
 

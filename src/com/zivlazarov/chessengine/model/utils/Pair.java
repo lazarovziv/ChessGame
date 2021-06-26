@@ -1,8 +1,6 @@
 package com.zivlazarov.chessengine.model.utils;
 
-import com.zivlazarov.chessengine.model.utils.board.Tile;
-
-import java.util.Objects;
+import com.zivlazarov.chessengine.model.board.Tile;
 
 public class Pair<T, V> {
 

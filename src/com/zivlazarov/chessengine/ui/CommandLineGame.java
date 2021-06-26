@@ -5,12 +5,12 @@ import com.zivlazarov.chessengine.controllers.PlayerController;
 import com.zivlazarov.chessengine.logs.MovesLog;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.pieces.*;
-import com.zivlazarov.chessengine.model.utils.board.Board;
-import com.zivlazarov.chessengine.model.utils.board.GameSituation;
-import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
-import com.zivlazarov.chessengine.model.utils.player.Piece;
-import com.zivlazarov.chessengine.model.utils.player.Player;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.GameSituation;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.Scanner;
 import java.util.Stack;
@@ -154,13 +154,13 @@ public class CommandLineGame {
                     System.out.println("This tile is empty! Please choose another tile: ");
                 } else if (tileChosen.getPiece().getPieceColor() != currentPlayer.getPlayerColor()) {
                     System.out.println("Please choose a " + currentPlayer.getPlayerColor() + " piece!");
-                } else if (!tileChosen.getPiece().canMove()) {
+                } else if (!currentPlayer.getPiecesCanMove().contains(tileChosen.getPiece())) {
                     System.out.println("This piece can't move!");
                 }
 
             } while (rowChosen < 1 || rowChosen > 8 || colChosen < 1 || colChosen > 8 ||
                     tileChosen.isEmpty() || tileChosen.getPiece().getPieceColor() != currentTurn
-                    || !tileChosen.getPiece().canMove());
+                    || !currentPlayer.getPiecesCanMove().contains(tileChosen.getPiece()));
 
             // show board to player from his side of view
             if (turn % 2 == 0) boardController.printBoardUpsideDown(tileChosen);
@@ -226,7 +226,7 @@ public class CommandLineGame {
         }
     }
 
-    private static void initPieces(Player whitePlayer, Player blackPlayer) {
+    public static void initPieces(Player whitePlayer, Player blackPlayer) {
         RookPiece whiteRookKingSide = new RookPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][0], 0);
 //        whiteRookKingSide.setImageIcon(createImageView("whiteRook"));
         RookPiece whiteRookQueenSide = new RookPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][7], 1);

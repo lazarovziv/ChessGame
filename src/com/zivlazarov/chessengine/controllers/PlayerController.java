@@ -3,9 +3,9 @@ package com.zivlazarov.chessengine.controllers;
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;
-import com.zivlazarov.chessengine.model.utils.player.Piece;
-import com.zivlazarov.chessengine.model.utils.player.Player;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.board.Tile;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
