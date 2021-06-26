@@ -2,6 +2,7 @@ package com.zivlazarov.chessengine.model.player;
 
 //import javafx.scene.image.ImageView;
 
+import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
@@ -9,7 +10,7 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public interface Piece extends Cloneable {
+public interface Piece extends Cloneable, MyObserver {
 
     String name = "";
     boolean isAlive = true;
@@ -60,4 +61,6 @@ public interface Piece extends Cloneable {
     boolean hasMoved();
 
     boolean equals(Piece piece);
+
+    void update();
 }

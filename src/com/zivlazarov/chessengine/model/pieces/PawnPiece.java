@@ -1,5 +1,6 @@
 package com.zivlazarov.chessengine.model.pieces;
 
+import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
@@ -354,5 +355,10 @@ public class PawnPiece implements Piece, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 (name + pieceCounter).equals(piece.getName() + pieceCounter);
+    }
+
+    @Override
+    public void update() {
+        refresh();
     }
 }

@@ -1,15 +1,16 @@
 package com.zivlazarov.chessengine.model.board;
 
-import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.player.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.MyObservable;
+import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 // make as Singleton (?)
-public class Board extends Observable {
+public class Board implements MyObservable {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -28,7 +29,7 @@ public class Board extends Observable {
     private Player whitePlayer;
     private Player blackPlayer;
     private GameSituation gameSituation;
-    private List<Observer> observers;
+    private List<MyObserver> observers;
 
     private Stack<Pair<Piece, Pair<Tile, Tile>>> historyMoves;
 
@@ -165,7 +166,8 @@ public class Board extends Observable {
         historyMoves.push(new Pair<Piece, Pair<Tile, Tile>>(piece, new Pair<Tile, Tile>(piece.getCurrentTile(), tile)));
         piece.setCurrentTile(tile);
         piece.getHistoryMoves().push(tile);
-        piece.refresh();
+        // notifyObservers();
+        updateObservers();
         return true;
     }
 
@@ -196,7 +198,7 @@ public class Board extends Observable {
 
         piece.getCurrentTile().setPiece(null);
         piece.setCurrentTile(previousTile);
-        piece.refresh();
+        updateObservers();
     }
 
     public int distanceBetweenPieces(Piece first, Piece second) {
@@ -356,27 +358,29 @@ public class Board extends Observable {
     }
 
     @Override
-    public synchronized void addObserver(Observer o) {
-        super.addObserver(o);
-        observers.add(o);
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     @Override
-    public synchronized void deleteObserver(Observer o) {
-        super.deleteObserver(o);
-        observers.remove(o);
-    }
-
-    @Override
-    public void notifyObservers() {
-        super.notifyObservers();
-        for (Observer observer : observers) {
-            observer.notify();
+    public void updateObservers() {
+        for (MyObserver observer : observers) {
+            observer.update();
         }
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public void addObserver(MyObserver observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void addAllObservers(MyObserver[] o) {
+        observers.addAll(Arrays.asList(o));
+    }
+
+    @Override
+    public void removeObserver(MyObserver observer) {
+        observers.remove(observer);
     }
 }

@@ -1,21 +1,19 @@
 package com.zivlazarov.chessengine.model.pieces;
 
-import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.player.Piece;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
-//import javafx.scene.image.ImageView;
+import com.zivlazarov.chessengine.model.utils.MyObserver;
+import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
-public class BishopPiece implements Piece, Observer, Cloneable {
+public class BishopPiece implements Piece, Cloneable {
 
     private Player player;
 
@@ -285,11 +283,6 @@ public class BishopPiece implements Piece, Observer, Cloneable {
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-
-    }
-
-    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -299,5 +292,10 @@ public class BishopPiece implements Piece, Observer, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 (name + pieceCounter).equals(piece.getName() + pieceCounter);
+    }
+
+    @Override
+    public void update() {
+        refresh();
     }
 }
