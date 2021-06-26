@@ -162,6 +162,7 @@ public class Player {
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
             alivePieces.remove(piece);
+            piece.getCurrentTile().setPiece(null);
             piece.setCurrentTile(null);
             piece.setIsAlive(false);
         }
