@@ -352,10 +352,6 @@ public class CommandLineGame {
             if (board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
                 System.out.println("Checkmate! " + currentPlayer.getOpponentPlayer().getName() + " wins!");
                 currentPlayer.getOpponentPlayer().setHasWonGame(true);
-                System.out.println("Moves from the match: ");
-                for (int i = 0; i < movesLog.size(); i++) {
-                    System.out.println(movesLog.pop().getFirst().getFirst().getName() + " played: " + movesLog.pop().getSecond());
-                }
             } else if (board.getGameSituation() == GameSituation.WHITE_IN_CHECK) {
                 System.out.println("Check! " + currentPlayer.getName() + "'s King is in danger!");
                 System.out.println(currentPlayer.getName() + "'s turn: ");
@@ -373,9 +369,6 @@ public class CommandLineGame {
                 System.out.println("Checkmate! " + currentPlayer.getOpponentPlayer().getName() + " wins!");
                 currentPlayer.getOpponentPlayer().setHasWonGame(true);
                 System.out.println("Moves from the match: ");
-                for (int i = 0; i < movesLog.size(); i++) {
-                    System.out.println(movesLog.pop().getFirst() + " played: " + movesLog.pop().getSecond());
-                }
             } else if (board.getGameSituation() == GameSituation.BLACK_IN_CHECK) {
                 System.out.println("Check! " + currentPlayer.getName() + "'s King is in danger!");
                 System.out.println(currentPlayer.getName() + "'s turn: ");
@@ -389,9 +382,5 @@ public class CommandLineGame {
                 }
             }
         }
-    }
-
-    public void receiveInputForMove(Player currentPlayer, int rowChosen, int colChosen) {
-
     }
 }
