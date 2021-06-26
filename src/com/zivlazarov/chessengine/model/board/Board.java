@@ -3,6 +3,7 @@ package com.zivlazarov.chessengine.model.board;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.player.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,12 +30,16 @@ public class Board extends Observable {
     private GameSituation gameSituation;
     private List<Observer> observers;
 
+    private Stack<Pair<Piece, Pair<Tile, Tile>>> historyMoves;
+
     public Board() {
         board = new Tile[8][8];
         blackAlivePieces = new HashMap<>();
         whiteAlivePieces = new HashMap<>();
 
         observers = new ArrayList<>();
+
+        historyMoves = new Stack<>();
 
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
@@ -122,12 +127,12 @@ public class Board extends Observable {
         List<Tile> actualLegalMoves = new ArrayList<>();
 
         for (Piece piece : currentPlayer.getAlivePieces()) {
-            Runnable runnable = () -> {
-                for (Tile tile : pseudoLegalMoves) {
+            Runnable runnable = null;
+            for (Tile tile : pseudoLegalMoves) {
+                runnable = () -> {
                     if (piece.getTilesToMoveTo().contains(tile)) {
                         piece.moveToTile(tile);
                         refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
-//                    refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
                         if (!currentPlayer.isInCheck()) {
                             actualLegalMoves.add(tile);
                             if (!currentPlayer.getPiecesCanMove().contains(piece)) {
@@ -137,27 +142,42 @@ public class Board extends Observable {
                         unmakeLastMove(piece);
                         refreshPieces(currentPlayer.getOpponentPlayer());
                     }
-                }
-            };
+                };
+            }
             new Thread(runnable).start();
-//            for (Tile tile : pseudoLegalMoves) {
-//                if (piece.getTilesToMoveTo().contains(tile)) {
-//                    piece.moveToTile(tile);
-//                    refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
-////                    refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
-//                    if (!currentPlayer.isInCheck()) {
-//                        actualLegalMoves.add(tile);
-//                        currentPlayer.getPiecesCanMove().add(piece);
-//                    }
-//                    unmakeLastMove(piece);
-//                    refreshPieces(currentPlayer.getOpponentPlayer());
-//                }
-//            }
         }
         if (actualLegalMoves.size() == 0) gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
         currentPlayer.getLegalMoves().clear();
         currentPlayer.getLegalMoves().addAll(actualLegalMoves);
         // checking if any of current piece's tiles to move to contains player's legal moves
+    }
+
+    // save board state before making the move for being able to restore it later on!
+    public boolean makeMove(Player player, Piece piece, Tile tile) {
+        if (!piece.getIsAlive()) return false;
+        if (!player.getPiecesCanMove().contains(piece)) return false;
+        if (piece.getTilesToMoveTo().contains(tile)) {
+            piece.getCurrentTile().setPiece(null);
+            if (!tile.isEmpty() && tile.getPiece().getPieceColor() != piece.getPieceColor()) {
+                player.getOpponentPlayer().addPieceToDead(tile.getPiece());
+            }
+        } else return false;
+        historyMoves.push(new Pair<Piece, Pair<Tile, Tile>>(piece, new Pair<Tile, Tile>(piece.getCurrentTile(), tile)));
+        piece.setCurrentTile(tile);
+        piece.getHistoryMoves().push(tile);
+        piece.refresh();
+        return true;
+    }
+
+    // search how to save board state and restore it in here!!!
+    public boolean unmakeMove() {
+        Pair<Piece, Pair<Tile, Tile>> lastMove = historyMoves.pop();
+        Piece piece = lastMove.getFirst();
+        Pair<Tile, Tile> tilesPair = lastMove.getSecond();
+        piece.getCurrentTile().setPiece(null);
+        piece.setCurrentTile(tilesPair.getFirst());
+
+        return true;
     }
 
     public void unmakeLastMove(Piece piece) {
