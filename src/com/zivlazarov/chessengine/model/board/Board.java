@@ -1,10 +1,8 @@
-package com.zivlazarov.chessengine.model.utils.board;
+package com.zivlazarov.chessengine.model.board;
 
-import com.zivlazarov.chessengine.logs.MovesLog;
 import com.zivlazarov.chessengine.model.pieces.*;
-import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.player.Piece;
-import com.zivlazarov.chessengine.model.utils.player.Player;
+import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,21 +51,27 @@ public class Board extends Observable {
     public void refreshPieces(Player currentPlayer) {
         currentPlayer.getOpponentPlayer().getLegalMoves().clear();
         currentPlayer.getLegalMoves().clear();
+        currentPlayer.getOpponentPlayer().getPiecesCanMove().clear();
+        currentPlayer.getPiecesCanMove().clear();
         for (Piece piece : currentPlayer.getOpponentPlayer().getAlivePieces()) {
             piece.refresh();
             currentPlayer.getOpponentPlayer().getLegalMoves().addAll(piece.getTilesToMoveTo());
+            if (piece.canMove()) currentPlayer.getOpponentPlayer().getPiecesCanMove().add(piece);
         }
         for (Piece piece : currentPlayer.getAlivePieces()) {
             piece.refresh();
             currentPlayer.getLegalMoves().addAll(piece.getTilesToMoveTo());
+            if (piece.canMove()) currentPlayer.getPiecesCanMove().add(piece);
         }
     }
 
     public void refreshPiecesOfPlayer(Player player) {
         player.getLegalMoves().clear();
+        player.getPiecesCanMove().clear();
         for (Piece piece : player.getAlivePieces()) {
             piece.refresh();
             player.getLegalMoves().addAll(piece.getTilesToMoveTo());
+            if (piece.canMove()) player.getPiecesCanMove().add(piece);
         }
     }
 
@@ -75,8 +79,8 @@ public class Board extends Observable {
         // resetting tiles threatened state before every check
         for (Tile[] tiles : board) {
             for (Tile tile : tiles) {
-                tile.setThreatenedByWhite(false);
-                tile.setThreatenedByBlack(false);
+                tile.setThreatenedByColor(currentPlayer.getPlayerColor(), false);
+                tile.setThreatenedByColor(currentPlayer.getOpponentPlayer().getPlayerColor(), false);
             }
         }
         refreshPiecesOfPlayer(currentPlayer);
@@ -89,6 +93,7 @@ public class Board extends Observable {
                 tile.getPiece().setIsInDanger(true);
             }
         }
+
         for (Tile tile : currentPlayer.getOpponentPlayer().getLegalMoves()) {
             tile.setThreatenedByColor(currentPlayer.getOpponentPlayer().getPlayerColor(), true);
             if (!tile.isEmpty() && tile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
@@ -96,60 +101,86 @@ public class Board extends Observable {
             }
         }
 
-        if (currentPlayer.getKing().getIsInDanger()) {
+        if (currentPlayer.isInCheck()) {
+            // reset all legal moves before proceeding to generation of legal moves in check situation
             currentPlayer.getLegalMoves().clear();
+            currentPlayer.getPiecesCanMove().clear();
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
-            calculateLegalMovesWhenInCheck(currentPlayer);
+            generateLegalMovesWhenInCheck(currentPlayer);
         } else {
             gameSituation = GameSituation.NORMAL;
         }
     }
 
+    public void generateLegalMovesWhenInCheck(Player currentPlayer) {
+        List<Tile> pseudoLegalMoves = currentPlayer.getLegalMoves();
+        List<Tile> actualLegalMoves = new ArrayList<>();
+
+        for (Piece piece : currentPlayer.getAlivePieces()) {
+            for (Tile tile : pseudoLegalMoves) {
+                if (piece.getTilesToMoveTo().contains(tile)) {
+                    piece.moveToTile(tile);
+                    checkBoard(currentPlayer);
+//                    refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
+                    if (!currentPlayer.isInCheck()) {
+                        actualLegalMoves.add(tile);
+                        currentPlayer.getPiecesCanMove().add(piece);
+                    }
+                    unmakeLastMove(piece);
+                    refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
+                }
+            }
+        }
+        currentPlayer.getLegalMoves().clear();
+        currentPlayer.getLegalMoves().addAll(actualLegalMoves);
+        // checking if any of current piece's tiles to move to contains player's legal moves
+    }
+
     public void calculateLegalMovesWhenInCheck(Player currentPlayer) {
         if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
-            Runnable whiteRunnable = () -> {
-                for (Piece piece : currentPlayer.getAlivePieces()) {
-                    // problem is in tiles for loop
-                    List<Tile> clonedMoves = (List<Tile>) piece.getTilesToMoveTo().clone();
-                    Tile[][] clonedBoard = board.clone();
-                    for (Tile tile : clonedMoves) {
-                        piece.moveToTile(tile);
-                        refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
-                        List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
-                                .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
-                                .collect(Collectors.toList());
-                        if (piecesThreateningKing.size() == 0) currentPlayer.getLegalMoves().add(tile);
+            for (Piece piece : currentPlayer.getAlivePieces()) {
+                // problem is in tiles for loop
+                if (!piece.canMove()) continue;
+                List<Tile> clonedMoves = (List<Tile>) piece.getTilesToMoveTo().clone();
+                Tile[][] clonedBoard = board.clone();
+                for (Tile tile : clonedMoves) {
+                    piece.moveToTile(tile);
+                    refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
+                    List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
+                            .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
+                            .collect(Collectors.toList());
+                    if (piecesThreateningKing.size() == 0) currentPlayer.getLegalMoves().add(tile);
 //                        piece.unmakeLastMove();
-                        unmakeLastMove(piece);
-                        refreshPiecesOfPlayer(currentPlayer);
-                    }
+                    unmakeLastMove(piece);
+                    board = clonedBoard;
+                    refreshPiecesOfPlayer(currentPlayer);
                 }
-                if (currentPlayer.getLegalMoves().size() == 0)
-                    gameSituation = GameSituation.WHITE_CHECKMATED;
-            };
-            new Thread(whiteRunnable).start();
+                if (piece.canMove()) currentPlayer.getPiecesCanMove().add(piece);
+            }
+            if (currentPlayer.getLegalMoves().size() == 0)
+                gameSituation = GameSituation.WHITE_CHECKMATED;
         } else if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
-            Runnable blackRunnable = () -> {
-                for (Piece piece : currentPlayer.getAlivePieces()) {
-                    // problem is in tiles for loop
-                    List<Tile> clonedMoves = (List<Tile>) piece.getTilesToMoveTo().clone();
-                    Tile[][] clonedBoard = board.clone();
-                    for (Tile tile : clonedMoves) {
-                        piece.moveToTile(tile);
-                        refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
-                        List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
-                                .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
-                                .collect(Collectors.toList());
-                        if (piecesThreateningKing.size() == 0) currentPlayer.getLegalMoves().add(tile);
+            for (Piece piece : currentPlayer.getAlivePieces()) {
+                // problem is in tiles for loop
+                if (!piece.canMove()) continue;
+                List<Tile> clonedMoves = (List<Tile>) piece.getTilesToMoveTo().clone();
+                Tile[][] clonedBoard = board.clone();
+                for (Tile tile : clonedMoves) {
+                    piece.moveToTile(tile);
+                    refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
+                    List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
+                            .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
+                            .collect(Collectors.toList());
+                    if (piecesThreateningKing.size() == 0) currentPlayer.getLegalMoves().add(tile);
 //                        piece.unmakeLastMove();
-                        unmakeLastMove(piece);
-                        refreshPieces(currentPlayer);
-                    }
+                    unmakeLastMove(piece);
+                    board = clonedBoard;
+                    refreshPieces(currentPlayer);
                 }
-                if (currentPlayer.getLegalMoves().size() == 0)
-                    gameSituation = GameSituation.BLACK_CHECKMATED;
-            };
-            new Thread(blackRunnable).start();
+                if (piece.canMove()) currentPlayer.getPiecesCanMove().add(piece);
+            }
+            if (currentPlayer.getLegalMoves().size() == 0)
+                gameSituation = GameSituation.BLACK_CHECKMATED;
         }
     }
 
@@ -170,12 +201,6 @@ public class Board extends Observable {
         piece.getCurrentTile().setPiece(null);
         piece.setCurrentTile(previousTile);
         piece.refresh();
-    }
-
-    public boolean canPieceGetInTheWayOfPiece(Piece defendingPiece, Piece threateningPiece) {
-
-
-        return false;
     }
 
     public int distanceBetweenPieces(Piece first, Piece second) {

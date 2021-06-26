@@ -1,11 +1,10 @@
-package com.zivlazarov.chessengine.model.utils.player;
+package com.zivlazarov.chessengine.model.player;
 
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.board.Board;
-import com.zivlazarov.chessengine.model.utils.board.GameSituation;
-import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +25,7 @@ public class Player {
     private boolean hasPlayedThisTurn;
 
     private List<Tile> legalMoves;
+    private List<Piece> piecesCanMove;
 
     private int numOfPawns;
     private int numOfKnights;
@@ -46,6 +46,7 @@ public class Player {
         hasWonGame = false;
         hasPlayedThisTurn = false;
         legalMoves = new ArrayList<>();
+        piecesCanMove = new ArrayList<>();
 
         // setting player direction, white goes up the board, black goes down (specifically to pawn pieces and for checking pawn promotion)
         if (playerColor == PieceColor.WHITE) {
@@ -161,7 +162,6 @@ public class Player {
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
             alivePieces.remove(piece);
-            clearTileFromPiece(piece.getCurrentTile());
             piece.setCurrentTile(null);
             piece.setIsAlive(false);
         }
@@ -295,6 +295,10 @@ public class Player {
 
     public List<Tile> getLegalMoves() {
         return legalMoves;
+    }
+
+    public List<Piece> getPiecesCanMove() {
+        return piecesCanMove;
     }
 
     public void updateLegalMoves() {
