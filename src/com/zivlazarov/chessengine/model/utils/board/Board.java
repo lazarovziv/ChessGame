@@ -23,9 +23,6 @@ public class Board extends Observable {
     public static final String ANSI_WHITE = "\u001B[37m";
     private final Map<String, Piece> blackAlivePieces;
     private final Map<String, Piece> whiteAlivePieces;
-    private final List<Tile> whiteLegalTilesToMoveToWhenInCheck;
-    private final List<Tile> blackLegalTilesToMoveToWhenInCheck;
-    private final Map<PieceColor, List<Tile>> legalMovesWhenInCheck;
     private final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
     private Tile[][] board;
     private Player whitePlayer;
@@ -39,11 +36,6 @@ public class Board extends Observable {
         whiteAlivePieces = new HashMap<>();
 
         observers = new ArrayList<>();
-
-        whiteLegalTilesToMoveToWhenInCheck = new ArrayList<>();
-        blackLegalTilesToMoveToWhenInCheck = new ArrayList<>();
-
-        legalMovesWhenInCheck = new HashMap<>();
 
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
@@ -105,7 +97,7 @@ public class Board extends Observable {
         }
 
         if (currentPlayer.getKing().getIsInDanger()) {
-            legalMovesWhenInCheck.clear();
+            currentPlayer.getLegalMoves().clear();
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
             calculateLegalMovesWhenInCheck(currentPlayer);
         } else {
@@ -126,14 +118,13 @@ public class Board extends Observable {
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
-                        if (piecesThreateningKing.size() == 0) whiteLegalTilesToMoveToWhenInCheck.add(tile);
+                        if (piecesThreateningKing.size() == 0) currentPlayer.getLegalMoves().add(tile);
 //                        piece.unmakeLastMove();
-                        board = clonedBoard;
+                        unmakeLastMove(piece);
                         refreshPiecesOfPlayer(currentPlayer);
                     }
                 }
-                legalMovesWhenInCheck.put(PieceColor.WHITE, whiteLegalTilesToMoveToWhenInCheck);
-                if (legalMovesWhenInCheck.get(PieceColor.WHITE).size() == 0)
+                if (currentPlayer.getLegalMoves().size() == 0)
                     gameSituation = GameSituation.WHITE_CHECKMATED;
             };
             new Thread(whiteRunnable).start();
@@ -149,14 +140,13 @@ public class Board extends Observable {
                         List<Piece> piecesThreateningKing = currentPlayer.getOpponentPlayer().getAlivePieces()
                                 .stream().filter(p -> p.getPiecesUnderThreat().contains(currentPlayer.getKing()))
                                 .collect(Collectors.toList());
-                        if (piecesThreateningKing.size() == 0) blackLegalTilesToMoveToWhenInCheck.add(tile);
+                        if (piecesThreateningKing.size() == 0) currentPlayer.getLegalMoves().add(tile);
 //                        piece.unmakeLastMove();
-                        board = clonedBoard;
+                        unmakeLastMove(piece);
                         refreshPieces(currentPlayer);
                     }
                 }
-                legalMovesWhenInCheck.put(PieceColor.BLACK, blackLegalTilesToMoveToWhenInCheck);
-                if (legalMovesWhenInCheck.get(PieceColor.BLACK).size() == 0)
+                if (currentPlayer.getLegalMoves().size() == 0)
                     gameSituation = GameSituation.BLACK_CHECKMATED;
             };
             new Thread(blackRunnable).start();
@@ -164,8 +154,9 @@ public class Board extends Observable {
     }
 
     public void unmakeLastMove(Piece piece) {
-        if (piece.getHistoryMoves().size() == 0) return;
-        Tile previousTile = piece.getHistoryMoves().pop();
+        if (piece.getHistoryMoves().size() == 1) return;
+        Tile previousTile = piece.getHistoryMoves().get(piece.getHistoryMoves().size() - 1);
+        piece.getHistoryMoves().remove(previousTile);
 
         if (piece.getLastPieceEaten() != null) {
             if (piece.getLastPieceEaten().getHistoryMoves().peek().equals(piece.getCurrentTile())) {
@@ -174,10 +165,10 @@ public class Board extends Observable {
                 eatenPiece.setIsAlive(true);
                 eatenPiece.getPlayer().getOpponentPlayer().addPieceToAlive(eatenPiece);
             }
-        } else piece.getCurrentTile().setPiece(null);
+        }
 
+        piece.getCurrentTile().setPiece(null);
         piece.setCurrentTile(previousTile);
-        piece.getCurrentTile().setPiece(piece);
         piece.refresh();
     }
 
@@ -335,24 +326,12 @@ public class Board extends Observable {
         this.gameSituation = situation;
     }
 
-    public List<Tile> getWhiteLegalTilesToMoveTo() {
-        return whiteLegalTilesToMoveToWhenInCheck;
-    }
-
-    public List<Tile> getBlackLegalTilesToMoveTo() {
-        return blackLegalTilesToMoveToWhenInCheck;
-    }
-
     public void setWhitePlayer(Player whitePlayer) {
         this.whitePlayer = whitePlayer;
     }
 
     public void setBlackPlayer(Player blackPlayer) {
         this.blackPlayer = blackPlayer;
-    }
-
-    public Map<PieceColor, List<Tile>> getLegalMovesWhenInCheck() {
-        return legalMovesWhenInCheck;
     }
 
     @Override

@@ -60,8 +60,9 @@ public class BoardTest {
 
     @Test
     public void testUnmakeLastMove() {
+        System.out.println(rookPiece1.getCurrentTile());
         board.printBoard();
-        rookPiece1.moveToTile(board.getBoard()[4][0]);
+        rookPiece1.moveToTile(board.getBoard()[0][0]);
         board.printBoard();
         board.checkBoard(player);
         board.unmakeLastMove(rookPiece1);
