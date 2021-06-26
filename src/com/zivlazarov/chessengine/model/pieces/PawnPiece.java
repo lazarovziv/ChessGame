@@ -1,11 +1,11 @@
 package com.zivlazarov.chessengine.model.pieces;
 
 import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.board.Board;
-import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
-import com.zivlazarov.chessengine.model.utils.player.Piece;
-import com.zivlazarov.chessengine.model.utils.player.Player;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +28,7 @@ public class PawnPiece implements Piece, Cloneable {
     private boolean isInDanger = false;
     private Tile currentTile;
     private PieceColor pieceColor;
+    private String imageName;
     private boolean hasMoved = false;
 
     private Tile enPassantTile;
@@ -50,10 +51,12 @@ public class PawnPiece implements Piece, Cloneable {
         if (pieceColor == PieceColor.BLACK) {
             name = "bP";
             board.getBlackAlivePieces().put(name + pieceCounter, this);
+            imageName = "blackPawn.png";
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wP";
             board.getWhiteAlivePieces().put(name + pieceCounter, this);
+            imageName = "whitePawn.png";
         }
         player.addPieceToAlive(this);
 
@@ -104,7 +107,6 @@ public class PawnPiece implements Piece, Cloneable {
                 tilesToMoveTo.add(board.getBoard()[x + direction][y + d]);
                 piecesUnderThreat.add(board.getBoard()[x + direction][y + d].getPiece());
             }
-
             // insert en passant
             if (canEnPassant(d)) {
                 tilesToMoveTo.add(board.getBoard()[x+player.getPlayerDirection()][y+d]);
@@ -222,10 +224,9 @@ public class PawnPiece implements Piece, Cloneable {
         currentTile.setPiece(this);
     }
 
-//    @Override
-//    public void setImageIcon(ImageView imageIcon) {
-//        this.imageIcon = imageIcon;
-//    }
+    public String getImageName() {
+        return imageName;
+    }
 
     @Override
     public boolean isThreatenedAtTile(Tile tile) {

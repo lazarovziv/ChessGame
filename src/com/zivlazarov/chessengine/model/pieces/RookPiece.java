@@ -1,10 +1,10 @@
 package com.zivlazarov.chessengine.model.pieces;
 import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.board.Board;
-import com.zivlazarov.chessengine.model.utils.player.Piece;
-import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
-import com.zivlazarov.chessengine.model.utils.player.Player;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Player;
 //import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ public class RookPiece implements Piece, Cloneable {
     private boolean hasMoved;
     private Tile currentTile;
     private PieceColor pieceColor;
+    private String imageName;
 //    private ImageView imageIcon;
 
     public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
@@ -49,10 +50,12 @@ public class RookPiece implements Piece, Cloneable {
         if (pieceColor == PieceColor.BLACK) {
             name = "bR";
             board.getBlackAlivePieces().put(name + pieceCounter, this);
+            imageName = "blackRook.png";
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wR";
             board.getWhiteAlivePieces().put(name + pieceCounter, this);
+            imageName = "whiteRook.png";
         }
         player.addPieceToAlive(this);
 
@@ -186,6 +189,10 @@ public class RookPiece implements Piece, Cloneable {
 
     public int getPieceCounter() {
         return pieceCounter;
+    }
+
+    public String getImageName() {
+        return imageName;
     }
 
     @Override

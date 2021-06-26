@@ -1,10 +1,10 @@
 package com.zivlazarov.chessengine.model.pieces;
 import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.board.Board;
-import com.zivlazarov.chessengine.model.utils.player.Piece;
-import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
-import com.zivlazarov.chessengine.model.utils.player.Player;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Player;
 //import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ public class KnightPiece implements Piece, Cloneable {
     private boolean isInDanger = false;
     private Tile currentTile;
     private PieceColor pieceColor;
+    private String imageName;
 //    private ImageView imageIcon;
 
     public KnightPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
@@ -45,10 +46,12 @@ public class KnightPiece implements Piece, Cloneable {
         if (pieceColor == PieceColor.BLACK) {
             name = "bN";
             board.getBlackAlivePieces().put(name + pieceCounter, this);
+            imageName = "blackKnight.png";
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wN";
             board.getWhiteAlivePieces().put(name + pieceCounter, this);
+            imageName = "whiteKnight.png";
         }
         player.addPieceToAlive(this);
 
@@ -186,6 +189,10 @@ public class KnightPiece implements Piece, Cloneable {
         this.currentTile = currentTile;
         if (currentTile == null) return;
         currentTile.setPiece(this);
+    }
+
+    public String getImageName() {
+        return imageName;
     }
 
     @Override

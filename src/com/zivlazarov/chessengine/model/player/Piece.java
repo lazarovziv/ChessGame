@@ -1,10 +1,10 @@
-package com.zivlazarov.chessengine.model.utils.player;
+package com.zivlazarov.chessengine.model.player;
 
 //import javafx.scene.image.ImageView;
 
 import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -31,6 +31,7 @@ public interface Piece extends Cloneable {
     Pair<Tile, Tile> getLastMove();
     ArrayList<Piece> getPiecesUnderThreat();
     Player getPlayer();
+    String getImageName();
     boolean canMove();
 
     void setName(String name);

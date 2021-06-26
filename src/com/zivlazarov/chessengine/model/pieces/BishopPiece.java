@@ -1,11 +1,11 @@
 package com.zivlazarov.chessengine.model.pieces;
 
 import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.utils.board.Board;
-import com.zivlazarov.chessengine.model.utils.player.Piece;
-import com.zivlazarov.chessengine.model.utils.board.PieceColor;
-import com.zivlazarov.chessengine.model.utils.board.Tile;
-import com.zivlazarov.chessengine.model.utils.player.Player;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Player;
 //import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ public class BishopPiece implements Piece, Observer, Cloneable {
     private boolean isInDanger = false;
     private Tile currentTile;
     private PieceColor pieceColor;
+    private String imageName;
 //    private ImageView imageIcon;
 
     public BishopPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
@@ -49,10 +50,12 @@ public class BishopPiece implements Piece, Observer, Cloneable {
         if (pieceColor == PieceColor.BLACK) {
             name = "bB";
             board.getBlackAlivePieces().put(name + pieceCounter, this);
+            imageName = "blackBishop.png";
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wB";
             board.getWhiteAlivePieces().put(name + pieceCounter, this);
+            imageName = "whiteBishop.png";
         }
         player.addPieceToAlive(this);
 
@@ -175,6 +178,10 @@ public class BishopPiece implements Piece, Observer, Cloneable {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public String getImageName() {
+        return imageName;
     }
 
     @Override
