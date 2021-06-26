@@ -53,9 +53,10 @@ public class CommandLineGame {
             System.out.println("Would you like to start a game? (y/n)");
 
             answer = scanner.nextLine();
+            answer = answer.toLowerCase();
 
-            if (answer.equals("y") || answer.equals("Y")) gameStarted = true;
-            else if (answer.equals("n") || answer.equals("N")) System.exit(0);
+            if (answer.equals("y")) gameStarted = true;
+            else if (answer.equals("n")) System.exit(0);
 
         } while (!gameStarted);
 
@@ -200,10 +201,8 @@ public class CommandLineGame {
 
 
                 if (currentPlayer.isInCheck()) {
-                    if (!board.getLegalMovesWhenInCheck().get(currentPlayer.getPlayerColor()).contains(tileToMoveChosen)) {
-                        legalMoveWhenInCheck = false;
-                    }
-                } else legalMoveWhenInCheck = true;
+                    if (!currentPlayer.getLegalMoves().contains(tileToMoveChosen)) legalMoveWhenInCheck = false;
+                }
 
             } while (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen) && legalMoveWhenInCheck);
 
