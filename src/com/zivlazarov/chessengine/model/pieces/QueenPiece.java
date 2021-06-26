@@ -180,6 +180,8 @@ public class QueenPiece implements Piece, Cloneable {
     @Override
     public void setCurrentTile(Tile currentTile) {
         this.currentTile = currentTile;
+        if (currentTile == null) return;
+        currentTile.setPiece(this);
     }
 
 //    @Override

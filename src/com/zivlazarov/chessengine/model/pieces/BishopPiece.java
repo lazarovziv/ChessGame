@@ -180,6 +180,8 @@ public class BishopPiece implements Piece, Observer, Cloneable {
     @Override
     public void setCurrentTile(Tile currentTile) {
         this.currentTile = currentTile;
+        if (currentTile == null) return;
+        currentTile.setPiece(this);
     }
 
     @Override
@@ -250,18 +252,6 @@ public class BishopPiece implements Piece, Observer, Cloneable {
             return true;
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
-
-//    @Override
-//    public void setOnClickListener() {
-////        if (!isAlive) return;
-//        if (imageIcon == null) return;
-//        imageIcon.setOnMouseClicked(mouseEvent -> {
-//            if (tilesToMoveTo.size() == 0) return;
-//            for (Tile tile : tilesToMoveTo) {
-//                tile.setTileImageView(createImageView("redTile"));
-//            }
-//        });
-//    }
 
     @Override
     public boolean canMove() {
