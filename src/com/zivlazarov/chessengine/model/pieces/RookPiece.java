@@ -210,6 +210,8 @@ public class RookPiece implements Piece, Cloneable {
 
     @Override
     public void moveToTile(Tile tile) {
+        if (!player.getLegalMoves().contains(tile)) return;
+        if (!player.getPiecesCanMove().contains(this)) return;
         if (tilesToMoveTo.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
@@ -291,5 +293,12 @@ public class RookPiece implements Piece, Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    @Override
+    public boolean equals(Piece piece) {
+        return currentTile.getRow() == piece.getCurrentTile().getRow() &&
+                currentTile.getCol() == piece.getCurrentTile().getCol() &&
+                (name + pieceCounter).equals(piece.getName() + pieceCounter);
     }
 }

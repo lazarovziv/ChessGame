@@ -59,5 +59,5 @@ public interface Piece extends Cloneable {
 
     boolean hasMoved();
 
-
+    boolean equals(Piece piece);
 }

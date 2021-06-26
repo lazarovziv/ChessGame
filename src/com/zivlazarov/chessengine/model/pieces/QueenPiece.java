@@ -209,15 +209,10 @@ public class QueenPiece implements Piece, Cloneable {
         return false;
     }
 
-    public void move(Tile tile) {
-        currentTile = tile;
-        currentTile.setPiece(this);
-        historyMoves.add(currentTile);
-        generateTilesToMoveTo();
-    }
-
     @Override
     public void moveToTile(Tile tile) {
+        if (!player.getLegalMoves().contains(tile)) return;
+        if (!player.getPiecesCanMove().contains(this)) return;
         if (tilesToMoveTo.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
@@ -289,5 +284,12 @@ public class QueenPiece implements Piece, Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    @Override
+    public boolean equals(Piece piece) {
+        return currentTile.getRow() == piece.getCurrentTile().getRow() &&
+                currentTile.getCol() == piece.getCurrentTile().getCol() &&
+                name.equals(piece.getName());
     }
 }
