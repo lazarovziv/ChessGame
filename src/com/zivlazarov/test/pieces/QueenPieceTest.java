@@ -35,7 +35,7 @@ public class QueenPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
-        List<Tile> tilesGenerated = queenPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = queenPiece.getPossibleMoves();
         board.printBoard();
         List<Tile> tilesTrue = new ArrayList<>();
 
@@ -72,7 +72,7 @@ public class QueenPieceTest {
         opponentPawnPiece.getCurrentTile().setPiece(null);
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = queenPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = queenPiece.getPossibleMoves();
         board.printBoard();
         List<Tile> tilesTrue = new ArrayList<>();
 
@@ -116,7 +116,7 @@ public class QueenPieceTest {
 
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = queenPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = queenPiece.getPossibleMoves();
 
         board.printBoard();
 

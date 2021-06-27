@@ -35,7 +35,7 @@ public class KnightPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
-        List<Tile> tilesGenerated = knightPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = knightPiece.getPossibleMoves();
 //        for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
 //        board.printBoard();
 
@@ -52,7 +52,7 @@ public class KnightPieceTest {
         opponentPawnPiece.getCurrentTile().setPiece(null);
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = knightPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = knightPiece.getPossibleMoves();
         board.printBoard();
 
         List<Tile> tilesTrue = new ArrayList<>();

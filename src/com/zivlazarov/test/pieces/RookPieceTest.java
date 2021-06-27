@@ -35,7 +35,7 @@ public class RookPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
-        List<Tile> tilesGenerated = rookPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = rookPiece.getPossibleMoves();
         for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
         board.printBoard();
 
@@ -48,7 +48,7 @@ public class RookPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
-        List<Tile> tilesGenerated = rookPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = rookPiece.getPossibleMoves();
 
         pawnPiece.moveToTile(board.getBoard()[3][0]);
         opponentPawnPiece.getCurrentTile().setPiece(null);
@@ -77,7 +77,7 @@ public class RookPieceTest {
 
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = rookPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = rookPiece.getPossibleMoves();
 
         board.printBoard();
 

@@ -1,16 +1,17 @@
-package com.zivlazarov.chessengine.model.player;
+package com.zivlazarov.chessengine.model.pieces;
 
 //import javafx.scene.image.ImageView;
 
-import com.zivlazarov.chessengine.model.utils.MyObserver;
+import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
-public interface Piece extends Cloneable, MyObserver {
+public interface Piece extends Cloneable {
 
     String name = "";
     boolean isAlive = true;
@@ -22,11 +23,10 @@ public interface Piece extends Cloneable, MyObserver {
 //    ImageView imageIcon = null;
 
     String getName();
-    boolean getIsAlive();
+    boolean isAlive();
     boolean getIsInDanger();
-    ArrayList<Tile> getTilesToMoveTo();
+    ArrayList<Tile> getPossibleMoves();
     PieceColor getPieceColor();
-//    ImageView getImageIcon();
     Tile getCurrentTile();
     Stack<Tile> getHistoryMoves();
     Pair<Tile, Tile> getLastMove();
@@ -48,7 +48,7 @@ public interface Piece extends Cloneable, MyObserver {
 
     Piece getLastPieceEaten();
 
-    void generateTilesToMoveTo();
+    void generateMoves();
 
     boolean isThreatenedAtTile(Tile tile);
 
@@ -61,6 +61,4 @@ public interface Piece extends Cloneable, MyObserver {
     boolean hasMoved();
 
     boolean equals(Piece piece);
-
-    void update();
 }

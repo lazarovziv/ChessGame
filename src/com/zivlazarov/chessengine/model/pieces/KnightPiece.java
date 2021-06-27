@@ -1,8 +1,6 @@
 package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.player.Piece;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
@@ -17,7 +15,7 @@ public class KnightPiece implements Piece, Cloneable {
 
     private Player player;
 
-    private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Stack<Piece> piecesEaten;
@@ -37,7 +35,7 @@ public class KnightPiece implements Piece, Cloneable {
 
 //        name = 'N';
         pieceColor = pc;
-        tilesToMoveTo = new ArrayList<Tile>();
+        possibleMoves = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
         piecesEaten = new Stack<>();
@@ -63,14 +61,14 @@ public class KnightPiece implements Piece, Cloneable {
 
     @Override
     public void refresh() {
-        if (tilesToMoveTo.size() != 0) {
-            tilesToMoveTo.clear();
+        if (possibleMoves.size() != 0) {
+            possibleMoves.clear();
         }
-        generateTilesToMoveTo();
+        generateMoves();
     }
 
     @Override
-    public void generateTilesToMoveTo() {
+    public void generateMoves() {
         if (!isAlive) return;
         int[][] directions ={
                 {1, 2},
@@ -93,7 +91,7 @@ public class KnightPiece implements Piece, Cloneable {
             if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
-                tilesToMoveTo.add(targetTile);
+                possibleMoves.add(targetTile);
                 if (!targetTile.isEmpty()) {
                     if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
                 }
@@ -112,8 +110,8 @@ public class KnightPiece implements Piece, Cloneable {
     }
 
     @Override
-    public boolean getIsAlive() {
-        return isAlive;
+    public boolean isAlive() {
+        return !isAlive;
     }
 
 //    @Override
@@ -137,8 +135,8 @@ public class KnightPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Tile> getTilesToMoveTo() {
-        return tilesToMoveTo;
+    public ArrayList<Tile> getPossibleMoves() {
+        return possibleMoves;
     }
 
     @Override
@@ -213,7 +211,7 @@ public class KnightPiece implements Piece, Cloneable {
     public void moveToTile(Tile tile) {
         if (!player.getLegalMoves().contains(tile)) return;
         if (!player.getPiecesCanMove().contains(this)) return;
-        if (tilesToMoveTo.contains(tile)) {
+        if (possibleMoves.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
             // check if tile has opponent's piece and if so, mark as not alive
@@ -232,10 +230,10 @@ public class KnightPiece implements Piece, Cloneable {
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
-            tilesToMoveTo.clear();
+            possibleMoves.clear();
             // add the pair of tiles to history of moves
             historyMoves.push(currentTile);
-            generateTilesToMoveTo();
+            generateMoves();
             // call refresh() here ??
         }
     }
@@ -256,8 +254,8 @@ public class KnightPiece implements Piece, Cloneable {
 
         currentTile = previousTile;
         currentTile.setPiece(this);
-        tilesToMoveTo.clear();
-        generateTilesToMoveTo();
+        possibleMoves.clear();
+        generateMoves();
     }
 
     @Override
@@ -267,21 +265,9 @@ public class KnightPiece implements Piece, Cloneable {
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
 
-//    @Override
-//    public void setOnClickListener() {
-////        if (!isAlive) return;
-//        if (imageIcon == null) return;
-//        imageIcon.setOnMouseClicked(mouseEvent -> {
-//            if (tilesToMoveTo.size() == 0) return;
-//            for (Tile tile : tilesToMoveTo) {
-//                tile.setTileImageView(createImageView("redTile"));
-//            }
-//        });
-//    }
-
     @Override
     public boolean canMove() {
-        return tilesToMoveTo.size() != 0;
+        return possibleMoves.size() != 0;
     }
 
     @Override
@@ -305,10 +291,5 @@ public class KnightPiece implements Piece, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 (name + pieceCounter).equals(piece.getName() + pieceCounter);
-    }
-
-    @Override
-    public void update() {
-        refresh();
     }
 }

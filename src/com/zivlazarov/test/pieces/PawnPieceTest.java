@@ -36,7 +36,7 @@ public class PawnPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
-        List<Tile> tilesGenerated = pawnPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = pawnPiece.getPossibleMoves();
         board.printBoard();
         List<Tile> tilesTrue = new ArrayList<>();
         tilesTrue.add(opponentPawnPiece.getCurrentTile());
@@ -50,7 +50,7 @@ public class PawnPieceTest {
         opponentPawnPiece.getCurrentTile().setPiece(null);
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = pawnPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = pawnPiece.getPossibleMoves();
         board.printBoard();
         List<Tile> tilesTrue = new ArrayList<>();
         tilesTrue.add(board.getBoard()[2][0]);
@@ -86,6 +86,6 @@ public class PawnPieceTest {
         controller.setPlayer(player);
         board.checkBoard(player);
 
-        pawn.getTilesToMoveTo().forEach(tile -> System.out.print(tile + ","));
+        pawn.getPossibleMoves().forEach(tile -> System.out.print(tile + ","));
     }
 }

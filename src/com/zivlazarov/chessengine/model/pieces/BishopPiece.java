@@ -3,9 +3,8 @@ package com.zivlazarov.chessengine.model.pieces;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.player.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
-import com.zivlazarov.chessengine.model.utils.MyObserver;
+import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.util.ArrayList;
@@ -17,7 +16,9 @@ public class BishopPiece implements Piece, Cloneable {
 
     private Player player;
 
-    private final ArrayList<Tile> tilesToMoveTo;
+    private MyObservable observable;
+
+    private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Stack<Piece> piecesEaten;
@@ -37,7 +38,7 @@ public class BishopPiece implements Piece, Cloneable {
 
 //        name = "B";
         pieceColor = pc;
-        tilesToMoveTo = new ArrayList<>();
+        possibleMoves = new ArrayList<>();
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
         piecesEaten = new Stack<>();
@@ -65,14 +66,14 @@ public class BishopPiece implements Piece, Cloneable {
 
     @Override
     public void refresh() {
-        if (tilesToMoveTo.size() != 0) {
-            tilesToMoveTo.clear();
+        if (possibleMoves.size() != 0) {
+            possibleMoves.clear();
         }
-        generateTilesToMoveTo();
+        generateMoves();
     }
 
     @Override
-    public void generateTilesToMoveTo() {
+    public void generateMoves() {
         if (!isAlive) return;
         int[][] directions = {
                 {1, 1},
@@ -94,9 +95,9 @@ public class BishopPiece implements Piece, Cloneable {
                 if (x+r*i > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
                 Tile targetTile = board.getBoard()[x+r*i][y+c*i];
                 if (targetTile.isEmpty()) {
-                    tilesToMoveTo.add(targetTile);
+                    possibleMoves.add(targetTile);
                 } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
-                    tilesToMoveTo.add(targetTile);
+                    possibleMoves.add(targetTile);
                     piecesUnderThreat.add(targetTile.getPiece());
                     break;
                 }
@@ -111,8 +112,8 @@ public class BishopPiece implements Piece, Cloneable {
     }
 
     @Override
-    public boolean getIsAlive() {
-        return isAlive;
+    public boolean isAlive() {
+        return !isAlive;
     }
 
     @Override
@@ -121,19 +122,14 @@ public class BishopPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Tile> getTilesToMoveTo() {
-        return tilesToMoveTo;
+    public ArrayList<Tile> getPossibleMoves() {
+        return possibleMoves;
     }
 
     @Override
     public PieceColor getPieceColor() {
         return pieceColor;
     }
-
-//    @Override
-//    public ImageView getImageIcon() {
-//        return imageIcon;
-//    }
 
     @Override
     public Tile getCurrentTile() {
@@ -206,7 +202,7 @@ public class BishopPiece implements Piece, Cloneable {
     public void moveToTile(Tile tile) {
         if (!player.getLegalMoves().contains(tile)) return;
         if (!player.getPiecesCanMove().contains(this)) return;
-        if (tilesToMoveTo.contains(tile)) {
+        if (possibleMoves.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
             // check if tile has opponent's piece and if so, mark as not alive
@@ -225,11 +221,11 @@ public class BishopPiece implements Piece, Cloneable {
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
-            tilesToMoveTo.clear();
+            possibleMoves.clear();
             // add target tile to history of moves
             historyMoves.push(currentTile);
 
-            generateTilesToMoveTo();
+            generateMoves();
         }
     }
 
@@ -249,8 +245,8 @@ public class BishopPiece implements Piece, Cloneable {
 
         currentTile = previousTile;
         currentTile.setPiece(this);
-        tilesToMoveTo.clear();
-        generateTilesToMoveTo();
+        possibleMoves.clear();
+        generateMoves();
     }
 
     @Override
@@ -262,7 +258,7 @@ public class BishopPiece implements Piece, Cloneable {
 
     @Override
     public boolean canMove() {
-        return tilesToMoveTo.size() != 0;
+        return possibleMoves.size() != 0;
     }
 
     @Override
@@ -292,10 +288,5 @@ public class BishopPiece implements Piece, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 (name + pieceCounter).equals(piece.getName() + pieceCounter);
-    }
-
-    @Override
-    public void update() {
-        refresh();
     }
 }

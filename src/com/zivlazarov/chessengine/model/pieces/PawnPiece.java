@@ -1,11 +1,9 @@
 package com.zivlazarov.chessengine.model.pieces;
 
-import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.player.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.ArrayList;
@@ -17,7 +15,7 @@ import java.util.Stack;
 
 public class PawnPiece implements Piece, Cloneable {
 
-    private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Stack<Piece> piecesEaten;
@@ -41,7 +39,7 @@ public class PawnPiece implements Piece, Cloneable {
 
 //        name = 'P';
         pieceColor = pc;
-        tilesToMoveTo = new ArrayList<Tile>();
+        possibleMoves = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
         piecesEaten = new Stack<>();
@@ -68,14 +66,14 @@ public class PawnPiece implements Piece, Cloneable {
 
     @Override
     public void refresh() {
-        if (tilesToMoveTo.size() != 0) {
-            tilesToMoveTo.clear();
+        if (possibleMoves.size() != 0) {
+            possibleMoves.clear();
         }
-        generateTilesToMoveTo();
+        generateMoves();
     }
 
     @Override
-    public void generateTilesToMoveTo() {
+    public void generateMoves() {
         if (!isAlive) return;
         Map<PieceColor, Integer> map = new HashMap<>();
         map.put(PieceColor.WHITE, 1);
@@ -93,11 +91,11 @@ public class PawnPiece implements Piece, Cloneable {
         if (x + map.get(pieceColor) > board.getBoard().length - 1 || x + map.get(pieceColor) < 0) return;
 
         if (board.getBoard()[x + direction][y].isEmpty()) {
-            tilesToMoveTo.add(board.getBoard()[x + direction][y]);
+            possibleMoves.add(board.getBoard()[x + direction][y]);
             if (canMoveFurther) {
                 if (x + longDirection < 0 || x + longDirection > board.getBoard().length - 1) return;
                 if (board.getBoard()[x + longDirection][y].isEmpty()) {
-                    tilesToMoveTo.add(board.getBoard()[x + longDirection][y]);
+                    possibleMoves.add(board.getBoard()[x + longDirection][y]);
                 }
             }
         }
@@ -105,18 +103,19 @@ public class PawnPiece implements Piece, Cloneable {
             if (y + d > board.getBoard().length - 1 || y + d < 0) return;
             if (!board.getBoard()[x + direction][y + d].isEmpty() &&
                     board.getBoard()[x + direction][y + d].getPiece().getPieceColor() != pieceColor) {
-                tilesToMoveTo.add(board.getBoard()[x + direction][y + d]);
+                possibleMoves.add(board.getBoard()[x + direction][y + d]);
                 piecesUnderThreat.add(board.getBoard()[x + direction][y + d].getPiece());
             }
             // insert en passant
             if (canEnPassant(d)) {
-                tilesToMoveTo.add(board.getBoard()[x+player.getPlayerDirection()][y+d]);
+                possibleMoves.add(board.getBoard()[x+player.getPlayerDirection()][y+d]);
                 // setting the adjacent pawn piece as under threat
                 // only move in chess where piece can be eaten without moving to it's tile
                 piecesUnderThreat.add(board.getBoard()[x][y+d].getPiece());
             }
         }
 
+        player.getLegalMoves().addAll(possibleMoves);
     }
 
     public boolean canEnPassant(int eatingDirection) {
@@ -150,8 +149,8 @@ public class PawnPiece implements Piece, Cloneable {
     }
 
     @Override
-    public boolean getIsAlive() {
-        return isAlive;
+    public boolean isAlive() {
+        return !isAlive;
     }
 
     @Override
@@ -175,8 +174,8 @@ public class PawnPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Tile> getTilesToMoveTo() {
-        return tilesToMoveTo;
+    public ArrayList<Tile> getPossibleMoves() {
+        return possibleMoves;
     }
 
     @Override
@@ -246,20 +245,20 @@ public class PawnPiece implements Piece, Cloneable {
     public void moveToTile(Tile tile) {
         if (!player.getLegalMoves().contains(tile)) return;
         if (!player.getPiecesCanMove().contains(this)) return;
-        if (tilesToMoveTo.contains(tile)) {
+        if (possibleMoves.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
             if (enPassantTile != null) {
                 if (tile.equals(enPassantTile)) {
                     currentTile = tile;
                     currentTile.setPiece(this);
-                    tilesToMoveTo.clear();
+                    possibleMoves.clear();
                     historyMoves.push(enPassantTile);
                     piecesEaten.push(
                             board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].getPiece());
                     player.getOpponentPlayer().addPieceToDead(
                             board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].getPiece());
-                    generateTilesToMoveTo();
+                    generateMoves();
                     return;
                 }
             }
@@ -280,12 +279,12 @@ public class PawnPiece implements Piece, Cloneable {
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
-            tilesToMoveTo.clear();
+            possibleMoves.clear();
             // add target tile to history of moves
             historyMoves.push(currentTile);
 
             if (!hasMoved) hasMoved = true;
-            generateTilesToMoveTo();
+            generateMoves();
         }
     }
 
@@ -305,8 +304,8 @@ public class PawnPiece implements Piece, Cloneable {
 
         currentTile = previousTile;
         currentTile.setPiece(this);
-        tilesToMoveTo.clear();
-        generateTilesToMoveTo();
+        possibleMoves.clear();
+        generateMoves();
     }
 
     @Override
@@ -331,7 +330,7 @@ public class PawnPiece implements Piece, Cloneable {
 
     @Override
     public boolean canMove() {
-        return tilesToMoveTo.size() != 0;
+        return possibleMoves.size() != 0;
     }
 
     @Override
@@ -355,10 +354,5 @@ public class PawnPiece implements Piece, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 (name + pieceCounter).equals(piece.getName() + pieceCounter);
-    }
-
-    @Override
-    public void update() {
-        refresh();
     }
 }

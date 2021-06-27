@@ -35,7 +35,7 @@ public class BishopPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
-        List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = bishopPiece.getPossibleMoves();
 
         List<Tile> tilesTrue = new ArrayList<>();
         tilesTrue.add(board.getBoard()[1][1]);
@@ -53,7 +53,7 @@ public class BishopPieceTest {
         opponentPawnPiece.getCurrentTile().setPiece(null);
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = bishopPiece.getPossibleMoves();
         for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
         board.printBoard();
 
@@ -84,7 +84,7 @@ public class BishopPieceTest {
         bishopPiece.moveToTile(board.getBoard()[3][5]);
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = bishopPiece.getPossibleMoves();
         for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
         board.printBoard();
     }
@@ -98,7 +98,7 @@ public class BishopPieceTest {
 
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = bishopPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = bishopPiece.getPossibleMoves();
 
         board.printBoard();
 

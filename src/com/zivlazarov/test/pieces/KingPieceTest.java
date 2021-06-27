@@ -1,12 +1,10 @@
 package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.controllers.PlayerController;
-import com.zivlazarov.chessengine.logs.MovesLog;
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.KnightPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;
-import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.player.Player;
@@ -50,7 +48,7 @@ public class KingPieceTest {
         kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4]);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
         board.checkBoard(player);
-        List<Tile> tilesGenerated = kingPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
         board.printBoard();
 
         int kingRow = kingPiece.getCurrentTile().getRow();
@@ -77,7 +75,7 @@ public class KingPieceTest {
 //        opponentPawnPiece.moveToTile(board.getBoard()[opponentPawnPiece.getCurrentTile().getRow() - 1][opponentPawnPiece.getCurrentTile().getCol()]);
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = kingPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
         board.printBoard();
 
         int kingRow = kingPiece.getCurrentTile().getRow();
@@ -108,7 +106,7 @@ public class KingPieceTest {
         RookPiece blackRook1 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7], 1);
         board.checkBoard(player);
 
-        List<Tile> tilesGenerated = kingPiece.getTilesToMoveTo();
+        List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
         board.printBoard();
 
         tilesGenerated.forEach(System.out::println);
@@ -133,7 +131,7 @@ public class KingPieceTest {
         kingPiece.unmakeLastMove();
         board.printBoard();
         board.checkBoard(player);
-        for (Tile tile : kingPiece.getTilesToMoveTo()) System.out.println(tile);
+        for (Tile tile : kingPiece.getPossibleMoves()) System.out.println(tile);
     }
 
     @Test
@@ -146,7 +144,7 @@ public class KingPieceTest {
         board.checkBoard(player);
         if (player.isInCheck()) System.out.println("Check! ");
         board.printBoard();
-        pawnPiece.moveToTile(board.getBoard()[2][2]);
+        pawnPiece.moveToTile(board.getBoard()[2][1]);
         board.checkBoard(opponent);
         board.printBoard();
     }

@@ -1,8 +1,6 @@
 package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.player.Piece;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
@@ -17,7 +15,7 @@ public class KingPiece implements Piece, Cloneable {
 
     private Player player;
 
-    private final ArrayList<Tile> tilesToMoveTo;
+    private final ArrayList<Tile> possible;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Stack<Piece> piecesEaten;
@@ -37,7 +35,7 @@ public class KingPiece implements Piece, Cloneable {
 
 //        name = 'K';
         pieceColor = pc;
-        tilesToMoveTo = new ArrayList<>();
+        possible = new ArrayList<>();
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
         piecesEaten = new Stack<>();
@@ -64,14 +62,14 @@ public class KingPiece implements Piece, Cloneable {
 
     @Override
     public void refresh() {
-        if (tilesToMoveTo.size() != 0) {
-            tilesToMoveTo.clear();
+        if (possible.size() != 0) {
+            possible.clear();
         }
-        generateTilesToMoveTo();
+        generateMoves();
     }
 
     @Override
-    public void generateTilesToMoveTo() {
+    public void generateMoves() {
         if (!isAlive) return;
         int[][] directions = {
                 {1,0},
@@ -96,7 +94,7 @@ public class KingPiece implements Piece, Cloneable {
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
                 if (!isThreatenedAtTile(targetTile)) {
-                    tilesToMoveTo.add(targetTile);
+                    possible.add(targetTile);
                     if (!targetTile.isEmpty()) {
                         if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
                     }
@@ -111,21 +109,21 @@ public class KingPiece implements Piece, Cloneable {
 
         if (pieceColor == PieceColor.WHITE) {
             if (canKingSideCastle()) {
-                tilesToMoveTo.add(board.getBoard()[x][whiteRookKingSideColumn+1]);
+                possible.add(board.getBoard()[x][whiteRookKingSideColumn+1]);
             }
             if (canQueenSideCastle()) {
-                tilesToMoveTo.add(board.getBoard()[x][whiteRookQueenSideColumn-2]);
+                possible.add(board.getBoard()[x][whiteRookQueenSideColumn-2]);
             }
         } else if (pieceColor == PieceColor.BLACK) {
             if (canKingSideCastle()) {
-                tilesToMoveTo.add(board.getBoard()[x][blackRookKingSideColumn-1]);
+                possible.add(board.getBoard()[x][blackRookKingSideColumn-1]);
             }
             if (canQueenSideCastle()) {
-                tilesToMoveTo.add(board.getBoard()[x][blackRookQueenSideColumn+2]);
+                possible.add(board.getBoard()[x][blackRookQueenSideColumn+2]);
             }
         }
 
-        for (Tile tile : tilesToMoveTo) {
+        for (Tile tile : possible) {
             if (!tile.isEmpty()) {
                 if (tile.getPiece().getPieceColor() != pieceColor) {
                     piecesUnderThreat.add(tile.getPiece());
@@ -209,8 +207,8 @@ public class KingPiece implements Piece, Cloneable {
     }
 
     @Override
-    public boolean getIsAlive() {
-        return isAlive;
+    public boolean isAlive() {
+        return !isAlive;
     }
 
     @Override
@@ -229,8 +227,8 @@ public class KingPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Tile> getTilesToMoveTo() {
-        return tilesToMoveTo;
+    public ArrayList<Tile> getPossibleMoves() {
+        return possible;
     }
 
     @Override
@@ -302,7 +300,7 @@ public class KingPiece implements Piece, Cloneable {
     public void moveToTile(Tile tile) {
         if (!player.getLegalMoves().contains(tile)) return;
         if (!player.getPiecesCanMove().contains(this)) return;
-        if (tilesToMoveTo.contains(tile)) {
+        if (possible.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
             // check if tile has opponent's piece and if so, mark as not alive
@@ -321,11 +319,11 @@ public class KingPiece implements Piece, Cloneable {
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
-            tilesToMoveTo.clear();
+            possible.clear();
             historyMoves.push(currentTile);
             if (!hasMoved) hasMoved = true;
 
-            generateTilesToMoveTo();
+            generateMoves();
         }
     }
 
@@ -345,8 +343,8 @@ public class KingPiece implements Piece, Cloneable {
 
         currentTile = previousTile;
         currentTile.setPiece(this);
-        tilesToMoveTo.clear();
-        generateTilesToMoveTo();
+        possible.clear();
+        generateMoves();
     }
 
     @Override
@@ -358,7 +356,7 @@ public class KingPiece implements Piece, Cloneable {
 
     @Override
     public boolean canMove() {
-        return tilesToMoveTo.size() != 0;
+        return possible.size() != 0;
     }
 
     @Override
@@ -382,10 +380,5 @@ public class KingPiece implements Piece, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 name.equals(piece.getName());
-    }
-
-    @Override
-    public void update() {
-        refresh();
     }
 }
