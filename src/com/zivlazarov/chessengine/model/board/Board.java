@@ -1,7 +1,6 @@
 package com.zivlazarov.chessengine.model.board;
 
-import com.zivlazarov.chessengine.model.pieces.KingPiece;
-import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
@@ -33,6 +32,8 @@ public class Board implements MyObservable {
 
     private Stack<Pair<Piece, Pair<Tile, Tile>>> historyMoves;
 
+    private boolean changedState;
+
     public Board() {
         board = new Tile[8][8];
         blackAlivePieces = new HashMap<>();
@@ -58,63 +59,27 @@ public class Board implements MyObservable {
         gameSituation = GameSituation.NORMAL;
     }
 
-    public void refreshPieces(Player currentPlayer) {
-        currentPlayer.getOpponentPlayer().getLegalMoves().clear();
-        currentPlayer.getLegalMoves().clear();
-        currentPlayer.getOpponentPlayer().getPiecesCanMove().clear();
-        currentPlayer.getPiecesCanMove().clear();
-        for (Piece piece : currentPlayer.getOpponentPlayer().getAlivePieces()) {
-            piece.refresh();
-            currentPlayer.getOpponentPlayer().getLegalMoves().addAll(piece.getTilesToMoveTo());
-            if (piece.canMove()) currentPlayer.getOpponentPlayer().getPiecesCanMove().add(piece);
-        }
-        for (Piece piece : currentPlayer.getAlivePieces()) {
-            piece.refresh();
-            currentPlayer.getLegalMoves().addAll(piece.getTilesToMoveTo());
-            if (piece.canMove()) currentPlayer.getPiecesCanMove().add(piece);
-        }
-    }
-
     public void refreshPiecesOfPlayer(Player player) {
         player.getLegalMoves().clear();
         player.getPiecesCanMove().clear();
         for (Piece piece : player.getAlivePieces()) {
             piece.refresh();
-            player.getLegalMoves().addAll(piece.getTilesToMoveTo());
+            player.getLegalMoves().addAll(piece.getPossibleMoves());
             if (piece.canMove()) player.getPiecesCanMove().add(piece);
         }
     }
 
     public void checkBoard(Player currentPlayer) {
         // resetting tiles threatened state before every check
-        for (Tile[] tiles : board) {
-            for (Tile tile : tiles) {
-                tile.setThreatenedByColor(currentPlayer.getPlayerColor(), false);
-                tile.setThreatenedByColor(currentPlayer.getOpponentPlayer().getPlayerColor(), false);
-            }
-        }
-        refreshPiecesOfPlayer(currentPlayer);
-        refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
+        resetThreatsOnTiles();
 
+        updateObservers();
         // for each player's legal move's target piece, that piece is in danger of being eaten
-        for (Tile tile : currentPlayer.getLegalMoves()) {
-            tile.setThreatenedByColor(currentPlayer.getPlayerColor(), true);
-            if (!tile.isEmpty() && tile.getPiece().getPieceColor() == currentPlayer.getOpponentPlayer().getPlayerColor()) {
-                tile.getPiece().setIsInDanger(true);
-            }
-        }
-
-        for (Tile tile : currentPlayer.getOpponentPlayer().getLegalMoves()) {
-            tile.setThreatenedByColor(currentPlayer.getOpponentPlayer().getPlayerColor(), true);
-            if (!tile.isEmpty() && tile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
-                tile.getPiece().setIsInDanger(true);
-            }
-        }
+        markEndangeredPiecesFromPlayer(currentPlayer);
+        markEndangeredPiecesFromPlayer(currentPlayer.getOpponentPlayer());
 
         if (currentPlayer.isInCheck()) {
             // reset all legal moves before proceeding to generation of legal moves in check situation
-            currentPlayer.getLegalMoves().clear();
-            currentPlayer.getPiecesCanMove().clear();
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
             generateLegalMovesWhenInCheck(currentPlayer);
         } else {
@@ -123,7 +88,6 @@ public class Board implements MyObservable {
     }
 
     public synchronized void generateLegalMovesWhenInCheck(Player currentPlayer) {
-        refreshPiecesOfPlayer(currentPlayer);
         List<Tile> pseudoLegalMoves = currentPlayer.getLegalMoves();
         List<Tile> actualLegalMoves = new ArrayList<>();
 
@@ -131,18 +95,17 @@ public class Board implements MyObservable {
             Runnable runnable = null;
             for (Tile tile : pseudoLegalMoves) {
                 runnable = () -> {
-                    if (piece.getTilesToMoveTo().contains(tile)) {
-                        piece.moveToTile(tile);
-                        refreshPiecesOfPlayer(currentPlayer.getOpponentPlayer());
-                        if (!currentPlayer.isInCheck()) {
-                            actualLegalMoves.add(tile);
-                            if (!currentPlayer.getPiecesCanMove().contains(piece)) {
-                                currentPlayer.getPiecesCanMove().add(piece);
-                            }
-                        }
-                        unmakeLastMove(piece);
-                        refreshPieces(currentPlayer.getOpponentPlayer());
+                    if (!makeMove(currentPlayer, piece, tile)) {
+                        return;
                     }
+                    if (!currentPlayer.isInCheck()) {
+                        actualLegalMoves.add(tile);
+                        if (!currentPlayer.getPiecesCanMove().contains(piece)) {
+                            currentPlayer.getPiecesCanMove().add(piece);
+                        }
+                    }
+                    unmakeLastMove(piece);
+
                 };
             }
             new Thread(runnable).start();
@@ -155,9 +118,10 @@ public class Board implements MyObservable {
 
     // save board state before making the move for being able to restore it later on!
     public boolean makeMove(Player player, Piece piece, Tile tile) {
-        if (!piece.getIsAlive()) return false;
+        changedState = false;
+        if (piece.isAlive()) return false;
         if (!player.getPiecesCanMove().contains(piece)) return false;
-        if (piece.getTilesToMoveTo().contains(tile)) {
+        if (piece.getPossibleMoves().contains(tile)) {
             piece.getCurrentTile().setPiece(null);
             if (!tile.isEmpty() && tile.getPiece().getPieceColor() != piece.getPieceColor()) {
                 player.getOpponentPlayer().addPieceToDead(tile.getPiece());
@@ -166,19 +130,10 @@ public class Board implements MyObservable {
         historyMoves.push(new Pair<Piece, Pair<Tile, Tile>>(piece, new Pair<Tile, Tile>(piece.getCurrentTile(), tile)));
         piece.setCurrentTile(tile);
         piece.getHistoryMoves().push(tile);
-        // notifyObservers();
+
+        setChanged();
         updateObservers();
-        return true;
-    }
-
-    // search how to save board state and restore it in here!!!
-    public boolean unmakeMove() {
-        Pair<Piece, Pair<Tile, Tile>> lastMove = historyMoves.pop();
-        Piece piece = lastMove.getFirst();
-        Pair<Tile, Tile> tilesPair = lastMove.getSecond();
-        piece.getCurrentTile().setPiece(null);
-        piece.setCurrentTile(tilesPair.getFirst());
-
+        clearChanged();
         return true;
     }
 
@@ -198,7 +153,25 @@ public class Board implements MyObservable {
 
         piece.getCurrentTile().setPiece(null);
         piece.setCurrentTile(previousTile);
+
+        setChanged();
         updateObservers();
+        clearChanged();
+    }
+
+    public void resetThreatsOnTiles() {
+        for (Tile[] tiles : board) {
+            for (Tile tile : tiles) {
+                tile.setThreatenedByWhite(false);
+                tile.setThreatenedByBlack(false);
+            }
+        }
+    }
+
+    public void markEndangeredPiecesFromPlayer(Player player) {
+        for (Tile tile : player.getLegalMoves()) {
+            tile.setThreatenedByColor(player.getPlayerColor(), true);
+        }
     }
 
     public int distanceBetweenPieces(Piece first, Piece second) {
@@ -228,10 +201,6 @@ public class Board implements MyObservable {
             distance = Math.abs(firstRow - secondRow);
             return distance;
         }
-    }
-
-    public boolean canKingEscape(KingPiece kingPiece) {
-        return kingPiece.canMove();
     }
 
     public void removePieceFromBoard(Piece piece) {
@@ -382,5 +351,20 @@ public class Board implements MyObservable {
     @Override
     public void removeObserver(MyObserver observer) {
         observers.remove(observer);
+    }
+
+    @Override
+    public void setChanged() {
+        changedState = true;
+    }
+
+    @Override
+    public boolean hasChanged() {
+        return changedState;
+    }
+
+    @Override
+    public void clearChanged() {
+        changedState = false;
     }
 }
