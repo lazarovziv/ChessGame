@@ -3,15 +3,14 @@ package com.zivlazarov.chessengine.ui;
 import com.zivlazarov.chessengine.controllers.BoardController;
 import com.zivlazarov.chessengine.controllers.PlayerController;
 import com.zivlazarov.chessengine.logs.MovesLog;
-import com.zivlazarov.chessengine.model.utils.MyObserver;
-import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.GameSituation;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.util.Scanner;
 import java.util.Stack;
@@ -22,22 +21,33 @@ public class CommandLineGame {
     private static Piece[] allPieces = new Piece[32];
     private static Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> movesLog;
 
+    private static String whitePlayerName = "";
+    private static String blackPlayerName = "";
+
+    private static Player whitePlayer;
+    private static Player blackPlayer;
+
+    private static Player currentPlayer;
+
+    private static PlayerController playerController;
+    private static BoardController boardController;
+
+    private static boolean gameStarted = false;
+
     public static void main(String[] args) {
 
-        boolean gameStarted = false;
+        whitePlayer = new Player(board, PieceColor.WHITE);
+        blackPlayer = new Player(board, PieceColor.BLACK);
 
-        String whitePlayerName = "";
-        String blackPlayerName = "";
-
-        Player whitePlayer = new Player(board, PieceColor.WHITE);
-        Player blackPlayer = new Player(board, PieceColor.BLACK);
+        board.addObserver(whitePlayer);
+        board.addObserver(blackPlayer);
 
         MovesLog log = MovesLog.getInstance();
         movesLog = log.getMovesLog();
 
-        PlayerController playerController = new PlayerController();
+        playerController = new PlayerController();
 
-        BoardController boardController = new BoardController();
+        boardController = new BoardController();
         boardController.setBoard(board);
         boardController.setWhitePlayer(whitePlayer);
         boardController.setBlackPlayer(blackPlayer);
@@ -47,43 +57,11 @@ public class CommandLineGame {
         playerController.setPlayer(whitePlayer);
         playerController.setOpponentPlayer(blackPlayer);
 
-        String answer = "";
-        Scanner scanner = new Scanner(System.in);
-
-        do {
-            System.out.println("Would you like to start a game? (y/n)");
-
-            answer = scanner.nextLine();
-            answer = answer.toLowerCase();
-
-            if (answer.equals("y")) gameStarted = true;
-            else if (answer.equals("n")) System.exit(0);
-
-        } while (!gameStarted);
-
-        do {
-            System.out.println("Who plays white? ");
-
-            whitePlayerName = scanner.nextLine();
-            playerController.setPlayerName(whitePlayerName);
-
-            System.out.println("Who plays black? ");
-
-            blackPlayerName = scanner.nextLine();
-            playerController.setOpponentPlayerName(blackPlayerName);
-
-            System.out.println();
-            System.out.println("It's a " + playerController.getPlayer().getName() + " vs. " + playerController.getOpponentPlayer().getName() + " SHOWDOWN!");
-            System.out.println();
-
-        } while (whitePlayerName.equals("") || blackPlayerName.equals(""));
+        askIfWantToPlay();
+        askForPlayersNames();
 
         // initializing all pieces
         initPieces(whitePlayer, blackPlayer);
-
-        // adding players' alive pieces
-//        playerController.addAlivePieces(allPieces);
-//        playerController.addAlivePiecesToOpponent(allPieces);
 
         // white always starts first
         int turn = 0;
@@ -97,7 +75,7 @@ public class CommandLineGame {
 
             PieceColor currentTurn = playersColors[(turn + playersColors.length) % 2];
 
-            Player currentPlayer = playerController.getPlayer();
+            currentPlayer = playerController.getPlayer();
 
             if (turn != 0) {
                 if (currentTurn == whitePlayer.getPlayerColor()) {
@@ -122,46 +100,8 @@ public class CommandLineGame {
             if (turn % 2 == 0) boardController.printBoardUpsideDown();
             else boardController.printBoard();
 
-            int rowChosen;
-            int colChosen;
-            Tile tileChosen;
-
-            System.out.println("Choose a piece from tile: (row, column)");
-
-            do {
-                // getting row input
-                System.out.print("Row: ");
-                rowChosen = scanner.nextInt();
-
-                while (rowChosen < 1 || rowChosen > 8) {
-                    System.out.println("Please enter a value from 1 to 8: ");
-                    System.out.print("Row: ");
-                    rowChosen = scanner.nextInt();
-                }
-
-                // getting column input
-                System.out.print("Column: ");
-                colChosen = scanner.nextInt();
-
-                while (colChosen < 1 || colChosen > 8) {
-                    System.out.println("Please enter a value from 1 to 8: ");
-                    System.out.print("Column: ");
-                    colChosen = scanner.nextInt();
-                }
-
-                tileChosen = board.getBoard()[rowChosen-1][colChosen-1];
-
-                if (tileChosen.isEmpty()) {
-                    System.out.println("This tile is empty! Please choose another tile: ");
-                } else if (tileChosen.getPiece().getPieceColor() != currentPlayer.getPlayerColor()) {
-                    System.out.println("Please choose a " + currentPlayer.getPlayerColor() + " piece!");
-                } else if (!currentPlayer.getPiecesCanMove().contains(tileChosen.getPiece())) {
-                    System.out.println("This piece can't move!");
-                }
-
-            } while (rowChosen < 1 || rowChosen > 8 || colChosen < 1 || colChosen > 8 ||
-                    tileChosen.isEmpty() || tileChosen.getPiece().getPieceColor() != currentTurn
-                    || !currentPlayer.getPiecesCanMove().contains(tileChosen.getPiece()));
+            // askForPiece
+            Tile tileChosen = chosenTile();
 
             // show board to player from his side of view
             if (turn % 2 == 0) boardController.printBoardUpsideDown(tileChosen);
@@ -173,45 +113,14 @@ public class CommandLineGame {
                 pieceChosen = tileChosen.getPiece();
             }
 
-            int rowToMoveChosen;
-            int colToMoveChosen;
-            Tile tileToMoveChosen;
-
-            System.out.println("Please choose a tile to move to: (row, column)");
-            for (int i = 0; i < pieceChosen.getTilesToMoveTo().size(); i++) {
-                if (i == pieceChosen.getTilesToMoveTo().size() - 1) {
-                    System.out.print(pieceChosen.getTilesToMoveTo().get(i) + " ");
-                } else System.out.print(pieceChosen.getTilesToMoveTo().get(i) + ", ");
-            }
-
-            System.out.println();
-
-            boolean legalMoveWhenInCheck = true;
-
-            do {
-                System.out.print("Row: ");
-                rowToMoveChosen = scanner.nextInt();
-                System.out.print("Column: ");
-                colToMoveChosen = scanner.nextInt();
-
-                tileToMoveChosen = boardController.getBoard().getBoard()[rowToMoveChosen-1][colToMoveChosen-1];
-
-                if (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen)) {
-                    System.out.println("Piece cannot move to " + tileToMoveChosen + " !");
-                }
-
-
-                if (currentPlayer.isInCheck()) {
-                    if (!currentPlayer.getLegalMoves().contains(tileToMoveChosen)) legalMoveWhenInCheck = false;
-                }
-
-            } while (!pieceChosen.getTilesToMoveTo().contains(tileToMoveChosen) && legalMoveWhenInCheck);
+            // chosenMove()
+            Tile tileToMoveChosen = chosenMove(pieceChosen);
 
             // handle castling
             handleCastling(currentPlayer, whitePlayer, blackPlayer, pieceChosen, tileToMoveChosen, playerController);
 
             // handle pawn promotion
-            handlePawnPromotion(pieceChosen, currentPlayer, playerController, scanner);
+            handlePawnPromotion(pieceChosen, currentPlayer, playerController);
 
             if (!playerController.hasPlayerPlayedThisTurn()) {
                 playerController.movePiece(pieceChosen, tileToMoveChosen);
@@ -276,12 +185,12 @@ public class CommandLineGame {
                 whitePawn0, whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7,
                 blackRookQueenSide, blackKnightKingSide, blackBishopQueenSide, blackQueen, blackKing, blackBishopKingSide, blackKnightQueenSide, blackRookKingSide,
                 blackPawn0, blackPawn1, blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7};
-
-        board.addAllObservers(allPieces);
     }
 
-    private static void handlePawnPromotion(Piece pieceChosen, Player currentPlayer, PlayerController playerController, Scanner scanner) {
+    private static void handlePawnPromotion(Piece pieceChosen, Player currentPlayer, PlayerController playerController) {
+        Scanner scanner = null;
         if (pieceChosen instanceof PawnPiece) {
+            scanner = new Scanner(System.in);
             if (pieceChosen.getCurrentTile().getRow() == currentPlayer.getPlayerDirection() * (board.getBoard().length - 1)) {
                 String promotionAnswer = "";
                 boolean answeredCorrect = false;
@@ -355,5 +264,128 @@ public class CommandLineGame {
                 }
             }
         }
+    }
+
+    private static void askForPlayersNames() {
+        Scanner scanner = new Scanner(System.in);
+        do {
+            System.out.println("Who plays white? ");
+
+            whitePlayerName = scanner.nextLine();
+            playerController.setPlayerName(whitePlayerName);
+
+            System.out.println("Who plays black? ");
+
+            blackPlayerName = scanner.nextLine();
+            playerController.setOpponentPlayerName(blackPlayerName);
+
+            System.out.println();
+            System.out.println("It's a " + playerController.getPlayer().getName() + " vs. " + playerController.getOpponentPlayer().getName() + " SHOWDOWN!");
+            System.out.println();
+
+        } while (whitePlayerName.equals("") || blackPlayerName.equals(""));
+    }
+
+    private static void askIfWantToPlay() {
+        Scanner scanner = new Scanner(System.in);
+        String answer = "";
+
+        do {
+            System.out.println("Would you like to start a game? (y/n)");
+
+            answer = scanner.nextLine();
+            answer = answer.toLowerCase();
+
+            if (answer.equals("y")) gameStarted = true;
+            else if (answer.equals("n")) System.exit(0);
+
+        } while (!gameStarted);
+    }
+
+    private static Tile chosenTile() {
+        Scanner scanner = new Scanner(System.in);
+
+        int rowChosen;
+        int colChosen;
+        Tile tileChosen;
+
+        System.out.println("Choose a piece from tile: (row, column)");
+
+        do {
+            // getting row input
+            System.out.print("Row: ");
+            rowChosen = scanner.nextInt();
+
+            while (rowChosen < 1 || rowChosen > 8) {
+                System.out.println("Please enter a value from 1 to 8: ");
+                System.out.print("Row: ");
+                rowChosen = scanner.nextInt();
+            }
+
+            // getting column input
+            System.out.print("Column: ");
+            colChosen = scanner.nextInt();
+
+            while (colChosen < 1 || colChosen > 8) {
+                System.out.println("Please enter a value from 1 to 8: ");
+                System.out.print("Column: ");
+                colChosen = scanner.nextInt();
+            }
+
+            tileChosen = board.getBoard()[rowChosen-1][colChosen-1];
+
+            if (tileChosen.isEmpty()) {
+                System.out.println("This tile is empty! Please choose another tile: ");
+            } else if (tileChosen.getPiece().getPieceColor() != currentPlayer.getPlayerColor()) {
+                System.out.println("Please choose a " + currentPlayer.getPlayerColor() + " piece!");
+            } else if (!tileChosen.getPiece().canMove()) {
+                System.out.println("This piece can't move!");
+            }
+
+        } while (rowChosen < 1 || rowChosen > 8 || colChosen < 1 || colChosen > 8 ||
+                tileChosen.isEmpty() || tileChosen.getPiece().getPieceColor() != currentPlayer.getPlayerColor() ||
+                !currentPlayer.getPiecesCanMove().contains(tileChosen.getPiece()));
+        return tileChosen;
+    }
+
+    private static Tile chosenMove(Piece pieceChosen) {
+        if (pieceChosen == null) throw new NullPointerException("No Piece Chosen!");
+
+        Scanner scanner = new Scanner(System.in);
+
+        int rowToMoveChosen;
+        int colToMoveChosen;
+        Tile tileToMoveChosen;
+
+        System.out.println("Choose your move: (row, column)");
+        for (int i = 0; i < pieceChosen.getPossibleMoves().size(); i++) {
+            if (i == pieceChosen.getPossibleMoves().size() - 1) {
+                System.out.print(pieceChosen.getPossibleMoves().get(i) + " ");
+            } else System.out.print(pieceChosen.getPossibleMoves().get(i) + ", ");
+        }
+
+        System.out.println();
+
+        boolean legalMoveWhenInCheck = true;
+
+        do {
+            System.out.print("Row: ");
+            rowToMoveChosen = scanner.nextInt();
+            System.out.print("Column: ");
+            colToMoveChosen = scanner.nextInt();
+
+            tileToMoveChosen = boardController.getBoard().getBoard()[rowToMoveChosen-1][colToMoveChosen-1];
+
+            if (!pieceChosen.getPossibleMoves().contains(tileToMoveChosen)) {
+                System.out.println("Piece cannot move to " + tileToMoveChosen + " !");
+            }
+
+
+            if (currentPlayer.isInCheck()) {
+                if (!currentPlayer.getLegalMoves().contains(tileToMoveChosen)) legalMoveWhenInCheck = false;
+            }
+
+        } while (!pieceChosen.getPossibleMoves().contains(tileToMoveChosen) && legalMoveWhenInCheck);
+        return tileToMoveChosen;
     }
 }
