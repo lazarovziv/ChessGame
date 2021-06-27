@@ -7,4 +7,7 @@ public interface MyObservable {
     void addObserver(MyObserver observer);
     void addAllObservers(MyObserver[] observers);
     void removeObserver(MyObserver observer);
+    void setChanged();
+    boolean hasChanged();
+    void clearChanged();
 }

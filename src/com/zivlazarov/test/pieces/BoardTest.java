@@ -77,4 +77,13 @@ public class BoardTest {
         board.makeMove(player, rookPiece1, opponentBishopPiece.getCurrentTile());
         board.printBoard();
     }
+
+    @Test
+    public void testCheckSituation() {
+        board.printBoard();
+        board.checkBoard(player);
+        for (Piece piece : player.getAlivePieces()) {
+            if (piece.getPiecesUnderThreat().contains(opponentBishopPiece)) System.out.println("Threat!");
+        }
+    }
 }

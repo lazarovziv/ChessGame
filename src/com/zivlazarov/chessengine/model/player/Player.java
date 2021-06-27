@@ -1,6 +1,8 @@
 package com.zivlazarov.chessengine.model.player;
 
 import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.utils.MyObservable;
+import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
@@ -9,23 +11,26 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
-public class Player {
+public class Player implements MyObserver {
 
     private Player opponentPlayer;
 
-    private Board board;
+    private final Board board;
+    private MyObservable observable;
 
-    private PieceColor playerColor;
+    private final PieceColor playerColor;
     private String name;
-    private List<Piece> alivePieces;
-    private List<Piece> deadPieces;
+    private final List<Piece> alivePieces;
+    private final List<Piece> deadPieces;
+    private final Stack<Piece> eatenPieces;
     private boolean hasWonGame;
     private boolean hasPlayedThisTurn;
 
-    private List<Tile> legalMoves;
-    private List<Piece> piecesCanMove;
+    private final List<Tile> legalMoves;
+    private final List<Piece> piecesCanMove;
 
     private int numOfPawns;
     private int numOfKnights;
@@ -34,19 +39,20 @@ public class Player {
     private int numOfKings;
     private int numOfQueens;
 
-    private int playerDirection;
+    private final int playerDirection;
 
     private Pair<Tile, Tile> lastMove;
 
     public Player(Board b, PieceColor pc) {
         board = b;
         playerColor = pc;
-        alivePieces = new ArrayList();
-        deadPieces = new ArrayList();
+        alivePieces = new ArrayList<Piece>();
+        deadPieces = new ArrayList<Piece>();
         hasWonGame = false;
         hasPlayedThisTurn = false;
         legalMoves = new ArrayList<>();
         piecesCanMove = new ArrayList<>();
+        eatenPieces = new Stack<>();
 
         // setting player direction, white goes up the board, black goes down (specifically to pawn pieces and for checking pawn promotion)
         if (playerColor == PieceColor.WHITE) {
@@ -61,13 +67,14 @@ public class Player {
         numOfPawns = 8;
     }
 
-    public Player(Board b, PieceColor pc, String name) {
-        board = b;
-        playerColor = pc;
-        this.name = name;
-        alivePieces = new ArrayList();
-        deadPieces = new ArrayList();
-        hasWonGame = false;
+    public void refreshPieces() {
+        legalMoves.clear();
+        piecesCanMove.clear();
+        for (Piece piece : alivePieces) {
+            piece.refresh();
+            legalMoves.addAll(piece.getPossibleMoves());
+            if (piece.canMove()) piecesCanMove.add(piece);
+        }
     }
 
     public void updatePieceAsDead(Piece piece) {
@@ -80,14 +87,28 @@ public class Player {
         addPieceToAlive(piece);
     }
 
-    public void movePiece(Piece piece, Tile targetTile) {
-        Tile currentTile = piece.getCurrentTile();
-        if (alivePieces.contains(piece)) {
-            piece.moveToTile(targetTile);
-            lastMove = null;
-            lastMove = new Pair<>(currentTile, targetTile);
-            hasPlayedThisTurn = true;
+    public boolean movePiece(Piece piece, Tile targetTile) {
+//        if (!alivePieces.contains(piece)) return false;
+//        if (!legalMoves.contains(targetTile)) return false;
+
+        Tile pieceTile = piece.getCurrentTile();
+        clearTileFromPiece(pieceTile);
+        // eat move
+        if (!targetTile.isEmpty()) {
+            eatenPieces.push(targetTile.getPiece());
+            opponentPlayer.addPieceToDead(targetTile.getPiece());
         }
+
+        piece.setCurrentTile(targetTile);
+        update();
+
+        piece.getHistoryMoves().push(targetTile);
+
+        lastMove = null;
+        lastMove = new Pair<>(pieceTile, targetTile);
+        hasPlayedThisTurn = true;
+
+        return true;
     }
 
     public void kingSideCastle(KingPiece kingPiece, RookPiece rookPiece) {
@@ -162,7 +183,7 @@ public class Player {
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
             alivePieces.remove(piece);
-            piece.getCurrentTile().setPiece(null);
+            clearTileFromPiece(piece.getCurrentTile());
             piece.setCurrentTile(null);
             piece.setIsAlive(false);
         }
@@ -304,7 +325,7 @@ public class Player {
 
     public void updateLegalMoves() {
         for (Piece piece : alivePieces) {
-            legalMoves.addAll(piece.getTilesToMoveTo());
+            legalMoves.addAll(piece.getPossibleMoves());
         }
     }
 
@@ -312,5 +333,15 @@ public class Player {
         return getKing().getIsInDanger();
 //        if (playerColor == PieceColor.WHITE) return board.getGameSituation() == GameSituation.WHITE_IN_CHECK;
 //        else return board.getGameSituation() == GameSituation.BLACK_IN_CHECK;
+    }
+
+    @Override
+    public void update() {
+        refreshPieces();
+    }
+
+    @Override
+    public void setObservable(MyObservable observable) {
+        this.observable = observable;
     }
 }

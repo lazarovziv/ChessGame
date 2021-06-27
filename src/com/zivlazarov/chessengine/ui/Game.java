@@ -8,7 +8,7 @@ public class Game {
 //
 //import com.zivlazarov.chessengine.model.pieces.*;
 //import com.zivlazarov.chessengine.model.board.Board;
-//import com.zivlazarov.chessengine.model.player.Piece;
+//import com.zivlazarov.chessengine.model.pieces.Piece;
 //import com.zivlazarov.chessengine.model.board.PieceColor;
 //import com.zivlazarov.chessengine.model.board.Tile;
 //import javafx.application.Application;
