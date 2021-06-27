@@ -2,7 +2,7 @@ package com.zivlazarov.chessengine.model.board;
 
 //import javafx.scene.image.ImageView;
 
-import com.zivlazarov.chessengine.model.player.Piece;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 
 public class Tile {
 
@@ -87,7 +87,7 @@ public class Tile {
 
 	public void setPiece(Piece p) {
 		piece = p;
-		isEmpty = piece == null || !piece.getIsAlive();
+		isEmpty = piece == null || piece.isAlive();
 	}
 
 	public void setThreatenedByWhite(boolean threatenedByWhite) {
@@ -101,6 +101,13 @@ public class Tile {
 	public void setThreatenedByColor(PieceColor pieceColor, boolean isThreatened) {
 		if (pieceColor == PieceColor.WHITE) isThreatenedByWhite = isThreatened;
 		if (pieceColor == PieceColor.BLACK) isThreatenedByBlack = isThreatened;
+
+		if (!isThreatened) return;
+		if (piece != null) {
+			if (piece.getPieceColor() != pieceColor) {
+				piece.setIsInDanger(true);
+			}
+		}
 	}
 
 	public boolean equals(Tile tile) {
