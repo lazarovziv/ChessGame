@@ -7,11 +7,12 @@ import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public interface Piece extends Cloneable {
+public interface Piece extends Cloneable, Serializable {
 
     String name = "";
     boolean isAlive = true;

@@ -2,6 +2,7 @@ package com.zivlazarov.chessengine.controllers;
 
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 
 public class BoardController {
@@ -24,6 +25,10 @@ public class BoardController {
 
     public void printBoardUpsideDown(Tile tileChosen) {
         board.printBoardUpsideDown(tileChosen);
+    }
+
+    public void movePiece(Player player, Piece piece, Tile tile) {
+        board.makeMove(player, piece, tile);
     }
 
     public void checkBoard(Player currentPlayer) {

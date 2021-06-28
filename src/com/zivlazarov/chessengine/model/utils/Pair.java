@@ -2,7 +2,9 @@ package com.zivlazarov.chessengine.model.utils;
 
 import com.zivlazarov.chessengine.model.board.Tile;
 
-public class Pair<T, V> {
+import java.io.Serializable;
+
+public class Pair<T, V> implements Serializable {
 
     private T first;
     private V second;

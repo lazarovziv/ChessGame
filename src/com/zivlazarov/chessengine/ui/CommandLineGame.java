@@ -123,7 +123,7 @@ public class CommandLineGame {
             handlePawnPromotion(pieceChosen, currentPlayer, playerController);
 
             if (!playerController.hasPlayerPlayedThisTurn()) {
-                playerController.movePiece(pieceChosen, tileToMoveChosen);
+                boardController.movePiece(currentPlayer, pieceChosen, tileToMoveChosen);
             }
 
             Pair<Pair<Player, Piece>, Pair<Tile, Tile>> lastMove =
@@ -332,7 +332,7 @@ public class CommandLineGame {
                 colChosen = scanner.nextInt();
             }
 
-            tileChosen = board.getBoard()[rowChosen-1][colChosen-1];
+            tileChosen = board.getBoard()[rowChosen - 1][colChosen - 1];
 
             if (tileChosen.isEmpty()) {
                 System.out.println("This tile is empty! Please choose another tile: ");

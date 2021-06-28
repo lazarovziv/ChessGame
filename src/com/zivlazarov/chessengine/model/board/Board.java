@@ -6,10 +6,15 @@ import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
+import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 // make as Singleton (?)
-public class Board implements MyObservable {
+public class Board implements MyObservable, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -30,7 +35,7 @@ public class Board implements MyObservable {
     private GameSituation gameSituation;
     private List<MyObserver> observers;
 
-    private Stack<Pair<Piece, Pair<Tile, Tile>>> historyMoves;
+    private final Stack<Pair<Piece, Pair<Tile, Tile>>> historyMoves;
 
     private boolean changedState;
 
@@ -87,38 +92,54 @@ public class Board implements MyObservable {
         }
     }
 
-    public synchronized void generateLegalMovesWhenInCheck(Player currentPlayer) {
+    public void generateLegalMovesWhenInCheck(Player currentPlayer) {
         List<Tile> pseudoLegalMoves = currentPlayer.getLegalMoves();
-        List<Tile> actualLegalMoves = new ArrayList<>();
+        List<Pair<Piece, Tile>> actualLegalMoves = new ArrayList<>();
 
         for (Piece piece : currentPlayer.getAlivePieces()) {
-            Runnable runnable = null;
-            for (Tile tile : pseudoLegalMoves) {
-                runnable = () -> {
+            synchronized (piece) {
+                for (Tile tile : pseudoLegalMoves.stream().filter(
+                        tile -> piece.getPossibleMoves().contains(tile)).collect(Collectors.toList())) {
+                    saveState();
                     if (!makeMove(currentPlayer, piece, tile)) {
+                        setChanged();
+                        updateObservers();
+                        clearChanged();
                         return;
                     }
                     if (!currentPlayer.isInCheck()) {
-                        actualLegalMoves.add(tile);
-                        if (!currentPlayer.getPiecesCanMove().contains(piece)) {
-                            currentPlayer.getPiecesCanMove().add(piece);
-                        }
+                        actualLegalMoves.add(new Pair<>(piece, tile));
                     }
-                    unmakeLastMove(piece);
-
-                };
+//                    unmakeLastMove(piece);
+                    board = loadState().getBoard();
+                }
             }
-            new Thread(runnable).start();
+//            Runnable runnable = null;
+//            for (Tile tile : pseudoLegalMoves) {
+//                runnable = () -> {
+//                    if (!makeMove(currentPlayer, piece, tile)) {
+//                        return;
+//                    }
+//                    if (!currentPlayer.isInCheck()) {
+//                        actualLegalMoves.add(tile);
+//                        if (!currentPlayer.getPiecesCanMove().contains(piece)) {
+//                            currentPlayer.getPiecesCanMove().add(piece);
+//                        }
+//                    }
+//                    unmakeLastMove(piece);
+//
+//                };
+//            }
+//            new Thread(runnable).start();
         }
         if (actualLegalMoves.size() == 0) gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
         currentPlayer.getLegalMoves().clear();
-        currentPlayer.getLegalMoves().addAll(actualLegalMoves);
+        for (Pair<Piece, Tile> pair : actualLegalMoves) currentPlayer.getLegalMovesForPiece().add(pair);
         // checking if any of current piece's tiles to move to contains player's legal moves
     }
 
     // save board state before making the move for being able to restore it later on!
     public boolean makeMove(Player player, Piece piece, Tile tile) {
-        changedState = false;
         if (piece.isAlive()) return false;
         if (!player.getPiecesCanMove().contains(piece)) return false;
         if (piece.getPossibleMoves().contains(tile)) {
@@ -138,9 +159,10 @@ public class Board implements MyObservable {
     }
 
     public void unmakeLastMove(Piece piece) {
-        if (piece.getHistoryMoves().size() == 1) return;
-        Tile previousTile = piece.getHistoryMoves().get(piece.getHistoryMoves().size() - 1);
-        piece.getHistoryMoves().remove(previousTile);
+        if (historyMoves.size() == 0) return;
+        if (!historyMoves.lastElement().getFirst().equals(piece)) return;
+        Tile previousTile = historyMoves.lastElement().getSecond().getFirst();
+//        piece.getHistoryMoves().remove(previousTile);
 
         if (piece.getLastPieceEaten() != null) {
             if (piece.getLastPieceEaten().getHistoryMoves().peek().equals(piece.getCurrentTile())) {
@@ -329,6 +351,33 @@ public class Board implements MyObservable {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    public void saveState() {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream("board.txt");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(this);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Board loadState() {
+        Board loadedBoard = null;
+        try {
+            FileInputStream fileInputStream = new FileInputStream("board.txt");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            loadedBoard = (Board) objectInputStream.readObject();
+            objectInputStream.close();
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return loadedBoard;
     }
 
     @Override

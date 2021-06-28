@@ -4,7 +4,9 @@ package com.zivlazarov.chessengine.model.board;
 
 import com.zivlazarov.chessengine.model.pieces.Piece;
 
-public class Tile {
+import java.io.Serializable;
+
+public class Tile implements Serializable {
 
 	private int row;
 	private int col;

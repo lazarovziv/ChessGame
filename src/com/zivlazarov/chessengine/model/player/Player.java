@@ -8,13 +8,14 @@ import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-public class Player implements MyObserver {
+public class Player implements MyObserver, Serializable {
 
     private Player opponentPlayer;
 
@@ -30,6 +31,7 @@ public class Player implements MyObserver {
     private boolean hasPlayedThisTurn;
 
     private final List<Tile> legalMoves;
+    private final List<Pair<Piece, Tile>> legalMovesForPiece;
     private final List<Piece> piecesCanMove;
 
     private int numOfPawns;
@@ -51,6 +53,7 @@ public class Player implements MyObserver {
         hasWonGame = false;
         hasPlayedThisTurn = false;
         legalMoves = new ArrayList<>();
+        legalMovesForPiece = new ArrayList<>();
         piecesCanMove = new ArrayList<>();
         eatenPieces = new Stack<>();
 
@@ -70,9 +73,11 @@ public class Player implements MyObserver {
     public void refreshPieces() {
         legalMoves.clear();
         piecesCanMove.clear();
+        legalMovesForPiece.clear();
         for (Piece piece : alivePieces) {
             piece.refresh();
             legalMoves.addAll(piece.getPossibleMoves());
+            for (Tile tile : piece.getPossibleMoves()) legalMovesForPiece.add(new Pair<>(piece, tile));
             if (piece.canMove()) piecesCanMove.add(piece);
         }
     }
@@ -321,6 +326,10 @@ public class Player implements MyObserver {
 
     public List<Piece> getPiecesCanMove() {
         return piecesCanMove;
+    }
+
+    public List<Pair<Piece, Tile>> getLegalMovesForPiece() {
+        return legalMovesForPiece;
     }
 
     public void updateLegalMoves() {
