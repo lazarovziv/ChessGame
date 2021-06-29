@@ -17,7 +17,7 @@ public class PawnPiece implements Piece, Cloneable {
 
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
-    private final Stack<Tile> historyMoves;
+    private final Stack<Pair<Tile, Tile>> historyMoves;
     private Stack<Piece> piecesEaten;
     private final Board board;
     private Player player;
@@ -60,7 +60,6 @@ public class PawnPiece implements Piece, Cloneable {
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
-        historyMoves.push(currentTile);
 //        generateTilesToMoveTo();
     }
 
@@ -128,12 +127,18 @@ public class PawnPiece implements Piece, Cloneable {
                 board.getBoard()[x][y + eatingDirection].getPiece().getPieceColor() != pieceColor) {
             PawnPiece pawn = (PawnPiece) board.getBoard()[x][y + eatingDirection].getPiece();
             // checking to see if opponent's last move is pawn's move 2 tiles forward
-            if (pawn.getPlayer().getLastMove().equals(new Pair<Tile, Tile>(
+            if (board.getGameHistoryMoves().lastElement().getSecond().equals(new Pair<>(
                     board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
                     pawn.getCurrentTile()))) {
                 enPassantTile = board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection];
                 return enPassantTile.isEmpty();
             }
+//            if (pawn.getPlayer().getLastMove().equals(new Pair<Tile, Tile>(
+//                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
+//                    pawn.getCurrentTile()))) {
+//                enPassantTile = board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection];
+//                return enPassantTile.isEmpty();
+//            }
         }
         return false;
     }
@@ -202,14 +207,14 @@ public class PawnPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Stack<Tile> getHistoryMoves() {
+    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
         return historyMoves;
     }
 
     @Override
     public Pair<Tile, Tile> getLastMove() {
         if (historyMoves.size() == 0) return null;
-        return new Pair<Tile, Tile>(historyMoves.peek(), currentTile);
+        return new Pair<Tile, Tile>(historyMoves.peek().getFirst(), currentTile);
     }
 
     @Override
@@ -222,6 +227,10 @@ public class PawnPiece implements Piece, Cloneable {
         this.currentTile = currentTile;
         if (currentTile == null) return;
         currentTile.setPiece(this);
+    }
+
+    public void setHasMoved(boolean moved) {
+        hasMoved = moved;
     }
 
     public String getImageName() {
@@ -250,10 +259,10 @@ public class PawnPiece implements Piece, Cloneable {
             currentTile.setPiece(null);
             if (enPassantTile != null) {
                 if (tile.equals(enPassantTile)) {
+                    historyMoves.push(new Pair<Tile, Tile>(currentTile, enPassantTile));
                     currentTile = tile;
                     currentTile.setPiece(this);
                     possibleMoves.clear();
-                    historyMoves.push(enPassantTile);
                     piecesEaten.push(
                             board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].getPiece());
                     player.getOpponentPlayer().addPieceToDead(
@@ -275,13 +284,13 @@ public class PawnPiece implements Piece, Cloneable {
                 player.getOpponentPlayer().addPieceToDead(tile.getPiece());
                 tile.setPiece(null);
             }
+            historyMoves.push(new Pair<Tile, Tile>(currentTile, tile));
             // change to selected tile
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
             possibleMoves.clear();
             // add target tile to history of moves
-            historyMoves.push(currentTile);
 
             if (!hasMoved) hasMoved = true;
             generateMoves();
@@ -291,7 +300,7 @@ public class PawnPiece implements Piece, Cloneable {
     @Override
     public void unmakeLastMove() {
         if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop();
+        Tile previousTile = historyMoves.pop().getFirst();
 
         if (piecesEaten.size() > 0) {
             if (piecesEaten.peek().getHistoryMoves().peek().equals(currentTile)) {
@@ -327,6 +336,11 @@ public class PawnPiece implements Piece, Cloneable {
 //            }
 //        });
 //    }
+
+
+    public Tile getEnPassantTile() {
+        return enPassantTile;
+    }
 
     @Override
     public boolean canMove() {

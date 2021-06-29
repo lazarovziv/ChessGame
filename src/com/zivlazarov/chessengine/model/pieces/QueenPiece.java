@@ -17,7 +17,7 @@ public class QueenPiece implements Piece, Cloneable {
 
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
-    private final Stack<Tile> historyMoves;
+    private final Stack<Pair<Tile, Tile>> historyMoves;
     private Stack<Piece> piecesEaten;
     private final Board board;
     private String name;
@@ -53,7 +53,6 @@ public class QueenPiece implements Piece, Cloneable {
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
-        historyMoves.push(currentTile);
 
 //        generateTilesToMoveTo();
     }
@@ -164,14 +163,14 @@ public class QueenPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Stack<Tile> getHistoryMoves() {
+    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
         return historyMoves;
     }
 
     @Override
     public Pair<Tile, Tile> getLastMove() {
         if (historyMoves.size() == 0) return null;
-        return new Pair<Tile, Tile>(historyMoves.peek(), currentTile);
+        return new Pair<Tile, Tile>(historyMoves.peek().getFirst(), currentTile);
     }
 
     @Override
@@ -227,12 +226,12 @@ public class QueenPiece implements Piece, Cloneable {
                 player.getOpponentPlayer().addPieceToDead(tile.getPiece());
                 tile.setPiece(null);
             }
+            historyMoves.push(new Pair<Tile, Tile>(currentTile, tile));
             // change to selected tile
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
             possibleMoves.clear();
-            historyMoves.push(currentTile);
             generateMoves();
         }
     }
@@ -240,7 +239,7 @@ public class QueenPiece implements Piece, Cloneable {
     @Override
     public void unmakeLastMove() {
         if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop();
+        Tile previousTile = historyMoves.pop().getFirst();
 
         if (piecesEaten.size() > 0) {
             if (piecesEaten.peek().getHistoryMoves().peek().equals(currentTile)) {

@@ -100,10 +100,10 @@ public class KingPieceTest {
 //        pawnPiece.getCurrentTile().setPiece(null);
 //        opponentPawnPiece.getCurrentTile().setPiece(null);
 //        kingPiece = new KingPiece(board, PieceColor.WHITE, board.getBoard()[0][3]);
-        RookPiece rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], 0);
-        RookPiece rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], 1);
-        RookPiece blackRook0 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][0], 0);
-        RookPiece blackRook1 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7], 1);
+        RookPiece rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], true, 0);
+        RookPiece rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], false, 1);
+        RookPiece blackRook0 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][0], true, 0);
+        RookPiece blackRook1 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7], false, 1);
         board.checkBoard(player);
 
         List<Tile> tilesGenerated = kingPiece.getPossibleMoves();

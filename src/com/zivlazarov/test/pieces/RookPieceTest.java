@@ -27,7 +27,7 @@ public class RookPieceTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], 0);
+        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], false, 0);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[0][3], 0);
         board.checkBoard(player);
@@ -71,7 +71,7 @@ public class RookPieceTest {
     @Test
     public void testWhatTilesAreBeingGenerated() {
         rookPiece.getCurrentTile().setPiece(null);
-        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3], 0);
+        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3], true,0);
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 

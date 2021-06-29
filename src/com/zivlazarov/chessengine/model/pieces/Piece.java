@@ -29,7 +29,7 @@ public interface Piece extends Cloneable, Serializable {
     ArrayList<Tile> getPossibleMoves();
     PieceColor getPieceColor();
     Tile getCurrentTile();
-    Stack<Tile> getHistoryMoves();
+    Stack<Pair<Tile, Tile>> getHistoryMoves();
     Pair<Tile, Tile> getLastMove();
     ArrayList<Piece> getPiecesUnderThreat();
     Player getPlayer();

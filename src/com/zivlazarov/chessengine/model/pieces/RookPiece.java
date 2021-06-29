@@ -13,11 +13,11 @@ import java.util.Stack;
 
 public class RookPiece implements Piece, Cloneable {
 
-    private Player player;
+    private final Player player;
 
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
-    private final Stack<Tile> historyMoves;
+    private final Stack<Pair<Tile, Tile>> historyMoves;
     private Stack<Piece> piecesEaten;
     private final Board board;
     private String name;
@@ -28,9 +28,14 @@ public class RookPiece implements Piece, Cloneable {
     private Tile currentTile;
     private PieceColor pieceColor;
     private String imageName;
+
+    private Tile kingSideCastlingTile = null;
+    private Tile queenSideCastlingTile = null;
+    private boolean isKingSide;
+    private boolean isQueenSide;
 //    private ImageView imageIcon;
 
-    public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
+    public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean isKingSide, int pieceCounter) {
         this.player = player;
         this.board = board;
 
@@ -45,21 +50,30 @@ public class RookPiece implements Piece, Cloneable {
 
         currentTile = initTile;
         this.pieceCounter = pieceCounter;
+        this.isKingSide = isKingSide;
+        this.isQueenSide = !isKingSide;
 
         if (pieceColor == PieceColor.BLACK) {
             name = "bR";
             board.getBlackAlivePieces().put(name + pieceCounter, this);
             imageName = "blackRook.png";
+
+            if (isKingSide) {
+                kingSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
+            } else queenSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 3];
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wR";
             board.getWhiteAlivePieces().put(name + pieceCounter, this);
             imageName = "whiteRook.png";
+
+            if (isKingSide) {
+                kingSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
+            } else queenSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 3];
         }
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
-        historyMoves.push(currentTile);
 //        generateTilesToMoveTo();
     }
 
@@ -156,7 +170,7 @@ public class RookPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Stack<Tile> getHistoryMoves() {
+    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
         return historyMoves;
     }
 
@@ -176,10 +190,17 @@ public class RookPiece implements Piece, Cloneable {
         currentTile.setPiece(this);
     }
 
-//    @Override
-//    public void setImageIcon(ImageView imageView) {
-//        this.imageIcon = imageView;
-//    }
+    public Tile getKingSideCastlingTile() {
+        return kingSideCastlingTile;
+    }
+
+    public Tile getQueenSideCastlingTile() {
+        return queenSideCastlingTile;
+    }
+
+    public void setHasMoved(boolean moved) {
+        hasMoved = moved;
+    }
 
     @Override
     public Tile getCurrentTile() {
@@ -192,6 +213,14 @@ public class RookPiece implements Piece, Cloneable {
 
     public String getImageName() {
         return imageName;
+    }
+
+    public boolean isKingSide() {
+        return isKingSide;
+    }
+
+    public boolean isQueenSide() {
+        return isQueenSide;
     }
 
     @Override
@@ -226,13 +255,13 @@ public class RookPiece implements Piece, Cloneable {
                 player.getOpponentPlayer().addPieceToDead(tile.getPiece());
                 tile.setPiece(null);
             }
+            historyMoves.push(new Pair<Tile, Tile>(currentTile, tile));
             // change to selected tile
             currentTile = tile;
             // set the piece at selected tile
             currentTile.setPiece(this);
             possibleMoves.clear();
             // add tile to history of moves
-            historyMoves.push(currentTile);
 
             if (!hasMoved) hasMoved = true;
 
@@ -243,7 +272,7 @@ public class RookPiece implements Piece, Cloneable {
     @Override
     public void unmakeLastMove() {
         if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop();
+        Tile previousTile = historyMoves.pop().getFirst();
 
         if (piecesEaten.size() > 0) {
             if (piecesEaten.peek().getHistoryMoves().peek().equals(currentTile)) {
@@ -286,7 +315,7 @@ public class RookPiece implements Piece, Cloneable {
     @Override
     public Pair<Tile, Tile> getLastMove() {
         if (historyMoves.size() == 0) return null;
-        return new Pair<Tile, Tile>(historyMoves.peek(), currentTile);
+        return new Pair<Tile, Tile>(historyMoves.peek().getFirst(), currentTile);
     }
 
     @Override
