@@ -104,10 +104,9 @@ public class Player implements MyObserver, Serializable {
             opponentPlayer.addPieceToDead(targetTile.getPiece());
         }
 
+        piece.getHistoryMoves().push(new Pair<Tile, Tile>(pieceTile, targetTile));
         piece.setCurrentTile(targetTile);
         update();
-
-        piece.getHistoryMoves().push(targetTile);
 
         lastMove = null;
         lastMove = new Pair<>(pieceTile, targetTile);
@@ -158,7 +157,7 @@ public class Player implements MyObserver, Serializable {
             case "R", "r" -> {
                 clearTileFromPiece(pawnPiece.getCurrentTile());
                 numOfRooks++;
-                piece = new RookPiece(this, board, playerColor, targetTile,numOfRooks - 1);
+                piece = new RookPiece(this, board, playerColor, targetTile,true, numOfRooks - 1);
             }
             case "B", "b" -> {
                 clearTileFromPiece(pawnPiece.getCurrentTile());

@@ -17,15 +17,7 @@ import java.util.Stack;
 
 public class CommandLineGame {
 
-    private static Board board = new Board();
-    private static Piece[] allPieces = new Piece[32];
-    private static Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> movesLog;
-
-    private static String whitePlayerName = "";
-    private static String blackPlayerName = "";
-
-    private static Player whitePlayer;
-    private static Player blackPlayer;
+    private static final Board board = new Board();
 
     private static Player currentPlayer;
 
@@ -36,14 +28,14 @@ public class CommandLineGame {
 
     public static void main(String[] args) {
 
-        whitePlayer = new Player(board, PieceColor.WHITE);
-        blackPlayer = new Player(board, PieceColor.BLACK);
+        Player whitePlayer = new Player(board, PieceColor.WHITE);
+        Player blackPlayer = new Player(board, PieceColor.BLACK);
 
         board.addObserver(whitePlayer);
         board.addObserver(blackPlayer);
 
         MovesLog log = MovesLog.getInstance();
-        movesLog = log.getMovesLog();
+        Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> movesLog = log.getMovesLog();
 
         playerController = new PlayerController();
 
@@ -67,11 +59,6 @@ public class CommandLineGame {
         int turn = 0;
 
         while (gameStarted) {
-
-            if (movesLog.size() != 0) {
-                System.out.println(movesLog.peek().getFirst() + " played: " + movesLog.peek().getSecond());
-                System.out.println();
-            }
 
             PieceColor currentTurn = playersColors[(turn + playersColors.length) % 2];
 
@@ -116,8 +103,7 @@ public class CommandLineGame {
             // chosenMove()
             Tile tileToMoveChosen = chosenMove(pieceChosen);
 
-            // handle castling
-            handleCastling(currentPlayer, whitePlayer, blackPlayer, pieceChosen, tileToMoveChosen, playerController);
+//            handleCastling(currentPlayer, whitePlayer, blackPlayer, pieceChosen, tileToMoveChosen, playerController);
 
             // handle pawn promotion
             handlePawnPromotion(pieceChosen, currentPlayer, playerController);
@@ -126,10 +112,7 @@ public class CommandLineGame {
                 boardController.movePiece(currentPlayer, pieceChosen, tileToMoveChosen);
             }
 
-            Pair<Pair<Player, Piece>, Pair<Tile, Tile>> lastMove =
-                    new Pair<Pair<Player, Piece>, Pair<Tile, Tile>>(new Pair<Player, Piece>(playerController.getPlayer(), pieceChosen),
-                            playerController.getPlayer().getLastMove());
-            movesLog.push(lastMove);
+            printLastMove();
 
             turn = turn + 1;
             System.out.println();
@@ -137,11 +120,11 @@ public class CommandLineGame {
     }
 
     public static void initPieces(Player whitePlayer, Player blackPlayer) {
-        RookPiece whiteRookKingSide = new RookPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][0], 0);
-        RookPiece whiteRookQueenSide = new RookPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][7], 1);
+        RookPiece whiteRookKingSide = new RookPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][0], true, 0);
+        RookPiece whiteRookQueenSide = new RookPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][7], false, 1);
 
-        RookPiece blackRookQueenSide = new RookPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][0], 0);
-        RookPiece blackRookKingSide = new RookPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][7], 1);
+        RookPiece blackRookQueenSide = new RookPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][0], false, 0);
+        RookPiece blackRookKingSide = new RookPiece(blackPlayer, board, PieceColor.BLACK, board.getBoard()[7][7], true, 1);
 
         KnightPiece whiteKnightKingSide = new KnightPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][1], 0);
         KnightPiece whiteKnightQueenSide = new KnightPiece(whitePlayer, board, PieceColor.WHITE, board.getBoard()[0][6], 1);
@@ -181,16 +164,17 @@ public class CommandLineGame {
 
         // when calling the refresh() method for every piece, first call for the pieces on the back row!!! because tiles in front of them aren't empty
 
-        allPieces = new Piece[] {whiteRookKingSide, whiteKnightKingSide, whiteBishopKingSide, whiteQueen, whiteKing, whiteBishopQueenSide, whiteKnightQueenSide, whiteRookQueenSide,
-                whitePawn0, whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7,
-                blackRookQueenSide, blackKnightKingSide, blackBishopQueenSide, blackQueen, blackKing, blackBishopKingSide, blackKnightQueenSide, blackRookKingSide,
-                blackPawn0, blackPawn1, blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7};
+//        Piece[] allPieces = new Piece[]{whiteRookKingSide, whiteKnightKingSide, whiteBishopKingSide, whiteQueen, whiteKing, whiteBishopQueenSide, whiteKnightQueenSide, whiteRookQueenSide,
+//                whitePawn0, whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7,
+//                blackRookQueenSide, blackKnightKingSide, blackBishopQueenSide, blackQueen, blackKing, blackBishopKingSide, blackKnightQueenSide, blackRookKingSide,
+//                blackPawn0, blackPawn1, blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7};
     }
 
     private static void handlePawnPromotion(Piece pieceChosen, Player currentPlayer, PlayerController playerController) {
         Scanner scanner = null;
         if (pieceChosen instanceof PawnPiece) {
             scanner = new Scanner(System.in);
+            // reached the last row
             if (pieceChosen.getCurrentTile().getRow() == currentPlayer.getPlayerDirection() * (board.getBoard().length - 1)) {
                 String promotionAnswer = "";
                 boolean answeredCorrect = false;
@@ -268,6 +252,8 @@ public class CommandLineGame {
 
     private static void askForPlayersNames() {
         Scanner scanner = new Scanner(System.in);
+        String whitePlayerName = "";
+        String blackPlayerName = "";
         do {
             System.out.println("Who plays white? ");
 
@@ -309,6 +295,8 @@ public class CommandLineGame {
         int colChosen;
         Tile tileChosen;
 
+//        boolean pieceCanMoveNow = true;
+
         System.out.println("Choose a piece from tile: (row, column)");
 
         do {
@@ -341,10 +329,22 @@ public class CommandLineGame {
             } else if (!tileChosen.getPiece().canMove()) {
                 System.out.println("This piece can't move!");
             }
+//            else {
+//                int counter = 0;
+//                for (Pair<Piece, Tile> pair : currentPlayer.getLegalMovesForPiece()) {
+//                    if (!pair.getFirst().equals(tileChosen.getPiece())) {
+//                        counter++;
+//                    }
+//                }
+//                if (counter == currentPlayer.getLegalMovesForPiece().size()) {
+//                    pieceCanMoveNow = false;
+//                    System.out.println("This piece can't move right now!");
+//                }
+//            }
 
         } while (rowChosen < 1 || rowChosen > 8 || colChosen < 1 || colChosen > 8 ||
                 tileChosen.isEmpty() || tileChosen.getPiece().getPieceColor() != currentPlayer.getPlayerColor() ||
-                !currentPlayer.getPiecesCanMove().contains(tileChosen.getPiece()));
+                !currentPlayer.getPiecesCanMove().contains(tileChosen.getPiece()) /*|| !pieceCanMoveNow */);
         return tileChosen;
     }
 
@@ -387,5 +387,13 @@ public class CommandLineGame {
 
         } while (!pieceChosen.getPossibleMoves().contains(tileToMoveChosen) && legalMoveWhenInCheck);
         return tileToMoveChosen;
+    }
+
+    private static void printLastMove() {
+        System.out.println();
+        System.out.println(currentPlayer.getName() + " played: ");
+        System.out.println(boardController.getGameHistoryMoves().lastElement().getFirst().getName() + " moved from "
+                + boardController.getGameHistoryMoves().lastElement().getSecond().getFirst() + " to " +
+                boardController.getGameHistoryMoves().lastElement().getSecond().getSecond());
     }
 }
