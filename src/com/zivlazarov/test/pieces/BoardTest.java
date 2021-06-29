@@ -30,8 +30,8 @@ public class BoardTest {
         opponent.setOpponentPlayer(player);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
-        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], 0);
-        rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], 1);
+        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], true, 0);
+        rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], false, 1);
         kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][4]);
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[3][4], 0);

@@ -8,6 +8,7 @@ import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.board.Tile;
 
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,18 @@ public class PlayerController {
 
     public void promotePawn(PawnPiece pawnPiece, String pieceName) {
         player.promotePawn(pawnPiece, pieceName);
+    }
+
+    public char receivePawnPromotionChoice() {
+        char answer;
+        System.out.println("Please enter a promotion for your pawn: (q/b/n/r)");
+        Scanner scanner = new Scanner(System.in);
+        answer = scanner.nextLine().toLowerCase().charAt(0);
+        while (!scanner.hasNextLine() && answer != 'q' && answer != 'b' && answer != 'n' && answer != 'r') {
+            System.out.println("Please enter a valid answer: (q/b/n/r)");
+            answer = scanner.nextLine().toLowerCase().charAt(0);
+        }
+        return answer;
     }
 
     public void updateStatusOfPiece(Piece piece, boolean isAlive) {
