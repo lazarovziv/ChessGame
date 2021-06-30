@@ -89,25 +89,25 @@ public class PawnPiece implements Piece, Cloneable {
 
         if (x + map.get(pieceColor) > board.getBoard().length - 1 || x + map.get(pieceColor) < 0) return;
 
-        if (board.getBoard()[x + direction][y].isEmpty()) {
+        if (board.getBoard()[x+direction][y].isEmpty()) {
             possibleMoves.add(board.getBoard()[x + direction][y]);
             if (canMoveFurther) {
                 if (x + longDirection < 0 || x + longDirection > board.getBoard().length - 1) return;
-                if (board.getBoard()[x + longDirection][y].isEmpty()) {
-                    possibleMoves.add(board.getBoard()[x + longDirection][y]);
+                if (board.getBoard()[x+longDirection][y].isEmpty()) {
+                    possibleMoves.add(board.getBoard()[x+longDirection][y]);
                 }
             }
         }
         for (int d : eatingDirections) {
-            if (y + d > board.getBoard().length - 1 || y + d < 0) return;
-            if (!board.getBoard()[x + direction][y + d].isEmpty() &&
-                    board.getBoard()[x + direction][y + d].getPiece().getPieceColor() != pieceColor) {
-                possibleMoves.add(board.getBoard()[x + direction][y + d]);
-                piecesUnderThreat.add(board.getBoard()[x + direction][y + d].getPiece());
+            if (y + d > board.getBoard().length - 1 || y + d < 0) continue;
+            if (!board.getBoard()[x+direction][y+d].isEmpty() &&
+                    board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
+                possibleMoves.add(board.getBoard()[x+direction][y+d]);
+                piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
             }
             // insert en passant
             if (canEnPassant(d)) {
-                possibleMoves.add(board.getBoard()[x+player.getPlayerDirection()][y+d]);
+                possibleMoves.add(board.getBoard()[x+direction][y+d]);
                 // setting the adjacent pawn piece as under threat
                 // only move in chess where piece can be eaten without moving to it's tile
                 piecesUnderThreat.add(board.getBoard()[x][y+d].getPiece());
@@ -121,7 +121,8 @@ public class PawnPiece implements Piece, Cloneable {
         int x = currentTile.getRow();
         int y = currentTile.getCol();
 
-        if (y + eatingDirection < 0 || y + eatingDirection > board.getBoard().length - 1) return false;
+        if (y + eatingDirection < 0 || y + eatingDirection > board.getBoard().length - 1
+        || x - 2 * player.getOpponentPlayer().getPlayerDirection() < 0) return false;
         // checking if piece next to pawn is of type pawn and is opponent's piece
         if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece &&
                 board.getBoard()[x][y + eatingDirection].getPiece().getPieceColor() != pieceColor) {
@@ -130,15 +131,9 @@ public class PawnPiece implements Piece, Cloneable {
             if (board.getGameHistoryMoves().lastElement().getSecond().equals(new Pair<>(
                     board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
                     pawn.getCurrentTile()))) {
-                enPassantTile = board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection];
+                enPassantTile = board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection];
                 return enPassantTile.isEmpty();
             }
-//            if (pawn.getPlayer().getLastMove().equals(new Pair<Tile, Tile>(
-//                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
-//                    pawn.getCurrentTile()))) {
-//                enPassantTile = board.getBoard()[x + player.getPlayerDirection()][y + eatingDirection];
-//                return enPassantTile.isEmpty();
-//            }
         }
         return false;
     }
@@ -167,11 +162,6 @@ public class PawnPiece implements Piece, Cloneable {
     public boolean getIsInDanger() {
         return false;
     }
-
-//    @Override
-//    public ImageView getImageIcon() {
-//        return imageIcon;
-//    }
 
     @Override
     public void setIsInDanger(boolean isInDanger) {
