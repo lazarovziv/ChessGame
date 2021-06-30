@@ -24,7 +24,7 @@ public class BishopPieceTest {
 
     @BeforeAll
     public static void setup() {
-        board = new Board();
+        board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         bishopPiece = new BishopPiece(player, board, PieceColor.WHITE, board.getBoard()[0][2], 0);

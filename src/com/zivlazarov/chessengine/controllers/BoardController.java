@@ -12,7 +12,9 @@ public class BoardController {
 
     private Board board;
 
-    public BoardController() {}
+    public BoardController(Board board) {
+        this.board = board;
+    }
 
     public void printBoard() {
         board.printBoard();

@@ -17,7 +17,7 @@ public class UIGame {
     private JButton[][] buttons = new JButton[8][8];
 
     public UIGame() {
-        board = new Board();
+        board = Board.getInstance();
         Player whitePlayer = new Player(board, PieceColor.WHITE);
         Player blackPlayer = new Player(board, PieceColor.BLACK);
 
@@ -25,8 +25,8 @@ public class UIGame {
 
         PlayerController playerController = new PlayerController();
 
-        BoardController boardController = new BoardController();
-        boardController.setBoard(board);
+        BoardController boardController = new BoardController(board);
+//        boardController.setBoard(board);
         boardController.setWhitePlayer(whitePlayer);
         boardController.setBlackPlayer(blackPlayer);
 

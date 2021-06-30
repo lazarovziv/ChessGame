@@ -24,7 +24,7 @@ public class KnightPieceTest {
 
     @BeforeAll
     public static void setup() {
-        board = new Board();
+        board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[0][1], 0);

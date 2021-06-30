@@ -16,7 +16,7 @@ public class PlayerTest {
 
     @BeforeAll
     public static void setup() {
-        board = new Board();
+        board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);

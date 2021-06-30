@@ -24,7 +24,7 @@ public class QueenPieceTest {
 
     @BeforeAll
     public static void setup() {
-        board = new Board();
+        board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         queenPiece = new QueenPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3]);

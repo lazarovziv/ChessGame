@@ -24,7 +24,7 @@ public class RookPieceTest {
 
     @BeforeAll
     public static void setup() {
-        board = new Board();
+        board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], false, 0);

@@ -7,6 +7,7 @@ import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,7 +27,7 @@ public class PawnPieceTest {
 
     @BeforeAll
     public static void setup() {
-        board = new Board();
+        board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
@@ -34,7 +35,8 @@ public class PawnPieceTest {
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[3][0], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][0], 0);
-        board.checkBoard(player);
+        for (Piece piece : player.getAlivePieces()) piece.refresh();
+        for (Piece piece : opponent.getAlivePieces()) piece.refresh();
     }
 
     @Test
@@ -64,7 +66,7 @@ public class PawnPieceTest {
 
     @Test
     public void testEnPassant() {
-        board = new Board();
+        board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
 
@@ -96,8 +98,9 @@ public class PawnPieceTest {
     public void testPromotion() {
         PawnPiece pawn = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[6][4], 3);
         board.printBoard();
-        board.checkBoard(player);
-        player.movePiece(pawn, board.getBoard()[7][4]);
+        pawn.refresh();
+        if (board.makeMove(player, pawn, board.getBoard()[7][4])) System.out.println("Moved!");
+        else System.out.println("Not Moved!");
         board.printBoard();
     }
 }

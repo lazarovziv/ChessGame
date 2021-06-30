@@ -1,5 +1,6 @@
 package com.zivlazarov.chessengine.model.board;
 
+import com.zivlazarov.chessengine.controllers.PlayerController;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
@@ -12,6 +13,8 @@ import java.util.stream.Collectors;
 
 // make as Singleton (?)
 public class Board implements MyObservable, Serializable {
+
+    private static volatile Board instance;
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -30,8 +33,8 @@ public class Board implements MyObservable, Serializable {
     private final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
     private final Map<PieceColor, GameSituation> checkmateSituations = new HashMap<>();
     private Tile[][] board;
-    private Player whitePlayer;
-    private Player blackPlayer;
+    private transient Player whitePlayer;
+    private transient Player blackPlayer;
     private GameSituation gameSituation;
     private List<MyObserver> observers;
 
@@ -39,7 +42,18 @@ public class Board implements MyObservable, Serializable {
 
     private boolean changedState;
 
-    public Board() {
+    public static Board getInstance() {
+        if (instance == null) {
+            synchronized (Board.class) {
+                if (instance == null) {
+                    instance = new Board();
+                }
+            }
+        }
+        return instance;
+    }
+
+    private Board() {
         board = new Tile[8][8];
         blackAlivePieces = new HashMap<>();
         whiteAlivePieces = new HashMap<>();
@@ -78,6 +92,7 @@ public class Board implements MyObservable, Serializable {
         // resetting tiles threatened state before every check
         resetThreatsOnTiles();
 
+        // update all observers
         updateObservers();
         // for each player's legal move's target piece, that piece is in danger of being eaten
         markEndangeredPiecesFromPlayer(currentPlayer);
@@ -97,15 +112,15 @@ public class Board implements MyObservable, Serializable {
         List<Pair<Piece, Tile>> actualLegalMoves = new ArrayList<>();
 
         for (Piece piece : currentPlayer.getAlivePieces()) {
+            saveState();
             synchronized (piece) {
                 for (Tile tile : pseudoLegalMoves.stream().filter(
                         tile -> piece.getPossibleMoves().contains(tile)).collect(Collectors.toList())) {
-                    saveState();
                     if (!makeMove(currentPlayer, piece, tile)) {
                         setChanged();
                         updateObservers();
                         clearChanged();
-                        return;
+                        continue;
                     }
                     if (!currentPlayer.isInCheck()) {
                         actualLegalMoves.add(new Pair<>(piece, tile));
@@ -117,7 +132,9 @@ public class Board implements MyObservable, Serializable {
         }
         if (actualLegalMoves.size() == 0) gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
         currentPlayer.getLegalMoves().clear();
-        for (Pair<Piece, Tile> pair : actualLegalMoves) currentPlayer.getLegalMovesForPiece().add(pair);
+        for (Pair<Piece, Tile> pair : actualLegalMoves) {
+            currentPlayer.getLegalMovesForPiece().add(pair);
+        }
         // checking if any of current piece's tiles to move to contains player's legal moves
     }
 
@@ -137,10 +154,12 @@ public class Board implements MyObservable, Serializable {
             if (((PawnPiece) piece).getEnPassantTile() != null) {
                 if (tile.equals(((PawnPiece) piece).getEnPassantTile())) {
                     player.getOpponentPlayer().addPieceToDead(
-                            board[((PawnPiece)piece).getEnPassantTile().getRow()-player.getPlayerDirection()][((PawnPiece)piece).getEnPassantTile().getCol()]
+                            board[((PawnPiece)piece).getEnPassantTile().getRow()-player.getPlayerDirection()]
+                                    [((PawnPiece)piece).getEnPassantTile().getCol()]
                                     .getPiece());
                 }
             }
+            ((PawnPiece) piece).setHasMoved(true);
             if (piece.getCurrentTile().getRow() == player.getPlayerDirection() * (board.length - 1)) {
                 // setting it as dead and adding it to deadPieces list
                 piece.setIsAlive(false);
@@ -150,17 +169,17 @@ public class Board implements MyObservable, Serializable {
                 // clearing piece from it's tile to set a new piece
                 targetTile.setPiece(null);
 
-                char chosenPiece;
+                char chosenPiece = PlayerController.receivePawnPromotionChoice();
 
                 switch (chosenPiece) {
-                    case 'q' -> piece = new QueenPiece(player, this, player.getPlayerColor(), targetTile);
-                    case 'b' -> piece = new BishopPiece(player, this, player.getPlayerColor(), targetTile, player.getNumOfBishops() + 1);
-                    case 'n' -> piece = new KnightPiece(player, this, player.getPlayerColor(), targetTile, player.getNumOfKnights() + 1);
-                    case 'r' -> piece = new RookPiece(player, this, player.getPlayerColor(), targetTile, false, player.getNumOfRooks() + 1);
+                    case 'q' -> convertedPiece = new QueenPiece(player, this, player.getPlayerColor(), targetTile);
+                    case 'b' -> convertedPiece = new BishopPiece(player, this, player.getPlayerColor(), targetTile, player.getNumOfBishops() + 1);
+                    case 'n' -> convertedPiece = new KnightPiece(player, this, player.getPlayerColor(), targetTile, player.getNumOfKnights() + 1);
+                    case 'r' -> convertedPiece = new RookPiece(player, this, player.getPlayerColor(), targetTile, false, player.getNumOfRooks() + 1);
 
                 }
+                if (convertedPiece != null) player.addPieceToAlive(convertedPiece);
             }
-            ((PawnPiece) piece).setHasMoved(true);
         }
 
         // king logic for castling

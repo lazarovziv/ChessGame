@@ -34,7 +34,7 @@ public class PlayerController {
         player.promotePawn(pawnPiece, pieceName);
     }
 
-    public char receivePawnPromotionChoice() {
+    public static char receivePawnPromotionChoice() {
         char answer;
         System.out.println("Please enter a promotion for your pawn: (q/b/n/r)");
         Scanner scanner = new Scanner(System.in);

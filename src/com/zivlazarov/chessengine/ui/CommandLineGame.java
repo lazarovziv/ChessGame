@@ -2,22 +2,20 @@ package com.zivlazarov.chessengine.ui;
 
 import com.zivlazarov.chessengine.controllers.BoardController;
 import com.zivlazarov.chessengine.controllers.PlayerController;
-import com.zivlazarov.chessengine.logs.MovesLog;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.GameSituation;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.move.MoveLabel;
 import com.zivlazarov.chessengine.model.pieces.*;
-import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
-import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.util.Scanner;
-import java.util.Stack;
 
 public class CommandLineGame {
 
-    private static final Board board = new Board();
+    private static final Board board = Board.getInstance();
 
     private static Player currentPlayer;
 
@@ -34,13 +32,10 @@ public class CommandLineGame {
         board.addObserver(whitePlayer);
         board.addObserver(blackPlayer);
 
-        MovesLog log = MovesLog.getInstance();
-        Stack<Pair<Pair<Player, Piece>, Pair<Tile, Tile>>> movesLog = log.getMovesLog();
-
         playerController = new PlayerController();
 
-        boardController = new BoardController();
-        boardController.setBoard(board);
+        boardController = new BoardController(board);
+//        boardController.setBoard(board);
         boardController.setWhitePlayer(whitePlayer);
         boardController.setBlackPlayer(blackPlayer);
 
@@ -48,6 +43,7 @@ public class CommandLineGame {
 
         playerController.setPlayer(whitePlayer);
         playerController.setOpponentPlayer(blackPlayer);
+        blackPlayer.setOpponentPlayer(whitePlayer);
 
         askIfWantToPlay();
         askForPlayersNames();
@@ -106,7 +102,19 @@ public class CommandLineGame {
 //            handleCastling(currentPlayer, whitePlayer, blackPlayer, pieceChosen, tileToMoveChosen, playerController);
 
             // handle pawn promotion
-            handlePawnPromotion(pieceChosen, currentPlayer, playerController);
+//            handlePawnPromotion(pieceChosen, currentPlayer, playerController);
+
+            Move move = new Move.Builder()
+                    .player(currentPlayer)
+                    .movingPiece(tileChosen.getPiece())
+                    .eatenPiece(tileToMoveChosen.getPiece())
+                    .currentTile(tileChosen)
+                    .targetTile(tileToMoveChosen)
+                    .moveLabel(MoveLabel.NORMAL)
+                    .build();
+
+            move.makeMove();
+
 
             if (!playerController.hasPlayerPlayedThisTurn()) {
                 boardController.movePiece(currentPlayer, pieceChosen, tileToMoveChosen);
@@ -215,13 +223,13 @@ public class CommandLineGame {
 
     private static void handleGameSituations(Player currentPlayer, int turn) {
         if (currentPlayer.getPlayerColor() == PieceColor.WHITE) {
-            if (board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
+            if (boardController.getBoard().getGameSituation() == GameSituation.WHITE_CHECKMATED) {
                 System.out.println("Checkmate! " + currentPlayer.getOpponentPlayer().getName() + " wins!");
                 currentPlayer.getOpponentPlayer().setHasWonGame(true);
-            } else if (board.getGameSituation() == GameSituation.WHITE_IN_CHECK) {
+            } else if (boardController.getBoard().getGameSituation() == GameSituation.WHITE_IN_CHECK) {
                 System.out.println("Check! " + currentPlayer.getName() + "'s King is in danger!");
                 System.out.println(currentPlayer.getName() + "'s turn: ");
-            } else if (board.getGameSituation() == GameSituation.DRAW) {
+            } else if (boardController.getBoard().getGameSituation() == GameSituation.DRAW) {
                 System.out.println("Draw! ");
             } else {
                 if (turn == 0) {
@@ -231,14 +239,14 @@ public class CommandLineGame {
                 }
             }
         } else if (currentPlayer.getPlayerColor() == PieceColor.BLACK) {
-            if (board.getGameSituation() == GameSituation.BLACK_CHECKMATED) {
+            if (boardController.getBoard().getGameSituation() == GameSituation.BLACK_CHECKMATED) {
                 System.out.println("Checkmate! " + currentPlayer.getOpponentPlayer().getName() + " wins!");
                 currentPlayer.getOpponentPlayer().setHasWonGame(true);
                 System.out.println("Moves from the match: ");
-            } else if (board.getGameSituation() == GameSituation.BLACK_IN_CHECK) {
+            } else if (boardController.getBoard().getGameSituation() == GameSituation.BLACK_IN_CHECK) {
                 System.out.println("Check! " + currentPlayer.getName() + "'s King is in danger!");
                 System.out.println(currentPlayer.getName() + "'s turn: ");
-            } else if (board.getGameSituation() == GameSituation.DRAW) {
+            } else if (boardController.getBoard().getGameSituation() == GameSituation.DRAW) {
                 System.out.println("Draw! ");
             } else {
                 if (turn == 0) {
@@ -321,6 +329,7 @@ public class CommandLineGame {
             }
 
             tileChosen = board.getBoard()[rowChosen - 1][colChosen - 1];
+            Tile copiedTileChosen = tileChosen;
 
             if (tileChosen.isEmpty()) {
                 System.out.println("This tile is empty! Please choose another tile: ");
