@@ -41,6 +41,8 @@ public class Board implements MyObservable, Serializable {
     private final Stack<Pair<Piece, Pair<Tile, Tile>>> gameHistoryMoves;
 
     private boolean changedState;
+    
+    private final Stack<Board> states;
 
     public static Board getInstance() {
         if (instance == null) {
@@ -59,6 +61,8 @@ public class Board implements MyObservable, Serializable {
         whiteAlivePieces = new HashMap<>();
 
         observers = new ArrayList<>();
+        
+        states = new Stack();
 
         gameHistoryMoves = new Stack<>();
 
@@ -76,6 +80,8 @@ public class Board implements MyObservable, Serializable {
             }
         }
         gameSituation = GameSituation.NORMAL;
+        
+        states.push(this);
     }
 
     public void refreshPiecesOfPlayer(Player player) {
@@ -224,6 +230,7 @@ public class Board implements MyObservable, Serializable {
         piece.setCurrentTile(tile);
 //        historyMoves.push(new Pair<Piece, Pair<Tile, Tile>>(piece, new Pair<Tile, Tile>(piece.getCurrentTile(), tile)));
         gameHistoryMoves.push(new Pair<>(piece, piece.getLastMove()));
+        states.push(this);
         setChanged();
         updateObservers();
         clearChanged();
@@ -251,6 +258,11 @@ public class Board implements MyObservable, Serializable {
         setChanged();
         updateObservers();
         clearChanged();
+    }
+    
+    public void unmakeMove() {
+        states.pop();
+        
     }
 
     public void resetThreatsOnTiles() {
