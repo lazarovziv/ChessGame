@@ -17,11 +17,11 @@ public class RookPiece implements Piece, Cloneable {
 
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
-    private final Stack<Pair<Tile, Tile>> historyMoves;
-    private Stack<Piece> piecesEaten;
+    private final Stack<Tile> historyMoves;
+    private final Stack<Piece> piecesEaten;
     private final Board board;
     private String name;
-    private int pieceCounter;
+    private final int pieceCounter;
     private boolean isAlive = true;
     private boolean isInDanger = false;
     private boolean hasMoved;
@@ -31,8 +31,8 @@ public class RookPiece implements Piece, Cloneable {
 
     private Tile kingSideCastlingTile = null;
     private Tile queenSideCastlingTile = null;
-    private boolean isKingSide;
-    private boolean isQueenSide;
+    private final boolean isKingSide;
+    private final boolean isQueenSide;
 //    private ImageView imageIcon;
 
     public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean isKingSide, int pieceCounter) {
@@ -55,7 +55,6 @@ public class RookPiece implements Piece, Cloneable {
 
         if (pieceColor == PieceColor.BLACK) {
             name = "bR";
-            board.getBlackAlivePieces().put(name + pieceCounter, this);
             imageName = "blackRook.png";
 
             if (isKingSide) {
@@ -64,7 +63,6 @@ public class RookPiece implements Piece, Cloneable {
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wR";
-            board.getWhiteAlivePieces().put(name + pieceCounter, this);
             imageName = "whiteRook.png";
 
             if (isKingSide) {
@@ -170,7 +168,7 @@ public class RookPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Stack<Pair<Tile, Tile>> getHistoryMoves() {
+    public Stack<Tile> getHistoryMoves() {
         return historyMoves;
     }
 
@@ -239,7 +237,6 @@ public class RookPiece implements Piece, Cloneable {
     @Override
     public void moveToTile(Tile tile) {
         if (!player.getLegalMoves().contains(tile)) return;
-        if (!player.getPiecesCanMove().contains(this)) return;
         if (possibleMoves.contains(tile)) {
             // clear current tile
             currentTile.setPiece(null);
@@ -247,15 +244,10 @@ public class RookPiece implements Piece, Cloneable {
             if (!tile.isEmpty()) {
                 piecesEaten.push(tile.getPiece());
                 tile.getPiece().setIsAlive(false);
-                if (pieceColor == PieceColor.BLACK) {
-                    board.getWhiteAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
-                } else if (pieceColor == PieceColor.WHITE) {
-                    board.getBlackAlivePieces().remove(tile.getPiece().getName() + pieceCounter);
-                }
                 player.getOpponentPlayer().addPieceToDead(tile.getPiece());
                 tile.setPiece(null);
             }
-            historyMoves.push(new Pair<Tile, Tile>(currentTile, tile));
+            historyMoves.push(tile);
             // change to selected tile
             currentTile = tile;
             // set the piece at selected tile
@@ -272,7 +264,7 @@ public class RookPiece implements Piece, Cloneable {
     @Override
     public void unmakeLastMove() {
         if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop().getFirst();
+        Tile previousTile = historyMoves.pop();
 
         if (piecesEaten.size() > 0) {
             if (piecesEaten.peek().getHistoryMoves().peek().equals(currentTile)) {
@@ -313,9 +305,9 @@ public class RookPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Pair<Tile, Tile> getLastMove() {
+    public Tile getLastMove() {
         if (historyMoves.size() == 0) return null;
-        return new Pair<Tile, Tile>(historyMoves.peek().getFirst(), currentTile);
+        return historyMoves.peek();
     }
 
     @Override

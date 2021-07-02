@@ -99,8 +99,6 @@ public class PawnPieceTest {
         PawnPiece pawn = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[6][4], 3);
         board.printBoard();
         pawn.refresh();
-        if (board.makeMove(player, pawn, board.getBoard()[7][4])) System.out.println("Moved!");
-        else System.out.println("Not Moved!");
         board.printBoard();
     }
 }

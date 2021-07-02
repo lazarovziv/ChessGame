@@ -116,7 +116,6 @@ public class KingPieceTest {
 
         PlayerController controller = new PlayerController();
         controller.setPlayer(player);
-        controller.kingSideCastle(kingPiece, rookPiece1);
         board.checkBoard(player);
         board.printBoard();
 
