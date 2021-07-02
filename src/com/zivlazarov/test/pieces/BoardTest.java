@@ -72,9 +72,7 @@ public class BoardTest {
     @Test
     public void testMakeMove() {
         board.printBoard();
-        board.makeMove(player, kingPiece, board.getBoard()[0][5]);
         board.printBoard();
-        board.makeMove(player, rookPiece1, opponentBishopPiece.getCurrentTile());
         board.printBoard();
     }
 

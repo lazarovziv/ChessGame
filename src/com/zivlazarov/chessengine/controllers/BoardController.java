@@ -4,6 +4,7 @@ import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.util.Stack;
@@ -32,10 +33,6 @@ public class BoardController {
         board.printBoardUpsideDown(tileChosen);
     }
 
-    public void movePiece(Player player, Piece piece, Tile tile) {
-        board.makeMove(player, piece, tile);
-    }
-
     public void checkBoard(Player currentPlayer) {
         board.checkBoard(currentPlayer);
     }
@@ -56,7 +53,15 @@ public class BoardController {
         board.setBlackPlayer(blackPlayer);
     }
 
-    public Stack<Pair<Piece, Pair<Tile, Tile>>> getGameHistoryMoves() {
+    public Stack<Pair<Piece, Tile>> getGameHistoryMoves() {
         return board.getGameHistoryMoves();
+    }
+
+    public void addObserver(MyObserver observer) {
+        board.addObserver(observer);
+    }
+
+    public void handleGameSituation(Player currentPlayer, int turn) {
+
     }
 }
