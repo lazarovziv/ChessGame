@@ -45,6 +45,8 @@ public class Player implements MyObserver, Serializable {
         if (playerColor == PieceColor.WHITE) {
             playerDirection = 1;
         } else playerDirection = -1;
+
+        board.addObserver(this);
     }
 
     public void refreshPieces() {
@@ -67,6 +69,9 @@ public class Player implements MyObserver, Serializable {
 
     public boolean movePiece(Piece piece, Tile targetTile) {
         if (!piece.getPossibleMoves().contains(targetTile)) return false;
+        if (!legalMoves.contains(targetTile)) return false;
+//        if (!piece.isAlive()) return false;
+
         Tile pieceTile = piece.getCurrentTile();
         clearTileFromPiece(pieceTile);
 
