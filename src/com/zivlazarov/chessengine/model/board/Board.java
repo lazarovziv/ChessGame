@@ -1,15 +1,14 @@
 package com.zivlazarov.chessengine.model.board;
 
-import com.zivlazarov.chessengine.controllers.PlayerController;
-import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.Memento;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 // make as Singleton (?)
 public class Board implements MyObservable, Serializable {
@@ -28,43 +27,30 @@ public class Board implements MyObservable, Serializable {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
-    private final Map<String, Piece> blackAlivePieces;
-    private final Map<String, Piece> whiteAlivePieces;
     private final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
     private final Map<PieceColor, GameSituation> checkmateSituations = new HashMap<>();
     private Tile[][] board;
-    private transient Player whitePlayer;
-    private transient Player blackPlayer;
+
+    private Player whitePlayer;
+    private Player blackPlayer;
+
     private GameSituation gameSituation;
     private List<MyObserver> observers;
 
-    private final Stack<Pair<Piece, Pair<Tile, Tile>>> gameHistoryMoves;
+    private final Stack<Pair<Piece, Tile>> gameHistoryMoves;
 
     private boolean changedState;
-    
-    private final Stack<Board> states;
 
-    public static Board getInstance() {
-        if (instance == null) {
-            synchronized (Board.class) {
-                if (instance == null) {
-                    instance = new Board();
-                }
-            }
-        }
-        return instance;
-    }
+    private final Stack<Board> states;
 
     private Board() {
         board = new Tile[8][8];
-        blackAlivePieces = new HashMap<>();
-        whiteAlivePieces = new HashMap<>();
 
         observers = new ArrayList<>();
-        
-        states = new Stack();
 
         gameHistoryMoves = new Stack<>();
+
+        states = new Stack<>();
 
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
@@ -80,24 +66,22 @@ public class Board implements MyObservable, Serializable {
             }
         }
         gameSituation = GameSituation.NORMAL;
-        
-        states.push(this);
     }
 
-    public void refreshPiecesOfPlayer(Player player) {
-        player.getLegalMoves().clear();
-        player.getPiecesCanMove().clear();
-        for (Piece piece : player.getAlivePieces()) {
-            piece.refresh();
-            player.getLegalMoves().addAll(piece.getPossibleMoves());
-            if (piece.canMove()) player.getPiecesCanMove().add(piece);
+    public static Board getInstance() {
+        if (instance == null) {
+            synchronized (Board.class) {
+                if (instance == null) {
+                    instance = new Board();
+                }
+            }
         }
+        return instance;
     }
 
     public void checkBoard(Player currentPlayer) {
         // resetting tiles threatened state before every check
         resetThreatsOnTiles();
-
         // update all observers
         updateObservers();
         // for each player's legal move's target piece, that piece is in danger of being eaten
@@ -107,140 +91,86 @@ public class Board implements MyObservable, Serializable {
         if (currentPlayer.isInCheck()) {
             // reset all legal moves before proceeding to generation of legal moves in check situation
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
-            generateLegalMovesWhenInCheck(currentPlayer);
+            generateLegalMovesWhenInCheck(currentPlayer, currentPlayer.getOpponentPlayer());
+            return;
         } else {
-            gameSituation = GameSituation.NORMAL;
+            if (gameSituation == GameSituation.NORMAL) {
+                return;
+            } // TODO: add stalemate and draw situations here
         }
+        gameSituation = GameSituation.NORMAL;
     }
 
-    public void generateLegalMovesWhenInCheck(Player currentPlayer) {
+    public void generateLegalMovesWhenInCheck(Player currentPlayer, Player opponentPlayer) {
         List<Tile> pseudoLegalMoves = currentPlayer.getLegalMoves();
-        List<Pair<Piece, Tile>> actualLegalMoves = new ArrayList<>();
+        List<Tile> actualLegalMoves = new ArrayList<>();
+
+        // saving players' states
+        Memento<Board> boardMemento = saveToMemento();
+        currentPlayer.saveState();
+        opponentPlayer.saveState();
 
         for (Piece piece : currentPlayer.getAlivePieces()) {
-            saveState();
             synchronized (piece) {
-                for (Tile tile : pseudoLegalMoves.stream().filter(
-                        tile -> piece.getPossibleMoves().contains(tile)).collect(Collectors.toList())) {
-                    if (!makeMove(currentPlayer, piece, tile)) {
-                        setChanged();
-                        updateObservers();
-                        clearChanged();
+                for (Tile tile : new ArrayList<>(pseudoLegalMoves)) {
+                    boolean successfulMove = currentPlayer.movePiece(piece, tile);
+                    if (!successfulMove) {
                         continue;
+                    } else {
+                        updateObservers();
                     }
-                    if (!currentPlayer.isInCheck()) {
-                        actualLegalMoves.add(new Pair<>(piece, tile));
-                    }
-//                    unmakeLastMove(piece);
-                    board = loadState().getBoard();
+                    // if the move broke the check, it's legal
+                    if (!currentPlayer.isInCheck()) actualLegalMoves.add(tile);
+
+                    restoreFromMemento(boardMemento);
+                    currentPlayer = currentPlayer.loadState();
+                    opponentPlayer = currentPlayer.getOpponentPlayer().loadState();
                 }
             }
         }
-        if (actualLegalMoves.size() == 0) gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
+
+        if (actualLegalMoves.size() == 0) {
+            gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
+            return;
+        }
         currentPlayer.getLegalMoves().clear();
-        for (Pair<Piece, Tile> pair : actualLegalMoves) {
-            currentPlayer.getLegalMovesForPiece().add(pair);
-        }
+        currentPlayer.getLegalMoves().addAll(actualLegalMoves);
+
+//        for (Piece piece : currentPlayer.getAlivePieces()) {
+//            synchronized (piece) {
+//                for (Tile tile : pseudoLegalMoves.stream().filter(
+//                        t -> piece.getPossibleMoves().contains(t)).collect(Collectors.toList())) {
+//                    if (currentPlayer.movePiece(piece, tile)) {
+//                        setChanged();
+//                        updateObserver(currentPlayer.getOpponentPlayer());
+//                        clearChanged();
+//                    } else continue;
+//                    if (!currentPlayer.isInCheck()) {
+//                        actualLegalMoves.add(tile);
+//                    }
+////                    unmakeLastMove(piece);
+//                    instance = loadState();
+//                    currentPlayer = currentPlayer.loadState();
+//                    currentPlayer.setOpponentPlayer(currentPlayer.getOpponentPlayer().loadState());
+//                }
+//            }
+//        }
+//        // after checking all possible moves, if none is "helping" it means checkmate
+//        if (actualLegalMoves.size() == 0) {
+//            gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
+//            return;
+//        }
+//        currentPlayer.getLegalMoves().clear();
+//        for (Tile tile : actualLegalMoves) {
+//            currentPlayer.getLegalMoves().add(tile);
+//        }
         // checking if any of current piece's tiles to move to contains player's legal moves
-    }
-
-    // save board state before making the move for being able to restore it later on!
-    public boolean makeMove(Player player, Piece piece, Tile tile) {
-        if (piece.isAlive()) return false;
-        if (!player.getPiecesCanMove().contains(piece)) return false;
-        if (piece.getPossibleMoves().contains(tile)) {
-            piece.getCurrentTile().setPiece(null);
-            if (!tile.isEmpty() && tile.getPiece().getPieceColor() != piece.getPieceColor()) {
-                player.getOpponentPlayer().addPieceToDead(tile.getPiece());
-            }
-        } else return false;
-
-        // pawn logic for en passant
-        if (piece instanceof PawnPiece) {
-            if (((PawnPiece) piece).getEnPassantTile() != null) {
-                if (tile.equals(((PawnPiece) piece).getEnPassantTile())) {
-                    player.getOpponentPlayer().addPieceToDead(
-                            board[((PawnPiece)piece).getEnPassantTile().getRow()-player.getPlayerDirection()]
-                                    [((PawnPiece)piece).getEnPassantTile().getCol()]
-                                    .getPiece());
-                }
-            }
-            ((PawnPiece) piece).setHasMoved(true);
-            if (piece.getCurrentTile().getRow() == player.getPlayerDirection() * (board.length - 1)) {
-                // setting it as dead and adding it to deadPieces list
-                piece.setIsAlive(false);
-                player.addPieceToDead(piece);
-                Tile targetTile = piece.getCurrentTile();
-                Piece convertedPiece = null;
-                // clearing piece from it's tile to set a new piece
-                targetTile.setPiece(null);
-
-                char chosenPiece = PlayerController.receivePawnPromotionChoice();
-
-                switch (chosenPiece) {
-                    case 'q' -> convertedPiece = new QueenPiece(player, this, player.getPlayerColor(), targetTile);
-                    case 'b' -> convertedPiece = new BishopPiece(player, this, player.getPlayerColor(), targetTile, player.getNumOfBishops() + 1);
-                    case 'n' -> convertedPiece = new KnightPiece(player, this, player.getPlayerColor(), targetTile, player.getNumOfKnights() + 1);
-                    case 'r' -> convertedPiece = new RookPiece(player, this, player.getPlayerColor(), targetTile, false, player.getNumOfRooks() + 1);
-
-                }
-                if (convertedPiece != null) player.addPieceToAlive(convertedPiece);
-            }
-        }
-
-        // king logic for castling
-        if (piece instanceof KingPiece) {
-            if (!piece.hasMoved() && tile.equals(((KingPiece) piece).getKingSideCastleTile())
-            && getKingSideRookPiece(player) != null
-            && !getKingSideRookPiece(player).hasMoved()) {
-//                player.kingSideCastle((KingPiece) piece, (RookPiece) ((KingPiece) piece).getKingSideCastleTile().getPiece());
-                // logging rook move
-                RookPiece kingSideRookPiece = getKingSideRookPiece(player);
-                kingSideRookPiece.getHistoryMoves().push(new Pair<Tile, Tile>(
-                        kingSideRookPiece.getCurrentTile(),
-                        kingSideRookPiece.getKingSideCastlingTile()));
-                // setting rook tile to it's king side castling tile
-                kingSideRookPiece.getCurrentTile().setPiece(null);
-                kingSideRookPiece.setCurrentTile(kingSideRookPiece.getKingSideCastlingTile());
-                kingSideRookPiece.setHasMoved(true);
-                // adding castling to game history moves
-                gameHistoryMoves.push(new Pair<>(kingSideRookPiece, kingSideRookPiece.getLastMove()));
-
-            } else if (!piece.hasMoved() && tile.equals(((KingPiece) piece).getQueenSideCastleTile())
-                    && getQueenSideRookPiece(player) != null
-                    && !getQueenSideRookPiece(player).hasMoved()) {
-//                player.queenSideCastle((KingPiece) piece, (RookPiece) ((KingPiece) piece).getQueenSideCastleTile().getPiece());
-                // logging rook move
-                RookPiece queenSideRookPiece = getQueenSideRookPiece(player);
-                queenSideRookPiece.getHistoryMoves().push(new Pair<>(
-                                queenSideRookPiece.getCurrentTile(),
-                        queenSideRookPiece.getQueenSideCastlingTile()));
-                // setting rook tile to it's queen side castling tile
-                queenSideRookPiece.getCurrentTile().setPiece(null);
-                queenSideRookPiece.setCurrentTile(queenSideRookPiece.getQueenSideCastlingTile());
-                queenSideRookPiece.setHasMoved(true);
-                // adding castling to game history moves
-                gameHistoryMoves.push(new Pair<>(queenSideRookPiece, queenSideRookPiece.getLastMove()));
-            }
-            ((KingPiece) piece).setHasMoved(true);
-            // letting the chosen piece (king) to update it's location on board and everything else
-        }
-
-        piece.getHistoryMoves().push(new Pair<Tile, Tile>(piece.getCurrentTile(), tile));
-        piece.setCurrentTile(tile);
-//        historyMoves.push(new Pair<Piece, Pair<Tile, Tile>>(piece, new Pair<Tile, Tile>(piece.getCurrentTile(), tile)));
-        gameHistoryMoves.push(new Pair<>(piece, piece.getLastMove()));
-        states.push(this);
-        setChanged();
-        updateObservers();
-        clearChanged();
-        return true;
     }
 
     public void unmakeLastMove(Piece piece) {
         if (gameHistoryMoves.size() == 0) return;
         if (!gameHistoryMoves.lastElement().getFirst().equals(piece)) return;
-        Tile previousTile = gameHistoryMoves.lastElement().getSecond().getFirst();
+        Tile previousTile = gameHistoryMoves.lastElement().getSecond();
 //        piece.getHistoryMoves().remove(previousTile);
 
         if (piece.getLastPieceEaten() != null) {
@@ -258,11 +188,6 @@ public class Board implements MyObservable, Serializable {
         setChanged();
         updateObservers();
         clearChanged();
-    }
-    
-    public void unmakeMove() {
-        states.pop();
-        
     }
 
     public void resetThreatsOnTiles() {
@@ -408,14 +333,6 @@ public class Board implements MyObservable, Serializable {
         return board;
     }
 
-    public Map<String, Piece> getBlackAlivePieces() {
-        return blackAlivePieces;
-    }
-
-    public Map<String, Piece> getWhiteAlivePieces() {
-        return whiteAlivePieces;
-    }
-
     public GameSituation getGameSituation() {
         return gameSituation;
     }
@@ -432,26 +349,8 @@ public class Board implements MyObservable, Serializable {
         this.blackPlayer = blackPlayer;
     }
 
-    public Stack<Pair<Piece, Pair<Tile, Tile>>> getGameHistoryMoves() {
+    public Stack<Pair<Piece, Tile>> getGameHistoryMoves() {
         return gameHistoryMoves;
-    }
-
-    public RookPiece getKingSideRookPiece(Player player) {
-        for (Piece piece : player.getAlivePieces()) {
-            if (piece instanceof RookPiece) {
-                if (((RookPiece) piece).isKingSide()) return (RookPiece) piece;
-            }
-        }
-        return null;
-    }
-
-    public RookPiece getQueenSideRookPiece(Player player) {
-        for (Piece piece : player.getAlivePieces()) {
-            if (piece instanceof RookPiece) {
-                if (((RookPiece) piece).isQueenSide()) return (RookPiece) piece;
-            }
-        }
-        return null;
     }
 
     @Override
@@ -486,11 +385,25 @@ public class Board implements MyObservable, Serializable {
         return loadedBoard;
     }
 
+    public Memento<Board> saveToMemento() {
+        return new Memento<>(instance);
+    }
+
+    public void restoreFromMemento(Memento memento) {
+        instance = saveToMemento().getSavedState();
+    }
+
     @Override
     public void updateObservers() {
         for (MyObserver observer : observers) {
             observer.update();
         }
+        states.add(this);
+    }
+
+    @Override
+    public void updateObserver(MyObserver observer) {
+        observer.update();
     }
 
     @Override
