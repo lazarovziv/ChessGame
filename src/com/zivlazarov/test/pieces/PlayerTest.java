@@ -2,6 +2,7 @@ package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.pieces.BishopPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,6 +12,7 @@ public class PlayerTest {
 
     private static Board board;
     private static PawnPiece pawnPiece;
+    private static BishopPiece bishopPiece;
     private static Player player;
     private static Player opponent;
 
@@ -22,6 +24,7 @@ public class PlayerTest {
         player.setOpponentPlayer(opponent);
         opponent.setOpponentPlayer(player);
         pawnPiece = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[0][3], 0);
+        bishopPiece = new BishopPiece(player, board, player.getPlayerColor(), board.getBoard()[1][0], 0);
     }
 
     @Test
@@ -29,5 +32,7 @@ public class PlayerTest {
         board.printBoard();
         pawnPiece.refresh();
         if (player.movePiece(pawnPiece, board.getBoard()[1][3])) board.printBoard();
+        bishopPiece.refresh();
+        if (player.movePiece(bishopPiece, board.getBoard()[7][6])) board.printBoard();
     }
 }
