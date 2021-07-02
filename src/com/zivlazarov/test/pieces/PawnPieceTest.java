@@ -32,11 +32,11 @@ public class PawnPieceTest {
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
         opponent.setOpponentPlayer(player);
+        KingPiece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[7][4]);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[3][0], 0);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][0], 0);
-        for (Piece piece : player.getAlivePieces()) piece.refresh();
-        for (Piece piece : opponent.getAlivePieces()) piece.refresh();
+        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][1], 0);
+        board.checkBoard(player);
     }
 
     @Test
@@ -100,5 +100,11 @@ public class PawnPieceTest {
         board.printBoard();
         pawn.refresh();
         board.printBoard();
+    }
+
+    @Test
+    public void testFirstMove() {
+        board.printBoard();
+        for (Tile tile : pawnPiece.getPossibleMoves()) System.out.println(tile);
     }
 }

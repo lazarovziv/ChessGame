@@ -1,5 +1,6 @@
 package com.zivlazarov.test.pieces;
 
+import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
@@ -30,8 +31,8 @@ public class BoardTest {
         opponent.setOpponentPlayer(player);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
-        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], true, 0);
-        rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], false, 1);
+        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], false, 0);
+        rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], true, 1);
         kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][4]);
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[3][4], 0);
@@ -70,18 +71,25 @@ public class BoardTest {
     }
 
     @Test
-    public void testMakeMove() {
-        board.printBoard();
-        board.printBoard();
-        board.printBoard();
-    }
-
-    @Test
     public void testCheckSituation() {
         board.printBoard();
         board.checkBoard(player);
         for (Piece piece : player.getAlivePieces()) {
             if (piece.getPiecesUnderThreat().contains(opponentBishopPiece)) System.out.println("Threat!");
         }
+    }
+
+    @Test
+    public void testSaveAndLoadState() {
+        board.printBoard();
+        board.saveState();
+        for (Tile tile : rookPiece.getPossibleMoves()) {
+            player.movePiece(rookPiece, tile);
+            break;
+        }
+        board.printBoard();
+
+        Board loadedBoard = board.loadState();
+        loadedBoard.printBoard();
     }
 }
