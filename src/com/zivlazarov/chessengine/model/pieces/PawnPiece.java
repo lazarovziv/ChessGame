@@ -82,7 +82,7 @@ public class PawnPiece implements Piece, Cloneable {
 
         boolean canMoveFurther = !hasMoved;
 
-        int direction = map.get(pieceColor);
+        int direction = player.getPlayerDirection();
         int longDirection = direction * 2;
 
         if (x + map.get(pieceColor) > board.getBoard().length - 1 || x + map.get(pieceColor) < 0) return;

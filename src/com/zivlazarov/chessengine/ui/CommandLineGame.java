@@ -45,8 +45,8 @@ public class CommandLineGame {
 
         boardController = new BoardController(board);
 
-        boardController.addObserver(whitePlayer);
-        boardController.addObserver(blackPlayer);
+//        boardController.addObserver(whitePlayer);
+//        boardController.addObserver(blackPlayer);
 
         boolean gameStarted = false;
 
@@ -186,10 +186,10 @@ public class CommandLineGame {
 
             // incrementing the turn
             turn++;
-            System.out.println();
-            System.out.println(
-                    board.getGameHistoryMoves().lastElement().getFirst().getName()
-                            + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
+//            System.out.println();
+//            System.out.println(
+//                    board.getGameHistoryMoves().lastElement().getFirst().getName()
+//                            + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
             System.out.println();
         }
     }
