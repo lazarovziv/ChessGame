@@ -1,6 +1,7 @@
 package com.zivlazarov.chessengine.model.utils;
 
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 
 import java.io.Serializable;
 
@@ -37,7 +38,10 @@ public class Pair<T, V> implements Serializable {
         } else return "!!!";
     }
 
-    public boolean equals(Pair<Tile, Tile> pair) {
+    public boolean equals(Pair pair) {
         return pair.getFirst().equals(first) && pair.getSecond().equals(second);
     }
+//    public boolean equals(Pair<Piece, Tile> pair) {
+//        return pair.getFirst().equals(first) && pair.getSecond().equals(second);
+//    }
 }
