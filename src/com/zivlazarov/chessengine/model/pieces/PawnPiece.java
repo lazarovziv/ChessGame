@@ -5,7 +5,9 @@ import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
+import javafx.scene.image.ImageView;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,7 @@ public class PawnPiece implements Piece, Cloneable {
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
+    private Tile lastTile;
     private Stack<Piece> piecesEaten;
     private final Board board;
     private Player player;
@@ -31,7 +34,7 @@ public class PawnPiece implements Piece, Cloneable {
     private boolean hasMoved = false;
 
     private Tile enPassantTile;
-//    private ImageView imageIcon;
+    private Icon imageIcon;
 
     public PawnPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
@@ -45,6 +48,8 @@ public class PawnPiece implements Piece, Cloneable {
         piecesEaten = new Stack<>();
 
         currentTile = initTile;
+        lastTile = currentTile;
+
         this.pieceCounter = pieceCounter;
 
         if (pieceColor == PieceColor.BLACK) {
@@ -65,6 +70,9 @@ public class PawnPiece implements Piece, Cloneable {
     public void refresh() {
         if (possibleMoves.size() != 0) {
             possibleMoves.clear();
+        }
+        if (piecesUnderThreat.size() != 0) {
+            piecesUnderThreat.clear();
         }
         generateMoves();
     }
@@ -105,7 +113,7 @@ public class PawnPiece implements Piece, Cloneable {
             }
             // insert en passant
             if (canEnPassant(d)) {
-                possibleMoves.add(board.getBoard()[x+direction][y+d]);
+                possibleMoves.add(enPassantTile);
                 // setting the adjacent pawn piece as under threat
                 // only move in chess where piece can be eaten without moving to it's tile
                 piecesUnderThreat.add(board.getBoard()[x][y+d].getPiece());
@@ -119,18 +127,23 @@ public class PawnPiece implements Piece, Cloneable {
         int x = currentTile.getRow();
         int y = currentTile.getCol();
 
+        // checking borders of board
         if (y + eatingDirection < 0 || y + eatingDirection > board.getBoard().length - 1
         || x - 2 * player.getOpponentPlayer().getPlayerDirection() < 0) return false;
+
         // checking if piece next to pawn is of type pawn and is opponent's piece
         if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece &&
                 board.getBoard()[x][y + eatingDirection].getPiece().getPieceColor() != pieceColor) {
             PawnPiece pawn = (PawnPiece) board.getBoard()[x][y + eatingDirection].getPiece();
             // checking to see if opponent's last move is pawn's move 2 tiles forward
-            if (board.getGameHistoryMoves().lastElement().getSecond().equals(new Pair<>(
-                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
+            if (board.getGameHistoryMoves().lastElement()/*.getSecond()*/.equals(new Pair<>(
+//                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
+                    pawn,
                     pawn.getCurrentTile()))) {
-                enPassantTile = board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection];
-                return enPassantTile.isEmpty();
+                if (board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection].isEmpty()) {
+                    enPassantTile = board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection];
+                    return true;
+                }
             }
         }
         return false;
@@ -350,5 +363,30 @@ public class PawnPiece implements Piece, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 (name + pieceCounter).equals(piece.getName() + pieceCounter);
+    }
+
+    @Override
+    public Stack<Piece> getPiecesEaten() {
+        return piecesEaten;
+    }
+
+    @Override
+    public Tile getLastTile() {
+        return lastTile;
+    }
+
+    @Override
+    public void setLastTile(Tile lastTile) {
+        this.lastTile = lastTile;
+    }
+
+    @Override
+    public Icon getImageIcon() {
+        return imageIcon;
+    }
+
+    @Override
+    public void setImageIcon(Icon imageIcon) {
+        this.imageIcon = imageIcon;
     }
 }

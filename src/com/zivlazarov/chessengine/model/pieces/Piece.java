@@ -2,14 +2,15 @@ package com.zivlazarov.chessengine.model.pieces;
 
 //import javafx.scene.image.ImageView;
 
-import com.zivlazarov.chessengine.model.player.Player;
-import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.Pair;
+import javafx.scene.image.ImageView;
 
+import javax.swing.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 public interface Piece extends Cloneable, Serializable {
@@ -34,6 +35,9 @@ public interface Piece extends Cloneable, Serializable {
     ArrayList<Piece> getPiecesUnderThreat();
     Player getPlayer();
     String getImageName();
+
+    Tile getLastTile();
+
     boolean canMove();
 
     void setName(String name);
@@ -41,13 +45,19 @@ public interface Piece extends Cloneable, Serializable {
     void setIsInDanger(boolean isInDanger);
     void setPieceColor(PieceColor pieceColor);
     void setCurrentTile(Tile tile);
-//    void setImageIcon(ImageView imageView);
+
+    void setLastTile(Tile tile);
+
+    Icon getImageIcon();
+    void setImageIcon(Icon imageView);
 
     void moveToTile(Tile tile);
 
     void unmakeLastMove();
 
     Piece getLastPieceEaten();
+
+    Stack<Piece> getPiecesEaten();
 
     void generateMoves();
 

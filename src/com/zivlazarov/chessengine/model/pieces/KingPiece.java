@@ -1,11 +1,12 @@
 package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
+import javafx.scene.image.ImageView;
 //import javafx.scene.image.ImageView;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -18,6 +19,7 @@ public class KingPiece implements Piece, Cloneable {
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
+    private Tile lastTile;
     private Stack<Piece> piecesEaten;
     private final Board board;
     private String name;
@@ -27,7 +29,7 @@ public class KingPiece implements Piece, Cloneable {
     private Tile currentTile;
     private PieceColor pieceColor;
     private String imageName;
-//    private ImageView imageIcon;
+    private Icon imageIcon;
 
     private Tile kingSideCastleTile;
     private Tile queenSideCastleTile;
@@ -46,6 +48,8 @@ public class KingPiece implements Piece, Cloneable {
         hasMoved = false;
 
         currentTile = initTile;
+        lastTile = currentTile;
+
         if (pieceColor == PieceColor.BLACK) {
             name = "bK";
             imageName = "blackKing.png";
@@ -68,6 +72,9 @@ public class KingPiece implements Piece, Cloneable {
     public void refresh() {
         if (possibleMoves.size() != 0) {
             possibleMoves.clear();
+        }
+        if (piecesUnderThreat.size() != 0) {
+            piecesUnderThreat.clear();
         }
         generateMoves();
     }
@@ -387,5 +394,30 @@ public class KingPiece implements Piece, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 name.equals(piece.getName());
+    }
+
+    @Override
+    public Stack<Piece> getPiecesEaten() {
+        return piecesEaten;
+    }
+
+    @Override
+    public Tile getLastTile() {
+        return lastTile;
+    }
+
+    @Override
+    public void setLastTile(Tile lastTile) {
+        this.lastTile = lastTile;
+    }
+
+    @Override
+    public Icon getImageIcon() {
+        return imageIcon;
+    }
+
+    @Override
+    public void setImageIcon(Icon imageIcon) {
+        this.imageIcon = imageIcon;
     }
 }

@@ -1,11 +1,12 @@
 package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
+import javafx.scene.image.ImageView;
 //import javafx.scene.image.ImageView;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -18,6 +19,7 @@ public class RookPiece implements Piece, Cloneable {
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
+    private Tile lastTile;
     private final Stack<Piece> piecesEaten;
     private final Board board;
     private String name;
@@ -33,7 +35,7 @@ public class RookPiece implements Piece, Cloneable {
     private Tile queenSideCastlingTile = null;
     private final boolean isKingSide;
     private final boolean isQueenSide;
-//    private ImageView imageIcon;
+    private Icon imageIcon;
 
     public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean isKingSide, int pieceCounter) {
         this.player = player;
@@ -49,6 +51,8 @@ public class RookPiece implements Piece, Cloneable {
         hasMoved = false;
 
         currentTile = initTile;
+        lastTile = currentTile;
+
         this.pieceCounter = pieceCounter;
         this.isKingSide = isKingSide;
         this.isQueenSide = !isKingSide;
@@ -79,6 +83,9 @@ public class RookPiece implements Piece, Cloneable {
     public void refresh() {
         if (possibleMoves.size() != 0) {
             possibleMoves.clear();
+        }
+        if (piecesUnderThreat.size() != 0) {
+            piecesUnderThreat.clear();
         }
         generateMoves();
     }
@@ -320,5 +327,30 @@ public class RookPiece implements Piece, Cloneable {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
                 (name + pieceCounter).equals(piece.getName() + pieceCounter);
+    }
+
+    @Override
+    public Stack<Piece> getPiecesEaten() {
+        return piecesEaten;
+    }
+
+    @Override
+    public Tile getLastTile() {
+        return lastTile;
+    }
+
+    @Override
+    public void setLastTile(Tile lastTile) {
+        this.lastTile = lastTile;
+    }
+
+    @Override
+    public Icon getImageIcon() {
+        return imageIcon;
+    }
+
+    @Override
+    public void setImageIcon(Icon imageIcon) {
+        this.imageIcon = imageIcon;
     }
 }
