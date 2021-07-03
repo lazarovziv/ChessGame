@@ -1,10 +1,15 @@
 package com.zivlazarov.chessengine.model.move;
 
+import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 
 public class Move {
+
+    private final Board board;
 
     private final Player player;
 
@@ -14,9 +19,10 @@ public class Move {
     private final Tile currentTile;
     private final Tile targetTile;
 
-    private final MoveLabel moveLabel;
+    private MoveLabel moveLabel;
 
-    private Move(Player player, Piece movingPiece, Piece eatenPiece, Tile currentTile, Tile targetTile, MoveLabel moveLabel) {
+    private Move(Board board, Player player, Piece movingPiece, Piece eatenPiece, Tile currentTile, Tile targetTile, MoveLabel moveLabel) {
+        this.board = board;
         this.player = player;
         this.movingPiece = movingPiece;
         this.eatenPiece = eatenPiece;
@@ -26,7 +32,20 @@ public class Move {
     }
 
     public void makeMove() {
+        if (!movingPiece.canMove()) return;
 
+        boolean isCapturing = !targetTile.isEmpty();
+        boolean isEnPassant = movingPiece instanceof PawnPiece && targetTile.equals(((PawnPiece) movingPiece).getEnPassantTile());
+        boolean isKingCastling = movingPiece instanceof KingPiece && targetTile.equals(((KingPiece) movingPiece).getKingSideCastleTile());
+        boolean isQueenCastling = movingPiece instanceof KingPiece && targetTile.equals(((KingPiece) movingPiece).getQueenSideCastleTile());
+
+        if (isEnPassant) moveLabel = MoveLabel.EN_PASSANT;
+        if (isKingCastling) moveLabel = MoveLabel.KING_SIDE_CASTLING;
+        if (isQueenCastling) moveLabel = MoveLabel.QUEEN_SIDE_CASTLING;
+
+        if (isCapturing) {
+            player.getOpponentPlayer().addPieceToDead(targetTile.getPiece());
+        }
     }
 
     public Player getPlayer() {
@@ -55,6 +74,8 @@ public class Move {
 
     public static class Builder {
 
+        private Board board;
+
         private Player player;
 
         private Piece movingPiece;
@@ -66,6 +87,11 @@ public class Move {
         private MoveLabel moveLabel;
 
         public Builder() {}
+
+        public Builder board(Board board) {
+            this.board = board;
+            return this;
+        }
 
         public Builder player(Player player) {
             this.player = player;
@@ -98,7 +124,7 @@ public class Move {
         }
 
         public Move build() {
-            return new Move(player, movingPiece, eatenPiece, currentTile, targetTile, moveLabel);
+            return new Move(board, player, movingPiece, eatenPiece, currentTile, targetTile, moveLabel);
         }
     }
 }

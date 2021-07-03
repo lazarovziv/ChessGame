@@ -74,6 +74,7 @@ public class CommandLineGame {
         // initializing all pieces
         initPieces(whitePlayer, blackPlayer);
 
+        // game loop
         while (gameStarted) {
 
             if (turn % 2 == 0) {
@@ -88,6 +89,7 @@ public class CommandLineGame {
                 board.printBoardUpsideDown();
             } else board.printBoard();
 
+            // checking the board to see what situation the current player is in
             boardController.checkBoard(currentPlayer);
 
             // showing current board situation and exiting program if it's checkmate
@@ -125,12 +127,19 @@ public class CommandLineGame {
                 pieceTile = board.getBoard()[pieceRowChosen-1][pieceColChosen-1];
 
                 if (pieceTile.isEmpty()) System.out.println("This tile is empty!");
-                if (!pieceTile.getPiece().canMove()) System.out.println("This piece can't move!");
-                if (pieceTile.getPiece().getPieceColor() != currentPlayer.getPlayerColor())
+                else if (!pieceTile.getPiece().canMove()) System.out.println("This piece can't move!");
+                else if (pieceTile.getPiece().getPieceColor() != currentPlayer.getPlayerColor())
                     System.out.println("Please choose a " + currentPlayer.getPlayerColor() + " piece.");
+//                else if (currentPlayer.isInCheck()) {
+//                    Player finalCurrentPlayer = currentPlayer;
+//                    if (!pieceTile.getPiece().getPossibleMoves().stream().anyMatch(tile -> finalCurrentPlayer.getLegalMoves().contains(tile))) {
+//                        System.out.println();
+//                    }
+//                }
 
             } while (pieceRowChosen < 1 || pieceRowChosen > 8 || pieceColChosen < 1 || pieceColChosen > 8
-                    || pieceTile.isEmpty() || !pieceTile.getPiece().canMove());
+                    || pieceTile.isEmpty() || !pieceTile.getPiece().canMove()
+                    || pieceTile.getPiece().getPieceColor() != currentPlayer.getPlayerColor());
 
             Piece pieceChosen = pieceTile.getPiece();
 
@@ -184,12 +193,21 @@ public class CommandLineGame {
 
             currentPlayer.movePiece(pieceChosen, targetTile);
 
+//            Move move = new Move.Builder()
+//                    .board(board)
+//                    .player(currentPlayer)
+//                    .movingPiece(pieceChosen)
+//                    .targetTile(targetTile)
+//                    .build();
+//
+//            move.makeMove();
+
             // incrementing the turn
             turn++;
-//            System.out.println();
-//            System.out.println(
-//                    board.getGameHistoryMoves().lastElement().getFirst().getName()
-//                            + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
+            System.out.println();
+            System.out.println(
+                    board.getGameHistoryMoves().lastElement().getFirst().getName()
+                            + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
             System.out.println();
         }
     }

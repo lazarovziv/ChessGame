@@ -5,6 +5,7 @@ import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.Memento;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -73,10 +74,13 @@ public class BoardTest {
     @Test
     public void testCheckSituation() {
         board.printBoard();
-        board.checkBoard(player);
-        for (Piece piece : player.getAlivePieces()) {
-            if (piece.getPiecesUnderThreat().contains(opponentBishopPiece)) System.out.println("Threat!");
-        }
+        if (player.isInCheck()) System.out.println("Check!");
+        else System.out.println("Normal");
+        player.movePiece(kingPiece, board.getBoard()[0][3]);
+        board.printBoard();
+        board.checkBoard(opponent);
+        if (player.isInCheck()) System.out.println("Check!");
+        else System.out.println("Normal");
     }
 
     @Test
@@ -91,5 +95,17 @@ public class BoardTest {
 
         Board loadedBoard = board.loadState();
         loadedBoard.printBoard();
+    }
+
+    @Test
+    public void testMemento() {
+        board.printBoard();
+        Memento<Board> boardMemento = board.saveToMemento();
+        Memento<Player> playerMemento = player.saveToMemento();
+        player.movePiece(kingPiece, board.getBoard()[0][3]);
+        board.printBoard();
+        board.restoreFromMemento(boardMemento);
+        board.printBoard();
+
     }
 }

@@ -3,7 +3,9 @@ package com.zivlazarov.chessengine.model.board;
 //import javafx.scene.image.ImageView;
 
 import com.zivlazarov.chessengine.model.pieces.Piece;
+import javafx.scene.image.ImageView;
 
+import javax.swing.*;
 import java.io.Serializable;
 
 public class Tile implements Serializable {
@@ -15,8 +17,10 @@ public class Tile implements Serializable {
 	private final TileColor tileColor;
 	private boolean isThreatenedByWhite;
 	private boolean isThreatenedByBlack;
-//	private ImageView tileImageView;
-//	private ImageView pieceImageView;
+	private ImageView tileImageView;
+	private ImageView pieceImageView;
+	private JLabel label;
+	private JButton button;
 
 	public Tile(int row, int col, TileColor tc) {
 		this.row = row;
@@ -98,6 +102,22 @@ public class Tile implements Serializable {
 		}
 	}
 
+	public ImageView getTileImageView() {
+		return tileImageView;
+	}
+
+	public void setTileImageView(ImageView tileImageView) {
+		this.tileImageView = tileImageView;
+	}
+
+	public ImageView getPieceImageView() {
+		return pieceImageView;
+	}
+
+	public void setPieceImageView(ImageView pieceImageView) {
+		this.pieceImageView = pieceImageView;
+	}
+
 	public boolean equals(Tile tile) {
 		return row == tile.getRow() && col == tile.getCol();
 	}
@@ -105,5 +125,22 @@ public class Tile implements Serializable {
 	@Override
 	public String toString() {
 		return "[" + (row+1) + ", " + (col+1) + "]";
+	}
+
+	public JLabel getLabel() {
+		return label;
+	}
+
+	public void setLabel(JLabel label) {
+		this.label = label;
+	}
+
+
+	public JButton getButton() {
+		return button;
+	}
+
+	public void setButton(JButton button) {
+		this.button = button;
 	}
 }

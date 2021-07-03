@@ -16,6 +16,7 @@ public class PlayerTest {
     private static PawnPiece pawnPiece;
     private static BishopPiece bishopPiece;
     private static KingPiece opponentKingPiece;
+    private static PawnPiece opponentPawnPiece;
     private static Player player;
     private static Player opponent;
 
@@ -26,9 +27,10 @@ public class PlayerTest {
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
         opponent.setOpponentPlayer(player);
-        pawnPiece = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[0][3], 0);
+        pawnPiece = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[5][3], 0);
         bishopPiece = new BishopPiece(player, board, player.getPlayerColor(), board.getBoard()[1][0], 0);
         opponentKingPiece = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][4]);
+        opponentPawnPiece = new PawnPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[6][2], 0);
         board.checkBoard(player);
     }
 
@@ -68,6 +70,18 @@ public class PlayerTest {
         System.out.println("Loaded opponent pieces: ");
         for (Piece piece : loadedOpponent.getAlivePieces()) {
             System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+        }
+    }
+
+    @Test
+    public void testUndoMove() {
+        board.printBoard();
+        pawnPiece.getPossibleMoves().forEach(System.out::println);
+        if (player.movePiece(pawnPiece, board.getBoard()[6][2])) {
+            board.checkBoard(player);
+            board.printBoard();
+            player.undoLastMove();
+            board.printBoard();
         }
     }
 }
