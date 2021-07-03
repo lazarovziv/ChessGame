@@ -91,7 +91,7 @@ public class Board implements MyObservable, Serializable {
         if (currentPlayer.isInCheck()) {
             // reset all legal moves before proceeding to generation of legal moves in check situation
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
-            generateLegalMovesWhenInCheck(currentPlayer, currentPlayer.getOpponentPlayer());
+            generateLegalMovesWhenInCheck(currentPlayer);
             return;
         } else {
             if (gameSituation == GameSituation.NORMAL) {
@@ -101,40 +101,63 @@ public class Board implements MyObservable, Serializable {
         gameSituation = GameSituation.NORMAL;
     }
 
-    public void generateLegalMovesWhenInCheck(Player currentPlayer, Player opponentPlayer) {
-        List<Tile> pseudoLegalMoves = currentPlayer.getLegalMoves();
-        List<Tile> actualLegalMoves = new ArrayList<>();
+    public void generateLegalMovesWhenInCheck(Player currentPlayer) {
+        Map<Piece, List<Tile>> actualLegalMoves = new HashMap<>();
 
         // saving players' states
-        Memento<Board> boardMemento = saveToMemento();
-        currentPlayer.saveState();
-        opponentPlayer.saveState();
+//        saveState();
+//        currentPlayer.saveState();
+//        opponentPlayer.saveState();
 
         for (Piece piece : currentPlayer.getAlivePieces()) {
+            if (!piece.canMove()) continue;
+            List<Tile> potentialLegalMovesForPiece = new ArrayList<>();
             synchronized (piece) {
-                for (Tile tile : new ArrayList<>(pseudoLegalMoves)) {
+                for (Tile tile : new ArrayList<>(piece.getPossibleMoves())) {
                     boolean successfulMove = currentPlayer.movePiece(piece, tile);
                     if (!successfulMove) {
                         continue;
                     } else {
-                        updateObservers();
+                        updateObserver(currentPlayer.getOpponentPlayer());
                     }
                     // if the move broke the check, it's legal
-                    if (!currentPlayer.isInCheck()) actualLegalMoves.add(tile);
+                    if (!currentPlayer.isInCheck()) {
+                        potentialLegalMovesForPiece.add(tile);
+                    }
 
-                    restoreFromMemento(boardMemento);
-                    currentPlayer = currentPlayer.loadState();
-                    opponentPlayer = currentPlayer.getOpponentPlayer().loadState();
+                    // unmaking last move
+                    currentPlayer.undoLastMove();
+                    updateObserver(currentPlayer.getOpponentPlayer());
+                }
+            }
+            // adding for looped piece it's potential legal moves after checking
+            actualLegalMoves.put(piece, potentialLegalMovesForPiece);
+        }
+
+        int emptyListsCounter = 0;
+        for (Piece piece : currentPlayer.getAlivePieces()) {
+            if (!actualLegalMoves.containsKey(piece)) continue;
+            for (int i = 0; i < actualLegalMoves.size(); i++) {
+                if (actualLegalMoves.get(piece).size() == 0) {
+                    emptyListsCounter++;
+                }
+                if (i == actualLegalMoves.size() - 1) {
+                    if (emptyListsCounter == actualLegalMoves.size()) {
+                        gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
+                        return;
+                    }
                 }
             }
         }
-
-        if (actualLegalMoves.size() == 0) {
-            gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
-            return;
-        }
+//        if (actualLegalMoves.size() == 0) {
+//            gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
+//            return;
+//        }
         currentPlayer.getLegalMoves().clear();
-        currentPlayer.getLegalMoves().addAll(actualLegalMoves);
+        // adding each possible move for piece
+        for (Piece piece : actualLegalMoves.keySet()) {
+            piece.getPossibleMoves().addAll(actualLegalMoves.get(piece));
+        }
 
 //        for (Piece piece : currentPlayer.getAlivePieces()) {
 //            synchronized (piece) {
@@ -386,11 +409,11 @@ public class Board implements MyObservable, Serializable {
     }
 
     public Memento<Board> saveToMemento() {
-        return new Memento<>(instance);
+        return new Memento<Board>(instance);
     }
 
-    public void restoreFromMemento(Memento memento) {
-        instance = saveToMemento().getSavedState();
+    public void restoreFromMemento(Memento<Board> memento) {
+        instance = memento.getSavedState();
     }
 
     @Override

@@ -1,19 +1,17 @@
 package com.zivlazarov.chessengine.model.player;
 
 import com.zivlazarov.chessengine.controllers.PlayerController;
-import com.zivlazarov.chessengine.model.pieces.*;
-import com.zivlazarov.chessengine.model.utils.MyObservable;
-import com.zivlazarov.chessengine.model.utils.MyObserver;
-import com.zivlazarov.chessengine.model.utils.Pair;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.utils.Memento;
+import com.zivlazarov.chessengine.model.utils.MyObservable;
+import com.zivlazarov.chessengine.model.utils.MyObserver;
+import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Player implements MyObserver, Serializable {
@@ -32,7 +30,7 @@ public class Player implements MyObserver, Serializable {
 
     private final int playerDirection;
 
-    private Pair<Piece, Tile> lastMove;
+    private Map<Piece, Pair<Tile, Tile>> lastMove;
 
     public Player(Board b, PieceColor pc) {
         board = b;
@@ -40,6 +38,7 @@ public class Player implements MyObserver, Serializable {
         alivePieces = new ArrayList<Piece>();
         deadPieces = new ArrayList<Piece>();
         legalMoves = new ArrayList<>();
+        lastMove = new HashMap<>();
 
         // setting player direction, white goes up the board, black goes down (specifically to pawn pieces and for checking pawn promotion)
         if (playerColor == PieceColor.WHITE) {
@@ -72,6 +71,9 @@ public class Player implements MyObserver, Serializable {
         if (!legalMoves.contains(targetTile)) return false;
 //        if (!piece.isAlive()) return false;
 
+        // clearing lastMove
+        lastMove.clear();
+
         Tile pieceTile = piece.getCurrentTile();
         clearTileFromPiece(pieceTile);
 
@@ -90,21 +92,47 @@ public class Player implements MyObserver, Serializable {
         }
         // eat move
         if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != playerColor) {
+            piece.getPiecesEaten().push(targetTile.getPiece());
             opponentPlayer.addPieceToDead(targetTile.getPiece());
         }
 
         // placing piece in target tile
         piece.setCurrentTile(targetTile);
+        piece.setLastTile(targetTile);
+
         // pushing move to log
-        piece.getHistoryMoves().push(pieceTile);
+        piece.getHistoryMoves().push(targetTile);
         board.getGameHistoryMoves().push(new Pair<>(piece, targetTile));
 
-        lastMove = null;
-        lastMove = new Pair<>(piece, targetTile);
+        lastMove.put(piece, new Pair<>(pieceTile, targetTile));
 
         update();
 
         return true;
+    }
+
+    public void undoLastMove() {
+        Piece piece = new ArrayList<>(lastMove.keySet()).get(0);
+        Tile previousTile = lastMove.get(piece).getFirst();
+        Tile currentTile = lastMove.get(piece).getSecond();
+
+        Piece eatenPiece = null;
+
+        // getting last eaten piece
+        if (piece.getPiecesEaten().size() != 0) {
+            eatenPiece = piece.getLastPieceEaten();
+
+            // if eaten piece's last tile is the last move's previous tile, return the eaten piece to the game
+            // and place eaten piece in that tile while clearing the current piece from there
+            if (currentTile.equals(eatenPiece.getLastTile())) {
+                addPieceToAlive(eatenPiece);
+                clearTileFromPiece(currentTile);
+                eatenPiece.setCurrentTile(currentTile);
+            }
+        }
+        // if last tile is not empty then clear it and set piece to it's previous tile
+        if (!currentTile.isEmpty()) clearTileFromPiece(currentTile);
+        piece.setCurrentTile(previousTile);
     }
 
     public void handlePawnPromotion(Piece piece) {
@@ -204,6 +232,7 @@ public class Player implements MyObserver, Serializable {
         if (piece.getPieceColor() == playerColor) {
             alivePieces.add(piece);
             deadPieces.remove(piece);
+            piece.setIsAlive(true);
 //            piece.setCurrentTile(piece.getCurrentTile());
         }
     }
@@ -275,7 +304,7 @@ public class Player implements MyObserver, Serializable {
         return name;
     }
 
-    public Pair<Piece, Tile> getLastMove() {
+    public Map<Piece, Pair<Tile, Tile>> getLastMove() {
         return lastMove;
     }
 
@@ -294,7 +323,13 @@ public class Player implements MyObserver, Serializable {
     }
 
     public boolean isInCheck() {
-        return getKing().getIsInDanger();
+        for (Piece piece : opponentPlayer.getAlivePieces()) {
+            if (piece.getPiecesUnderThreat().contains(getKing())) {
+                return true;
+            }
+        }
+        return false;
+//        return getKing().getIsInDanger();
     }
 
     public void saveState() {
@@ -322,6 +357,14 @@ public class Player implements MyObserver, Serializable {
             e.printStackTrace();
         }
         return loadedPlayer;
+    }
+
+    public Memento<Player> saveToMemento() {
+        return new Memento<Player>(this);
+    }
+
+    public void restoreFromMemento(Memento<Board> memento) {
+
     }
 
     @Override
