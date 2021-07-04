@@ -35,6 +35,7 @@ public class PawnPiece implements Piece, Cloneable {
 
     private Tile enPassantTile;
     private Icon imageIcon;
+    private ImageView imageView;
 
     public PawnPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
@@ -388,5 +389,15 @@ public class PawnPiece implements Piece, Cloneable {
     @Override
     public void setImageIcon(Icon imageIcon) {
         this.imageIcon = imageIcon;
+    }
+
+    @Override
+    public ImageView getImageView() {
+        return imageView;
+    }
+
+    @Override
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
     }
 }

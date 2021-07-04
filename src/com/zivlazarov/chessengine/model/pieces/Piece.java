@@ -51,6 +51,9 @@ public interface Piece extends Cloneable, Serializable {
     Icon getImageIcon();
     void setImageIcon(Icon imageView);
 
+    ImageView getImageView();
+    void setImageView(ImageView imageView);
+
     void moveToTile(Tile tile);
 
     void unmakeLastMove();

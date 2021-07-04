@@ -30,6 +30,7 @@ public class KingPiece implements Piece, Cloneable {
     private PieceColor pieceColor;
     private String imageName;
     private Icon imageIcon;
+    private ImageView imageView;
 
     private Tile kingSideCastleTile;
     private Tile queenSideCastleTile;
@@ -419,5 +420,15 @@ public class KingPiece implements Piece, Cloneable {
     @Override
     public void setImageIcon(Icon imageIcon) {
         this.imageIcon = imageIcon;
+    }
+
+    @Override
+    public ImageView getImageView() {
+        return imageView;
+    }
+
+    @Override
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
     }
 }
