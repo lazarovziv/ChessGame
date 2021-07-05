@@ -6,6 +6,7 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class BishopPiece implements Piece, Cloneable {
     private String imageName;
     private Icon imageIcon;
     private ImageView imageView;
+    private Image pieceImage;
 
     public BishopPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
@@ -318,5 +320,13 @@ public class BishopPiece implements Piece, Cloneable {
     @Override
     public void setImageView(ImageView imageView) {
         this.imageView = imageView;
+    }
+    
+    public Image getPieceImage() {
+        return pieceImage;
+    }
+    
+    public void setPieceImage(Image pieceImage) {
+        this.pieceImage = pieceImage;
     }
 }

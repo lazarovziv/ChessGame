@@ -7,6 +7,7 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 
 import javax.swing.*;
 import java.io.Serializable;
@@ -54,6 +55,9 @@ public interface Piece extends Cloneable, Serializable {
     ImageView getImageView();
     void setImageView(ImageView imageView);
 
+    Image getPieceImage();
+    void setPieceImage(Image pieceImage);
+    
     void moveToTile(Tile tile);
 
     void unmakeLastMove();
