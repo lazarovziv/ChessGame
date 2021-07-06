@@ -6,12 +6,12 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -20,7 +20,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Game extends Application {
 
@@ -32,9 +33,14 @@ public class Game extends Application {
     private static Player whitePlayer;
     private static Player blackPlayer;
 
+    private static final Path path = Paths.get("");
+    private static final String currentPath = path.toAbsolutePath().toString();
+
     public Game() {
         board = Board.getInstance();
         gridPane = new GridPane();
+//        gridPane.setMaxWidth(800);
+//        gridPane.setMaxHeight(600);
     }
 
     @Override
@@ -44,6 +50,8 @@ public class Game extends Application {
 //        String[] blackPieces = {"blackRook", "blackKnight", "blackBishop", "blackKing", "blackQueen", "blackBishop", "blackKnight", "blackRook",
 //                "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn"};
 
+        List<Node> nodes = new ArrayList<>();
+
         boolean gameStarted = false;
 
         whitePlayer = new Player(board, PieceColor.WHITE);
@@ -52,61 +60,58 @@ public class Game extends Application {
         whitePlayer.setOpponentPlayer(blackPlayer);
         blackPlayer.setOpponentPlayer(whitePlayer);
 
+        CommandLineGame.initPieces(whitePlayer, blackPlayer);
 
-        String answer = "";
+        Alert alertDialog = new Alert(Alert.AlertType.NONE,
+                "Would you like to start a game?",
+                ButtonType.YES,
+                ButtonType.NO);
+        alertDialog.showAndWait();
 
-        do {
-            System.out.println("Would you like to start a game? (y/n)");
-
-            Scanner scanner = new Scanner(System.in);
-            answer = scanner.nextLine();
-            answer = answer.toLowerCase();
-
-            if (answer.equals("y")) gameStarted = true;
-            else if (answer.equals("n")) System.exit(0);
-
-        } while (!answer.equals("y"));
+        if (alertDialog.getResult() == ButtonType.NO) System.exit(1);
 
         for (int i = 0; i < board.getBoard().length; i++) {
             for (int j = 0; j < board.getBoard().length; j++) {
-                ImageView pieceImageView = null;
                 // associating image tiles to board tiles
                 ImageView tileImageView = createImageView(colors[(i+j) % colors.length]);
+                tileImageView.setPreserveRatio(true);
                 board.getBoard()[i][j].setTileImageView(tileImageView);
+                GridPane.setConstraints(tileImageView, j, i);
+//                gridPane.add(tileImageView, i, j);
+                nodes.add(tileImageView);
                 if (!board.getBoard()[i][j].isEmpty()) {
                     Piece piece = board.getBoard()[i][j].getPiece();
-                    pieceImageView = createImageView(piece.getImageName());
-                    pieceImageView.setFitHeight(36);
-                    pieceImageView.setFitWidth(36);
+                    Image pieceImage = createImage(piece.getImageName());
+                    ImageView pieceImageView = new ImageView(pieceImage);
                     pieceImageView.setPreserveRatio(true);
-                    pieceImageView.setVisible(true);
-                    piece.setImageView(pieceImageView);
-
-                }
-                gridPane.add(tileImageView, j, i);
-                if (pieceImageView != null) {
-                    gridPane.add(pieceImageView, j, i);
+                    GridPane.setConstraints(pieceImageView, j, i);
+                    nodes.add(pieceImageView);
                 }
             }
         }
 
-        CommandLineGame.initPieces(whitePlayer, blackPlayer);
+        // bind image view every piece
 
+        board.printBoard();
 
-        // when calling the init() method for every piece, first call for the pieces on the back row!!! because tiles in front of them aren't empty
+        // !!!!!!!!!!!!!!!!!!!!!
+//        for (Tile[] tiles : board.getBoard()) {
+//            for (Tile tile : tiles) {
+//                if (tile.getPieceImageView() == null) continue;
+//                GridPane.setConstraints(tile.getPieceImageView(), tile.getCol(), tile.getRow());
+////                gridPane.add(tile.getPieceImageView(), tile.getCol(), tile.getCol());
+//                nodes.add(tile.getPieceImageView());
+//            }
+//        }
 
-        for (Node node : gridPane.getChildren()) {
-            node.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                }
-            });
-        }
+        gridPane.getChildren().addAll(nodes);
 
         Scene scene = new Scene(gridPane, 225*8,225*8);
         stage.setTitle("Chess");
         stage.setScene(scene);
         stage.setResizable(false);
+        stage.setWidth(800);
+        stage.setHeight(600);
         stage.show();
 
         int turn = 0;
@@ -123,9 +128,7 @@ public class Game extends Application {
     public static ImageView createImageView(String fileName) {
         InputStream stream = null;
         try {
-            Path currentRelativePath = Paths.get("");
-            String s = currentRelativePath.toAbsolutePath().toString();
-            stream = new FileInputStream(s + "/src/" + fileName + ".png");
+            stream = new FileInputStream(currentPath + "/src/" + fileName + ".png");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -136,11 +139,26 @@ public class Game extends Application {
 
         ImageView imageView = new ImageView();
         imageView.setImage(image);
-        imageView.setFitWidth(225);
-        imageView.setFitHeight(225);
-        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(112);
+        imageView.setFitHeight(72);
+//        imageView.setPreserveRatio(true);
 
         return imageView;
+    }
+
+    public static Image createImage(String fileName) {
+        InputStream stream = null;
+        try {
+            stream = new FileInputStream(currentPath + "/src/" + fileName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        Image image = null;
+        if (stream != null) {
+            image = new Image(stream);
+        }
+
+        return image;
     }
 
     private void updateBoard(Player currentPlayer) {
@@ -153,11 +171,11 @@ public class Game extends Application {
                 gridPane.add(tileImageView, r, c);
             }
         }
-        for (Piece piece : currentPlayer.getAlivePieces()) {
-            if (piece.getImageIcon() == null) continue;
-            // col first, row second
-            gridPane.add((Node) piece.getImageIcon(), piece.getCurrentTile().getCol(), piece.getCurrentTile().getRow());
-        }
+//        for (Piece piece : currentPlayer.getAlivePieces()) {
+//            if (piece.getImageIcon() == null) continue;
+//            // col first, row second
+//            gridPane.add(piece.getImageIcon(), piece.getCurrentTile().getCol(), piece.getCurrentTile().getRow());
+//        }
     }
 
     private void movePieceToTile(Piece piece, Tile tile) {
