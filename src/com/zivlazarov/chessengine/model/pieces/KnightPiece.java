@@ -3,7 +3,6 @@ import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 //import javafx.scene.image.ImageView;
 
@@ -31,7 +30,6 @@ public class KnightPiece implements Piece, Cloneable {
     private PieceColor pieceColor;
     private String imageName;
     private Icon imageIcon;
-    private Image pieceImage;
 
     public KnightPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
@@ -314,17 +312,7 @@ public class KnightPiece implements Piece, Cloneable {
     }
 
     @Override
-    public void setImageIcon(Icon imageView) {
-        this.imageIcon = imageView;
-    }
-
-    @Override
-    public Image getPieceImage() {
-        return pieceImage;
-    }
-
-    @Override
-    public void setPieceImage(Image pieceImage) {
-        this.pieceImage = pieceImage;
+    public void setImageIcon(Icon imageIcon) {
+        this.imageIcon = imageIcon;
     }
 }
