@@ -3,6 +3,7 @@ import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 //import javafx.scene.image.ImageView;
 
@@ -29,6 +30,7 @@ public class QueenPiece implements Piece, Cloneable {
     private PieceColor pieceColor;
     private String imageName;
     private Icon imageIcon;
+    private Image pieceImage;
 
     public QueenPiece(Player player, Board board, PieceColor pc, Tile initTile) {
         this.player = player;
@@ -313,5 +315,15 @@ public class QueenPiece implements Piece, Cloneable {
     @Override
     public void setImageIcon(Icon imageIcon) {
         this.imageIcon = imageIcon;
+    }
+
+    @Override
+    public Image getPieceImage() {
+        return pieceImage;
+    }
+
+    @Override
+    public void setPieceImage(Image pieceImage) {
+        this.pieceImage = pieceImage;
     }
 }

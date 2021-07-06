@@ -6,6 +6,7 @@ import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import javax.swing.*;
@@ -50,6 +51,9 @@ public interface Piece extends Cloneable, Serializable {
 
     Icon getImageIcon();
     void setImageIcon(Icon imageView);
+
+    Image getPieceImage();
+    void setPieceImage(Image pieceImage);
 
     void moveToTile(Tile tile);
 

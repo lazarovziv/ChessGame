@@ -3,6 +3,7 @@ import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 //import javafx.scene.image.ImageView;
 
@@ -36,6 +37,7 @@ public class RookPiece implements Piece, Cloneable {
     private final boolean isKingSide;
     private final boolean isQueenSide;
     private Icon imageIcon;
+    private Image pieceImage;
 
     public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean isKingSide, int pieceCounter) {
         this.player = player;
@@ -352,5 +354,15 @@ public class RookPiece implements Piece, Cloneable {
     @Override
     public void setImageIcon(Icon imageIcon) {
         this.imageIcon = imageIcon;
+    }
+
+    @Override
+    public Image getPieceImage() {
+        return pieceImage;
+    }
+
+    @Override
+    public void setPieceImage(Image pieceImage) {
+        this.pieceImage = pieceImage;
     }
 }
