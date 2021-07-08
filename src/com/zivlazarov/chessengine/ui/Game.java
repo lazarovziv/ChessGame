@@ -6,6 +6,14 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -62,6 +70,8 @@ public class Game extends Application {
 
         CommandLineGame.initPieces(whitePlayer, blackPlayer);
 
+        board.checkBoard(whitePlayer);
+
         Alert alertDialog = new Alert(Alert.AlertType.NONE,
                 "Would you like to start a game?",
                 ButtonType.YES,
@@ -72,39 +82,63 @@ public class Game extends Application {
 
         for (int i = 0; i < board.getBoard().length; i++) {
             for (int j = 0; j < board.getBoard().length; j++) {
+                Property<Tile> tileProperty = new SimpleObjectProperty<>();
+                tileProperty.setValue(board.getBoard()[i][j]);
+
                 // associating image tiles to board tiles
                 ImageView tileImageView = createImageView(colors[(i+j) % colors.length]);
                 tileImageView.setPreserveRatio(true);
+
                 board.getBoard()[i][j].setTileImageView(tileImageView);
                 GridPane.setConstraints(tileImageView, j, i);
+
 //                gridPane.add(tileImageView, i, j);
                 nodes.add(tileImageView);
+
                 if (!board.getBoard()[i][j].isEmpty()) {
                     Piece piece = board.getBoard()[i][j].getPiece();
                     Image pieceImage = createImage(piece.getImageName());
                     ImageView pieceImageView = new ImageView(pieceImage);
                     pieceImageView.setPreserveRatio(true);
+
+                    System.out.println(pieceImageView.getBoundsInLocal());
+                    // binding piece object to a property
+                    Property<Number> rowNumberProperty = new SimpleObjectProperty<>(piece, "row", piece.getCurrentTile().getRow());
+                    Property<Number> colNumberProperty = new SimpleObjectProperty<>(piece, "col", piece.getCurrentTile().getCol());
+                    /*
+//                    Property<Piece> pieceObjectProperty = new SimpleObjectProperty<Piece>();
+//                    pieceObjectProperty.setValue(piece);
+//
+//                    // binding piece's row and column (position on board) to different properties
+//                    Property<Number> rowNumberProperty = new SimpleObjectProperty<>();
+//                    rowNumberProperty.setValue(pieceObjectProperty.getValue().getCurrentTile().getRow());
+//
+//                    Property<Number> colNumberProperty = new SimpleObjectProperty<>();
+//                    colNumberProperty.setValue(piece.getCurrentTile().getCol());
+//
+//                    pieceObjectProperty.addListener((observable, oldValue, newValue) -> {
+//                        if (oldValue.getCurrentTile() != newValue.getCurrentTile()) {
+//                            rowNumberProperty.setValue(newValue.getCurrentTile().getRow());
+//                            colNumberProperty.setValue(newValue.getCurrentTile().getCol());
+//                        }
+//                    });
+//
+//                    pieceImageView.xProperty().bindBidirectional(rowNumberProperty);
+//                    pieceImageView.yProperty().bindBidirectional(colNumberProperty);
+*/
+//                    pieceImageView.setOnMouseClicked(event -> System.out.println(pieceImageView.getLayoutX() + ", " + pieceImageView.getLayoutY()));
+                    pieceImageView.layoutXProperty().bindBidirectional(rowNumberProperty);
+                    pieceImageView.layoutYProperty().bindBidirectional(colNumberProperty);
+
                     GridPane.setConstraints(pieceImageView, j, i);
                     nodes.add(pieceImageView);
                 }
             }
         }
 
-        // bind image view every piece
-
-        board.printBoard();
-
-        // !!!!!!!!!!!!!!!!!!!!!
-//        for (Tile[] tiles : board.getBoard()) {
-//            for (Tile tile : tiles) {
-//                if (tile.getPieceImageView() == null) continue;
-//                GridPane.setConstraints(tile.getPieceImageView(), tile.getCol(), tile.getRow());
-////                gridPane.add(tile.getPieceImageView(), tile.getCol(), tile.getCol());
-//                nodes.add(tile.getPieceImageView());
-//            }
-//        }
-
         gridPane.getChildren().addAll(nodes);
+
+        whitePlayer.movePiece(board.getBoard()[1][2].getPiece(), board.getBoard()[3][2]);
 
         Scene scene = new Scene(gridPane, 225*8,225*8);
         stage.setTitle("Chess");
