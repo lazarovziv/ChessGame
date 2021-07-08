@@ -48,6 +48,17 @@ public class BoardFrame {
             this.tile = tile;
             if (tile.getTileColor() == TileColor.WHITE) setBackground(whiteTileColor);
             else setBackground(blackTileColor);
+            
+            if (!tile.isEmpty()) {
+                this.removeAll();
+                try {
+                    BufferedImage image = ImageIO.read(new File(tile.getPiece().getImageName() + ".png"));
+                    add(new JLabel(new ImageIcon(image)));
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             // setpreferredsize();
             // validate();
         }
