@@ -5,6 +5,8 @@ import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.ImageView;
 
 import javax.swing.*;
@@ -18,6 +20,8 @@ public class BishopPiece implements Piece, Cloneable {
     private Player player;
 
     private MyObservable observable;
+
+    private ObjectProperty<Tile> currentTileProperty;
 
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
@@ -61,6 +65,8 @@ public class BishopPiece implements Piece, Cloneable {
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
+
+        currentTileProperty = new SimpleObjectProperty<>(this, "currentTile", currentTile);
     }
 
     @Override
@@ -307,5 +313,17 @@ public class BishopPiece implements Piece, Cloneable {
     @Override
     public void setImageIcon(Icon imageIcon) {
         this.imageIcon = imageIcon;
+    }
+
+    public Tile getCurrentTileProperty() {
+        return currentTileProperty.get();
+    }
+
+    public ObjectProperty<Tile> currentTilePropertyProperty() {
+        return currentTileProperty;
+    }
+
+    public void setCurrentTileProperty(Tile currentTileProperty) {
+        this.currentTileProperty.set(currentTileProperty);
     }
 }

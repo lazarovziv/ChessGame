@@ -3,6 +3,8 @@ import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.ImageView;
 //import javafx.scene.image.ImageView;
 
@@ -15,6 +17,8 @@ import java.util.Stack;
 public class KnightPiece implements Piece, Cloneable {
 
     private Player player;
+
+    private ObjectProperty<Tile> currentTileProperty;
 
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
@@ -57,6 +61,8 @@ public class KnightPiece implements Piece, Cloneable {
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
+
+        currentTileProperty = new SimpleObjectProperty<>(this, "currentTile", currentTile);
 //        generateTilesToMoveTo();
     }
 
@@ -314,5 +320,19 @@ public class KnightPiece implements Piece, Cloneable {
     @Override
     public void setImageIcon(Icon imageIcon) {
         this.imageIcon = imageIcon;
+    }
+
+    @Override
+    public Tile getCurrentTileProperty() {
+        return currentTileProperty.get();
+    }
+
+    @Override
+    public ObjectProperty<Tile> currentTilePropertyProperty() {
+        return currentTileProperty;
+    }
+
+    public void setCurrentTileProperty(Tile currentTileProperty) {
+        this.currentTileProperty.set(currentTileProperty);
     }
 }

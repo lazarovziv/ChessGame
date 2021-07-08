@@ -6,6 +6,7 @@ import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.image.ImageView;
 
 import javax.swing.*;
@@ -45,6 +46,10 @@ public interface Piece extends Cloneable, Serializable {
     void setIsInDanger(boolean isInDanger);
     void setPieceColor(PieceColor pieceColor);
     void setCurrentTile(Tile tile);
+
+    Tile getCurrentTileProperty();
+    ObjectProperty<Tile> currentTilePropertyProperty();
+    void setCurrentTileProperty(Tile currentTileProperty);
 
     void setLastTile(Tile tile);
 
