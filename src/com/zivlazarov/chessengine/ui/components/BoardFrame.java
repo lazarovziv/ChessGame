@@ -31,8 +31,8 @@ public class BoardFrame {
     private final BoardPanel boardPanel;
     private static Board board;
 
-    private final Player whitePlayer;
-    private final Player blackPlayer;
+    private static Player whitePlayer;
+    private static Player blackPlayer;
     private static Player currentPlayer;
 
     private static Tile sourceTile;
@@ -166,6 +166,8 @@ public class BoardFrame {
                                 else {
                                     currentPlayer.movePiece(playerPiece, destinationTile);
                                     board.checkBoard(currentPlayer);
+                                    if (currentPlayer.equals(whitePlayer)) currentPlayer = blackPlayer;
+                                    else currentPlayer = whitePlayer;
                                 }
 
                                 sourceTile = null;
