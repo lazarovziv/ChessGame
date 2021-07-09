@@ -118,7 +118,8 @@ public class Board implements MyObservable, Serializable {
                     if (!successfulMove) {
                         continue;
                     } else {
-                        updateObserver(currentPlayer.getOpponentPlayer());
+                        updateObservers();
+//                        updateObserver(currentPlayer.getOpponentPlayer());
                     }
                     // if the move broke the check, it's legal
                     if (!currentPlayer.isInCheck()) {
@@ -127,7 +128,8 @@ public class Board implements MyObservable, Serializable {
 
                     // unmaking last move
                     currentPlayer.undoLastMove();
-                    updateObserver(currentPlayer.getOpponentPlayer());
+                    updateObservers();
+//                    updateObserver(currentPlayer.getOpponentPlayer());
                 }
             }
             // adding for looped piece it's potential legal moves after checking
@@ -135,18 +137,14 @@ public class Board implements MyObservable, Serializable {
         }
 
         int emptyListsCounter = 0;
-        for (Piece piece : currentPlayer.getAlivePieces()) {
-            if (!actualLegalMoves.containsKey(piece)) continue;
-            for (int i = 0; i < actualLegalMoves.size(); i++) {
-                if (actualLegalMoves.get(piece).size() == 0) {
-                    emptyListsCounter++;
-                }
-                if (i == actualLegalMoves.size() - 1) {
-                    if (emptyListsCounter == actualLegalMoves.size()) {
-                        gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
-                        return;
-                    }
-                }
+        for (Piece piece : actualLegalMoves.keySet()) {
+            if (actualLegalMoves.get(piece).size() == 0) {
+                emptyListsCounter++;
+                continue;
+            }
+            if (emptyListsCounter == actualLegalMoves.keySet().size()) {
+                gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
+                return;
             }
         }
 //        if (actualLegalMoves.size() == 0) {
@@ -156,8 +154,10 @@ public class Board implements MyObservable, Serializable {
         currentPlayer.getLegalMoves().clear();
         // adding each possible move for piece
         for (Piece piece : actualLegalMoves.keySet()) {
+            piece.getPossibleMoves().clear();
             piece.getPossibleMoves().addAll(actualLegalMoves.get(piece));
         }
+        currentPlayer.updateLegalMoves();
 
 //        for (Piece piece : currentPlayer.getAlivePieces()) {
 //            synchronized (piece) {
