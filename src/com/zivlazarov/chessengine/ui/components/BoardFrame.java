@@ -1,9 +1,6 @@
 package com.zivlazarov.chessengine.ui.components;
 
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.board.TileColor;
+import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.ui.CommandLineGame;
@@ -31,6 +28,9 @@ public class BoardFrame {
     private final BoardPanel boardPanel;
     private static Board board;
 
+    private static final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
+    private static final Map<PieceColor, GameSituation> checkmateSituations = new HashMap<>();
+
     private static Player whitePlayer;
     private static Player blackPlayer;
     private static Player currentPlayer;
@@ -47,6 +47,12 @@ public class BoardFrame {
 
         whitePlayer.setOpponentPlayer(blackPlayer);
         blackPlayer.setOpponentPlayer(whitePlayer);
+
+        checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
+        checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
+
+        checkmateSituations.put(PieceColor.WHITE, GameSituation.WHITE_CHECKMATED);
+        checkmateSituations.put(PieceColor.BLACK, GameSituation.BLACK_CHECKMATED);
 
         CommandLineGame.initPieces(whitePlayer, blackPlayer);
 //        board.checkBoard(whitePlayer);
@@ -120,6 +126,8 @@ public class BoardFrame {
         private static final String currentPath = path.toAbsolutePath().toString();
 
         private static ArrayList<Tile> markedTiles;
+
+        private static boolean drawPossibleMoves = false;
         
         TilePanel(BoardPanel boardPanel, Tile tile) {
             super(new GridBagLayout());
@@ -136,18 +144,24 @@ public class BoardFrame {
                 public void mouseClicked(MouseEvent e) {
                     // first left mouse click
                     if (isLeftMouseButton(e)) {
-                        System.out.println(tile);
                         if (sourceTile == null) {
                             sourceTile = tile;
                             if (!sourceTile.isEmpty()) {
                                 if (sourceTile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
+                                    if (!sourceTile.getPiece().canMove()) {
+                                        sourceTile = null;
+                                        return;
+                                    }
                                     playerPiece = sourceTile.getPiece();
-                                    System.out.println(playerPiece.getName() + ": ");
-                                    System.out.println("Moves: ");
+                                    System.out.println("Possible Moves: ");
                                     for (Tile possibleMove : playerPiece.getPossibleMoves()) {
                                         System.out.println(possibleMove);
                                         markedTiles.add(possibleMove);
-                                        boardPanel.tilePanelMap.get(possibleMove).setBackground(Color.DARK_GRAY);
+                                        // drawing a circle in the possible move tile
+                                        drawPossibleMoves = true;
+//                                        boardPanel.tilePanelMap.get(possibleMove).paintComponent(getGraphics());
+                                        boardPanel.tilePanelMap.get(possibleMove).setBackground(Color.LIGHT_GRAY);
+                                        drawPossibleMoves = false;
                                     }
                                 } else sourceTile = null;
                             }
@@ -165,7 +179,15 @@ public class BoardFrame {
                                 // if it does, make move
                                 else {
                                     currentPlayer.movePiece(playerPiece, destinationTile);
-                                    board.checkBoard(currentPlayer);
+                                    board.checkBoard(currentPlayer.getOpponentPlayer());
+
+                                    System.out.println(board.getGameSituation());
+
+                                    System.out.println();
+                                    System.out.println(
+                                            board.getGameHistoryMoves().lastElement().getFirst().getName()
+                                                    + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
+
                                     if (currentPlayer.equals(whitePlayer)) currentPlayer = blackPlayer;
                                     else currentPlayer = whitePlayer;
                                 }
@@ -173,6 +195,7 @@ public class BoardFrame {
                                 sourceTile = null;
                                 playerPiece = null;
                                 destinationTile = null;
+
                                 for (Tile markedTile : markedTiles) {
                                     boardPanel.tilePanelMap.get(markedTile).setBackground(tileColorMap.get(markedTile.getTileColor()));
                                 }
@@ -192,12 +215,74 @@ public class BoardFrame {
 
                 @Override
                 public void mousePressed(MouseEvent e) {
-
+//                    if (isLeftMouseButton(e)) {
+//                        System.out.println(tile);
+//                        if (sourceTile == null) {
+//                            sourceTile = tile;
+//                            if (!sourceTile.isEmpty()) {
+//                                if (sourceTile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
+//                                    if (!sourceTile.getPiece().canMove()) {
+//                                        sourceTile = null;
+//                                        return;
+//                                    }
+//                                    playerPiece = sourceTile.getPiece();
+//                                    System.out.println(playerPiece.getName() + ": ");
+//                                    System.out.println("Moves: ");
+//                                    for (Tile possibleMove : playerPiece.getPossibleMoves()) {
+//                                        System.out.println(possibleMove);
+//                                        markedTiles.add(possibleMove);
+//                                        // drawing a circle in the possible move tile
+//                                        drawPossibleMoves = true;
+////                                        boardPanel.tilePanelMap.get(possibleMove).paintComponent(getGraphics());
+//                                        boardPanel.tilePanelMap.get(possibleMove).setBackground(Color.LIGHT_GRAY);
+//                                        drawPossibleMoves = false;
+//                                    }
+//                                } else sourceTile = null;
+//                            }
+//                        }
+//                    } else if (isRightMouseButton(e)) {
+//                        sourceTile = null;
+//                        destinationTile = null;
+//                        playerPiece = null;
+//                        drawPossibleMoves = false;
+//                    }
                 }
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-
+//                    if (isLeftMouseButton(e)) {
+//                        if (sourceTile != null) {
+//                            if (playerPiece != null) {
+//                                destinationTile = tile;
+//                                // checking if tile clicked is any of the chosen piece's possible moves
+//                                boolean noneMatch = playerPiece.getPossibleMoves().stream().noneMatch(t -> t.equals(tile));
+//                                // if it does not included in possible moves, destination tile needs to be reset
+//                                if (noneMatch) {
+//                                    System.out.println("Can't move to " + destinationTile + " !");
+//                                }
+//                                // if it does, make move
+//                                else {
+//                                    currentPlayer.movePiece(playerPiece, destinationTile);
+//                                    board.checkBoard(currentPlayer);
+//
+//                                    System.out.println();
+//                                    System.out.println(
+//                                            board.getGameHistoryMoves().lastElement().getFirst().getName()
+//                                                    + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
+//
+//                                    if (currentPlayer.equals(whitePlayer)) currentPlayer = blackPlayer;
+//                                    else currentPlayer = whitePlayer;
+//                                }
+//                                sourceTile = null;
+//                                playerPiece = null;
+//                                destinationTile = null;
+//                                for (Tile markedTile : markedTiles) {
+//                                    boardPanel.tilePanelMap.get(markedTile).setBackground(tileColorMap.get(markedTile.getTileColor()));
+//                                }
+//                                SwingUtilities.invokeLater(boardPanel::drawBoard);
+//                            }
+//                        }
+//                    }
                 }
 
                 @Override
@@ -248,5 +333,31 @@ public class BoardFrame {
             }
             return null;
         }
+
+//        @Override
+//        public void paintComponent(Graphics g){
+//            super.paintComponent(g);
+//            g.setColor(Color.BLACK);
+//
+//            if(drawPossibleMoves) {
+//                g.fillOval(tile.getRow() + (this.getSize().width / 2), tile.getCol() + (this.getSize().height / 2), 30, 30);
+//                g.setColor(Color.BLACK);
+//                g.drawOval(tile.getRow() + (this.getSize().width / 2), tile.getCol() + (this.getSize().height / 2), 30, 30);
+//            }
+//            validate();
+////            repaint();
+//        }
+
+//        @Override
+//        public void paint(Graphics g) {
+//            super.paint(g);
+//            int x = tile.getRow() - (5 / 2);
+//            int y = tile.getCol() - (5 / 2);
+//
+//            g.setColor(tileColorMap.get(tile.getTileColor()));
+//            g.fillOval(x, y, 5, 5);
+//            g.setColor(Color.LIGHT_GRAY);
+//            g.drawOval(x, y, 5, 5);
+//        }
     }
 }
