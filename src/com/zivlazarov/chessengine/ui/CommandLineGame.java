@@ -43,6 +43,9 @@ public class CommandLineGame {
         whitePlayer.setOpponentPlayer(blackPlayer);
         blackPlayer.setOpponentPlayer(whitePlayer);
 
+        board.setWhitePlayer(whitePlayer);
+        board.setBlackPlayer(blackPlayer);
+
         boardController = new BoardController(board);
 
 //        boardController.addObserver(whitePlayer);
@@ -72,7 +75,7 @@ public class CommandLineGame {
         System.out.println("\nIt's a " + whitePlayer.getName() + " vs. " + blackPlayer.getName() + " SHOWDOWN!");
 
         // initializing all pieces
-        initPieces(whitePlayer, blackPlayer);
+        board.initBoard();
 
         // game loop
         while (gameStarted) {

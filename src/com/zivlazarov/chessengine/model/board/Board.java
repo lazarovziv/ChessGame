@@ -1,6 +1,6 @@
 package com.zivlazarov.chessengine.model.board;
 
-import com.zivlazarov.chessengine.model.pieces.Piece;
+import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Memento;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
@@ -9,12 +9,15 @@ import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 // make as Singleton (?)
 public class Board implements MyObservable, Serializable {
 
     private static volatile Board instance;
+
+    private static volatile Board simulatedInstance;
+
+    private BoardNode node;
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -63,7 +66,9 @@ public class Board implements MyObservable, Serializable {
 
         for (int r = 0; r < board.length; r++) {
             for (int c = 0; c < board.length; c++) {
-                board[r][c] = new Tile(r, c, colors[(r + c) % colors.length]);
+                TileColor currentTileColor = colors[(r + c) % colors.length];
+                board[r][c] = new Tile(r, c, currentTileColor);
+//                simulatedInstance.getBoard()[r][c] = new Tile(r, c, currentTileColor);
             }
         }
         gameSituation = GameSituation.NORMAL;
@@ -78,6 +83,61 @@ public class Board implements MyObservable, Serializable {
             }
         }
         return instance;
+    }
+
+    public static Board getSimulatedInstance() {
+        if (simulatedInstance == null) {
+            synchronized (Board.class) {
+                if (simulatedInstance == null) simulatedInstance = new Board();
+            }
+        }
+        return simulatedInstance;
+    }
+
+    public void initBoard() {
+        RookPiece whiteRookKingSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][0], true, 0);
+        RookPiece whiteRookQueenSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][7], false, 1);
+
+        RookPiece blackRookQueenSide = new RookPiece(blackPlayer, instance, PieceColor.BLACK, board[7][0], false, 0);
+        RookPiece blackRookKingSide = new RookPiece(blackPlayer, instance, PieceColor.BLACK, board[7][7], true, 1);
+
+        KnightPiece whiteKnightKingSide = new KnightPiece(whitePlayer, instance, PieceColor.WHITE, board[0][1], 0);
+        KnightPiece whiteKnightQueenSide = new KnightPiece(whitePlayer, instance, PieceColor.WHITE, board[0][6], 1);
+
+        KnightPiece blackKnightKingSide = new KnightPiece(blackPlayer, instance, PieceColor.BLACK, board[7][1], 0);
+        KnightPiece blackKnightQueenSide = new KnightPiece(blackPlayer, instance, PieceColor.BLACK, board[7][6], 1);
+
+        BishopPiece whiteBishopKingSide = new BishopPiece(whitePlayer, instance, PieceColor.WHITE, board[0][2], 0);
+        BishopPiece whiteBishopQueenSide = new BishopPiece(whitePlayer, instance, PieceColor.WHITE, board[0][5], 1);
+
+        BishopPiece blackBishopKingSide = new BishopPiece(blackPlayer, instance, PieceColor.BLACK, board[7][5], 0);
+        BishopPiece blackBishopQueenSide = new BishopPiece(blackPlayer, instance, PieceColor.BLACK, board[7][2], 1);
+
+        QueenPiece whiteQueen = new QueenPiece(whitePlayer, instance, PieceColor.WHITE, board[0][4]);
+        QueenPiece blackQueen = new QueenPiece(blackPlayer, instance, PieceColor.BLACK, board[7][3]);
+
+        KingPiece whiteKing = new KingPiece(whitePlayer, instance, PieceColor.WHITE, board[0][3]);
+        KingPiece blackKing = new KingPiece(blackPlayer, instance, PieceColor.BLACK, board[7][4]);
+
+        PawnPiece whitePawn0 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][0], 0);
+        PawnPiece whitePawn1 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][1], 1);
+        PawnPiece whitePawn2 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][2], 2);
+        PawnPiece whitePawn3 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][3], 3);
+        PawnPiece whitePawn4 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][4], 4);
+        PawnPiece whitePawn5 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][5], 5);
+        PawnPiece whitePawn6 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][6], 6);
+        PawnPiece whitePawn7 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][7], 7);
+
+        PawnPiece blackPawn0 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][0], 0);
+        PawnPiece blackPawn1 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][1], 1);
+        PawnPiece blackPawn2 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][2], 2);
+        PawnPiece blackPawn3 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][3], 3);
+        PawnPiece blackPawn4 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][4], 4);
+        PawnPiece blackPawn5 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][5], 5);
+        PawnPiece blackPawn6 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][6], 6);
+        PawnPiece blackPawn7 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][7], 7);
+
+        node = new BoardNode(instance, whitePlayer);
     }
 
     public void checkBoard(Player currentPlayer) {
@@ -346,6 +406,14 @@ public class Board implements MyObservable, Serializable {
 
     public Stack<Pair<Piece, Tile>> getGameHistoryMoves() {
         return gameHistoryMoves;
+    }
+
+    public int getHeuristicScore(Player player) {
+        return player.getPlayerScore() - player.getOpponentPlayer().getPlayerScore();
+    }
+
+    public BoardNode getNode() {
+        return node;
     }
 
     @Override
