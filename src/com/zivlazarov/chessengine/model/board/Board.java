@@ -9,6 +9,7 @@ import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 // make as Singleton (?)
 public class Board implements MyObservable, Serializable {
@@ -80,7 +81,7 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void checkBoard(Player currentPlayer) {
-        // resetting tiles threatened state before every check
+        // resetting tiles threatened state before every board check
         resetThreatsOnTiles();
         // update all observers
         updateObservers();
@@ -104,23 +105,16 @@ public class Board implements MyObservable, Serializable {
     public void generateLegalMovesWhenInCheck(Player currentPlayer) {
         Map<Piece, List<Tile>> actualLegalMoves = new HashMap<>();
 
-        // saving players' states
-//        saveState();
-//        currentPlayer.saveState();
-//        opponentPlayer.saveState();
-
         for (Piece piece : currentPlayer.getAlivePieces()) {
             if (!piece.canMove()) continue;
             List<Tile> potentialLegalMovesForPiece = new ArrayList<>();
             synchronized (piece) {
                 for (Tile tile : new ArrayList<>(piece.getPossibleMoves())) {
                     boolean successfulMove = currentPlayer.movePiece(piece, tile);
-                    if (!successfulMove) {
-                        continue;
-                    } else {
-                        updateObservers();
-//                        updateObserver(currentPlayer.getOpponentPlayer());
-                    }
+
+                    if (!successfulMove) continue;
+                    else updateObservers();
+
                     // if the move broke the check, it's legal
                     if (!currentPlayer.isInCheck()) {
                         potentialLegalMovesForPiece.add(tile);
@@ -136,12 +130,18 @@ public class Board implements MyObservable, Serializable {
             actualLegalMoves.put(piece, potentialLegalMovesForPiece);
         }
 
+        // start counting for no potential legal moves for every piece
         int emptyListsCounter = 0;
+
+        // iterating on every piece
         for (Piece piece : actualLegalMoves.keySet()) {
+            // if it doesn't have any potential moves, increment variable and continue to next piece
             if (actualLegalMoves.get(piece).size() == 0) {
                 emptyListsCounter++;
                 continue;
             }
+
+            // if all pieces don't have potential legal moves, then it's checkmate, and stop the method
             if (emptyListsCounter == actualLegalMoves.keySet().size()) {
                 gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
                 return;
@@ -151,43 +151,15 @@ public class Board implements MyObservable, Serializable {
 //            gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
 //            return;
 //        }
+        // for every piece's "normal" legal move, clear it
         currentPlayer.getLegalMoves().clear();
         // adding each possible move for piece
         for (Piece piece : actualLegalMoves.keySet()) {
             piece.getPossibleMoves().clear();
             piece.getPossibleMoves().addAll(actualLegalMoves.get(piece));
         }
+        // add all piece's "check" legal moves to player's legal moves list
         currentPlayer.updateLegalMoves();
-
-//        for (Piece piece : currentPlayer.getAlivePieces()) {
-//            synchronized (piece) {
-//                for (Tile tile : pseudoLegalMoves.stream().filter(
-//                        t -> piece.getPossibleMoves().contains(t)).collect(Collectors.toList())) {
-//                    if (currentPlayer.movePiece(piece, tile)) {
-//                        setChanged();
-//                        updateObserver(currentPlayer.getOpponentPlayer());
-//                        clearChanged();
-//                    } else continue;
-//                    if (!currentPlayer.isInCheck()) {
-//                        actualLegalMoves.add(tile);
-//                    }
-////                    unmakeLastMove(piece);
-//                    instance = loadState();
-//                    currentPlayer = currentPlayer.loadState();
-//                    currentPlayer.setOpponentPlayer(currentPlayer.getOpponentPlayer().loadState());
-//                }
-//            }
-//        }
-//        // after checking all possible moves, if none is "helping" it means checkmate
-//        if (actualLegalMoves.size() == 0) {
-//            gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
-//            return;
-//        }
-//        currentPlayer.getLegalMoves().clear();
-//        for (Tile tile : actualLegalMoves) {
-//            currentPlayer.getLegalMoves().add(tile);
-//        }
-        // checking if any of current piece's tiles to move to contains player's legal moves
     }
 
     public void unmakeLastMove(Piece piece) {

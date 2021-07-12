@@ -179,7 +179,11 @@ public class BoardFrame {
                                 // if it does, make move
                                 else {
                                     currentPlayer.movePiece(playerPiece, destinationTile);
-                                    board.checkBoard(currentPlayer.getOpponentPlayer());
+
+                                    if (currentPlayer.equals(whitePlayer)) currentPlayer = blackPlayer;
+                                    else currentPlayer = whitePlayer;
+
+                                    board.checkBoard(currentPlayer);
 
                                     System.out.println(board.getGameSituation());
 
@@ -187,9 +191,6 @@ public class BoardFrame {
                                     System.out.println(
                                             board.getGameHistoryMoves().lastElement().getFirst().getName()
                                                     + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
-
-                                    if (currentPlayer.equals(whitePlayer)) currentPlayer = blackPlayer;
-                                    else currentPlayer = whitePlayer;
                                 }
 
                                 sourceTile = null;
