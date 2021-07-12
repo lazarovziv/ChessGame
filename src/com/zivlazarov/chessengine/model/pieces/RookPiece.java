@@ -41,6 +41,8 @@ public class RookPiece implements Piece, Cloneable {
     private final boolean isQueenSide;
     private Icon imageIcon;
 
+    private int value = 5;
+
     public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean isKingSide, int pieceCounter) {
         this.player = player;
         this.board = board;
@@ -224,6 +226,11 @@ public class RookPiece implements Piece, Cloneable {
 
     public String getImageName() {
         return imageName;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
     }
 
     public boolean isKingSide() {

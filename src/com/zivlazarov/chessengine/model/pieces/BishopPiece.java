@@ -38,6 +38,8 @@ public class BishopPiece implements Piece, Cloneable {
     private String imageName;
     private Icon imageIcon;
 
+    private int value = 3;
+
     public BishopPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
         this.board = board;
@@ -184,6 +186,11 @@ public class BishopPiece implements Piece, Cloneable {
 
     public String getImageName() {
         return imageName;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
     }
 
     @Override

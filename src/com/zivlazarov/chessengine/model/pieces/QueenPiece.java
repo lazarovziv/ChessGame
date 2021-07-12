@@ -34,6 +34,8 @@ public class QueenPiece implements Piece, Cloneable {
     private String imageName;
     private Icon imageIcon;
 
+    private int value = 9;
+
     public QueenPiece(Player player, Board board, PieceColor pc, Tile initTile) {
         this.player = player;
         this.board = board;
@@ -197,6 +199,11 @@ public class QueenPiece implements Piece, Cloneable {
 
     public String getImageName() {
         return imageName;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
     }
 
 //    @Override

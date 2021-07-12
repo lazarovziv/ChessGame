@@ -54,7 +54,12 @@ public class BoardFrame {
         checkmateSituations.put(PieceColor.WHITE, GameSituation.WHITE_CHECKMATED);
         checkmateSituations.put(PieceColor.BLACK, GameSituation.BLACK_CHECKMATED);
 
-        CommandLineGame.initPieces(whitePlayer, blackPlayer);
+        board.setWhitePlayer(whitePlayer);
+        board.setBlackPlayer(blackPlayer);
+
+        board.initBoard();
+
+//        CommandLineGame.initPieces(whitePlayer, blackPlayer);
 //        board.checkBoard(whitePlayer);
 
         currentPlayer = whitePlayer;

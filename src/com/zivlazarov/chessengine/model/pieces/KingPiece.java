@@ -38,6 +38,8 @@ public class KingPiece implements Piece, Cloneable {
     private Tile kingSideCastleTile;
     private Tile queenSideCastleTile;
 
+    private int value = 0;
+
     public KingPiece(Player player, Board board, PieceColor pc, Tile initTile) {
         this.player = player;
         this.board = board;
@@ -304,6 +306,11 @@ public class KingPiece implements Piece, Cloneable {
 
     public String getImageName() {
         return imageName;
+    }
+
+    @Override
+    public int getValue() {
+        return value;
     }
 
     @Override

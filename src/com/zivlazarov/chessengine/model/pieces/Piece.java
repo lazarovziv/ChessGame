@@ -74,6 +74,8 @@ public interface Piece extends Cloneable, Serializable {
 
     void refresh();
 
+    int getValue();
+
     boolean hasMoved();
 
     boolean equals(Piece piece);
