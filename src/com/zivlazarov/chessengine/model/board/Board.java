@@ -163,6 +163,7 @@ public class Board implements MyObservable, Serializable {
             } // TODO: add stalemate and draw situations here
         }
         gameSituation = GameSituation.NORMAL;
+        
     }
 
     public void generateLegalMovesWhenInCheck(Player currentPlayer) {
@@ -418,6 +419,11 @@ public class Board implements MyObservable, Serializable {
     }
 
     public int getHeuristicScore() {
+        whitePlayer.resetPlayerScore();
+        whitePlayer.evaluatePlayerScore();
+        blackPlayer.opponentPlayer.resetPlayerScore();
+        blackPlayer.opponentPlayer.evaluatePlayerScore();
+
         return whitePlayer.getPlayerScore() - blackPlayer.getPlayerScore();
     }
 
