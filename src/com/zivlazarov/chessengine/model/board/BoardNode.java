@@ -9,12 +9,14 @@ public class BoardNode {
 
     private int value;
     private Player currentPlayer;
+    private Board board;
 
     List<BoardNode> children;
 
     public BoardNode(Board board, Player player) {
+        this.board = board;
         this.currentPlayer = player;
-        this.value = board.getHeuristicScore(player);
+        this.value = this.board.getHeuristicScore(player);
         children = new ArrayList<>();
     }
 
@@ -48,5 +50,9 @@ public class BoardNode {
 
     public boolean isLeafNode() {
         return children.size() == 0;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 }
