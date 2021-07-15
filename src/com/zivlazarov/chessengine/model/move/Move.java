@@ -79,6 +79,10 @@ public class Move {
     public Tile getTargetTile() {
         return targetTile;
     }
+    
+    public String toString() {
+      return movingPiece.getName + " -> " + targetTile;
+    }
 
     public static class Builder {
 
