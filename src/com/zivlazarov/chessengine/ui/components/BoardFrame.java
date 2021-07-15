@@ -33,7 +33,6 @@ public class BoardFrame {
 
     private static Player whitePlayer;
     private static Player blackPlayer;
-    private static Player currentPlayer;
 
     private static Tile sourceTile;
     private static Tile destinationTile;
@@ -46,7 +45,7 @@ public class BoardFrame {
         blackPlayer = new Player(board, PieceColor.BLACK);
 
         whitePlayer.setOpponentPlayer(blackPlayer);
-        blackPlayer.setOpponentPlayer(whitePlayer);
+//        blackPlayer.setOpponentPlayer(whitePlayer);
 
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
@@ -62,10 +61,11 @@ public class BoardFrame {
 //        CommandLineGame.initPieces(whitePlayer, blackPlayer);
 //        board.checkBoard(whitePlayer);
 
-        currentPlayer = whitePlayer;
+        board.setCurrentPlayer(whitePlayer);
 
-        board.checkBoard(currentPlayer);
+        board.checkBoard(board.getCurrentPlayer());
 
+//        board.getCurrentPlayer().minimax(board, 6, Integer.MIN_VALUE, Integer.MAX_VALUE);
         gameFrame = new JFrame("Chess");
         gameFrame.setLayout(new BorderLayout());
         gameFrame.setSize(600, 600);
@@ -152,7 +152,7 @@ public class BoardFrame {
                         if (sourceTile == null) {
                             sourceTile = tile;
                             if (!sourceTile.isEmpty()) {
-                                if (sourceTile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
+                                if (sourceTile.getPiece().getPieceColor() == board.getCurrentPlayer().getPlayerColor()) {
                                     if (!sourceTile.getPiece().canMove()) {
                                         sourceTile = null;
                                         return;
@@ -183,12 +183,15 @@ public class BoardFrame {
                                 }
                                 // if it does, make move
                                 else {
-                                    currentPlayer.movePiece(playerPiece, destinationTile);
+                                    board.getCurrentPlayer().movePiece(playerPiece, destinationTile);
+//                                    currentPlayer.movePiece(playerPiece, destinationTile);
 
-                                    if (currentPlayer.equals(whitePlayer)) currentPlayer = blackPlayer;
-                                    else currentPlayer = whitePlayer;
+//                                    if (currentPlayer.equals(whitePlayer)) currentPlayer = blackPlayer;
+//                                    else currentPlayer = whitePlayer;
 
-                                    board.checkBoard(currentPlayer);
+//                                    board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
+
+//                                    board.checkBoard(board.getCurrentPlayer());
 
                                     System.out.println(board.getGameSituation());
 
