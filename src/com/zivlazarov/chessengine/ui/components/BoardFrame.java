@@ -1,6 +1,7 @@
 package com.zivlazarov.chessengine.ui.components;
 
 import com.zivlazarov.chessengine.model.board.*;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.ui.CommandLineGame;
@@ -183,15 +184,20 @@ public class BoardFrame {
                                 }
                                 // if it does, make move
                                 else {
-                                    board.getCurrentPlayer().movePiece(playerPiece, destinationTile);
-//                                    currentPlayer.movePiece(playerPiece, destinationTile);
+                                    Move move = new Move.Builder()
+                                            .board(board)
+                                            .player(board.getCurrentPlayer())
+                                            .movingPiece(playerPiece)
+                                            .targetTile(destinationTile)
+                                            .build();
 
-//                                    if (currentPlayer.equals(whitePlayer)) currentPlayer = blackPlayer;
-//                                    else currentPlayer = whitePlayer;
+                                    move.makeMove();
 
-//                                    board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
+//                                    board.getCurrentPlayer().movePiece(playerPiece, destinationTile);
 
-//                                    board.checkBoard(board.getCurrentPlayer());
+                                    board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
+
+                                    board.checkBoard(board.getCurrentPlayer());
 
                                     System.out.println(board.getGameSituation());
 

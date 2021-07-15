@@ -2,6 +2,7 @@ package com.zivlazarov.chessengine.model.player;
 
 import com.zivlazarov.chessengine.controllers.PlayerController;
 import com.zivlazarov.chessengine.model.board.*;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.utils.Memento;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
@@ -28,6 +29,8 @@ public class Player implements MyObserver, Serializable {
 
     private final int playerDirection;
 
+    private final List<Move> moves;
+
     private Map<Piece, Pair<Tile, Tile>> lastMove;
 
     private int playerScore = 0;
@@ -40,6 +43,8 @@ public class Player implements MyObserver, Serializable {
         legalMoves = new ArrayList<>();
         lastMove = new HashMap<>();
 
+        moves = new ArrayList<>();
+
         // setting player direction, white goes up the board, black goes down (specifically to pawn pieces and for checking pawn promotion)
         if (playerColor == PieceColor.WHITE) {
             playerDirection = 1;
@@ -50,8 +55,19 @@ public class Player implements MyObserver, Serializable {
 
     public void refreshPieces() {
         legalMoves.clear();
+        moves.clear();
         for (Piece piece : alivePieces) {
             piece.refresh();
+            for (Tile tile : piece.getPossibleMoves()) {
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(this)
+                        .movingPiece(piece)
+                        .targetTile(tile)
+                        .build();
+                moves.add(move);
+//                legalMoves.add(tile);
+            }
             legalMoves.addAll(piece.getPossibleMoves());
         }
 //        addAllPossibleNodes();
@@ -128,7 +144,8 @@ public class Player implements MyObserver, Serializable {
         opponentPlayer.resetPlayerScore();
         opponentPlayer.evaluatePlayerScore();
 
-        board.setCurrentPlayer(opponentPlayer);
+//        board.setCurrentPlayer(opponentPlayer);
+//        board.checkBoard(board.getCurrentPlayer());
         // set board's current node the node the player made
 //        for (BoardNode node : board.getCurrentNode().getChildren()) {
 //            if (node.getBoard().isSameBoard(board)) board.setCurrentNode(node);
@@ -326,6 +343,10 @@ public class Player implements MyObserver, Serializable {
 
     public boolean equals(Player other) {
         return playerColor == other.getPlayerColor();
+    }
+
+    public List<Move> getMoves() {
+        return moves;
     }
 
     @Override

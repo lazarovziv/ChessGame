@@ -120,7 +120,7 @@ public class BoardTest {
     public void testMinimax() {
 //        board.initBoard();
 //        board.checkBoard(player);
-        int value = new Minimax().minimax(board, 1200, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        int value = new Minimax().minimax(board, 200, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         System.out.println(value);
     }
 }

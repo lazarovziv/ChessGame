@@ -50,11 +50,11 @@ minimax(currentBoardNode, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)
         if (isMaximizingPlayer) {
             value = Integer.MIN_VALUE;
             ArrayList<Piece> movablePieces = new ArrayList<>(board.getCurrentPlayer().getAlivePieces().stream().filter(Piece::canMove).toList());
-            Collections.shuffle(movablePieces);
+//            Collections.shuffle(movablePieces);
             for (Piece piece : movablePieces) {
 //                if (!piece.canMove()) continue;
                 ArrayList<Tile> possibleMovesList = new ArrayList<>(piece.getPossibleMoves());
-                Collections.shuffle(possibleMovesList);
+//                Collections.shuffle(possibleMovesList);
                 for (Tile tile : possibleMovesList) {
                     if (board.getCurrentPlayer().movePiece(piece, tile)) {
                         System.out.println(value);
@@ -70,11 +70,11 @@ minimax(currentBoardNode, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)
         } else {
             value = Integer.MAX_VALUE;
             ArrayList<Piece> movablePieces = new ArrayList<>(board.getCurrentPlayer().getAlivePieces().stream().filter(Piece::canMove).toList());
-            Collections.shuffle(movablePieces);
+//            Collections.shuffle(movablePieces);
             for (Piece piece : movablePieces) {
 //                if (!piece.canMove()) continue;
                 ArrayList<Tile> possibleMovesList = new ArrayList<>(piece.getPossibleMoves());
-                Collections.shuffle(possibleMovesList);
+//                Collections.shuffle(possibleMovesList);
                 for (Tile tile : possibleMovesList) {
                     if (board.getCurrentPlayer().movePiece(piece, tile)) {
                         System.out.println(value);

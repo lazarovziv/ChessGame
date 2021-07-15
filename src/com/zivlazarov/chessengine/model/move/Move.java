@@ -6,46 +6,66 @@ import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.Pair;
 
 public class Move {
 
     private final Board board;
-
     private final Player player;
-
     private final Piece movingPiece;
-    private final Piece eatenPiece;
-
-    private final Tile currentTile;
     private final Tile targetTile;
 
-    private MoveLabel moveLabel;
-
-    private Move(Board board, Player player, Piece movingPiece, Piece eatenPiece, Tile currentTile, Tile targetTile, MoveLabel moveLabel) {
+    private Move(Board board, Player player, Piece movingPiece, Tile targetTile) {
         this.board = board;
         this.player = player;
         this.movingPiece = movingPiece;
-        this.eatenPiece = eatenPiece;
-        this.currentTile = currentTile;
         this.targetTile = targetTile;
-        this.moveLabel = moveLabel;
     }
 
-    public void makeMove() {
-        if (!movingPiece.canMove()) return;
+    public boolean makeMove() {
+        if (!movingPiece.getPossibleMoves().contains(targetTile)) return false;
+        if (!player.getLegalMoves().contains(targetTile)) return false;
+//        if (!player.getMoves().contains(this)) return false;
 
-        boolean isCapturing = !targetTile.isEmpty();
-        boolean isEnPassant = movingPiece instanceof PawnPiece && targetTile.equals(((PawnPiece) movingPiece).getEnPassantTile());
-        boolean isKingCastling = movingPiece instanceof KingPiece && targetTile.equals(((KingPiece) movingPiece).getKingSideCastleTile());
-        boolean isQueenCastling = movingPiece instanceof KingPiece && targetTile.equals(((KingPiece) movingPiece).getQueenSideCastleTile());
+        player.getLastMove().clear();
 
-        if (isEnPassant) moveLabel = MoveLabel.EN_PASSANT;
-        if (isKingCastling) moveLabel = MoveLabel.KING_SIDE_CASTLING;
-        if (isQueenCastling) moveLabel = MoveLabel.QUEEN_SIDE_CASTLING;
+        Tile currentTile = movingPiece.getCurrentTile();
+        if (currentTile != null) player.clearTileFromPiece(currentTile);
 
-        if (isCapturing) {
+        boolean isSpecialMove = false;
+
+        if (movingPiece instanceof PawnPiece) {
+            isSpecialMove = player.handleEnPassantMove(movingPiece, targetTile);
+            ((PawnPiece) movingPiece).setHasMoved(true);
+            player.handlePawnPromotion(movingPiece);
+        } else if (movingPiece instanceof KingPiece) {
+            isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
+            if (!isSpecialMove) isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
+            ((KingPiece) movingPiece).setHasMoved(true);
+        }
+
+        if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != player.getPlayerColor()) {
+            movingPiece.getPiecesEaten().push(targetTile.getPiece());
             player.getOpponentPlayer().addPieceToDead(targetTile.getPiece());
         }
+
+        movingPiece.setCurrentTile(targetTile);
+        movingPiece.setLastTile(targetTile);
+
+        movingPiece.getHistoryMoves().push(targetTile);
+        board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
+
+        player.getLastMove().put(movingPiece, new Pair<>(currentTile, targetTile));
+
+        player.resetPlayerScore();
+        player.evaluatePlayerScore();
+
+        player.getOpponentPlayer().resetPlayerScore();
+        player.getOpponentPlayer().evaluatePlayerScore();
+
+        board.setCurrentPlayer(player);
+
+        return true;
     }
 
     public Player getPlayer() {
@@ -56,20 +76,8 @@ public class Move {
         return movingPiece;
     }
 
-    public Piece getEatenPiece() {
-        return eatenPiece;
-    }
-
-    public Tile getCurrentTile() {
-        return currentTile;
-    }
-
     public Tile getTargetTile() {
         return targetTile;
-    }
-
-    public MoveLabel getMoveLabel() {
-        return moveLabel;
     }
 
     public static class Builder {
@@ -79,14 +87,10 @@ public class Move {
         private Player player;
 
         private Piece movingPiece;
-        private Piece eatenPiece;
-
-        private Tile currentTile;
         private Tile targetTile;
 
-        private MoveLabel moveLabel;
-
-        public Builder() {}
+        public Builder() {
+        }
 
         public Builder board(Board board) {
             this.board = board;
@@ -98,33 +102,18 @@ public class Move {
             return this;
         }
 
-        public Builder movingPiece(Piece piece) {
-            this.movingPiece = piece;
+        public Builder movingPiece(Piece movingPiece) {
+            this.movingPiece = movingPiece;
             return this;
         }
 
-        public Builder eatenPiece(Piece piece) {
-            this.eatenPiece = piece;
-            return this;
-        }
-
-        public Builder currentTile(Tile tile) {
-            this.currentTile = tile;
-            return this;
-        }
-
-        public Builder targetTile(Tile tile) {
-            this.targetTile = tile;
-            return this;
-        }
-
-        public Builder moveLabel(MoveLabel label) {
-            this.moveLabel = label;
+        public Builder targetTile(Tile targetTile) {
+            this.targetTile = targetTile;
             return this;
         }
 
         public Move build() {
-            return new Move(board, player, movingPiece, eatenPiece, currentTile, targetTile, moveLabel);
+            return new Move(board, player, movingPiece, targetTile);
         }
     }
 }

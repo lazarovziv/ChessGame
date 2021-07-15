@@ -155,7 +155,6 @@ public class Board implements MyObservable, Serializable {
         if (currentPlayer.isInCheck()) {
             // reset all legal moves before proceeding to generation of legal moves in check situation
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
-            System.out.println(gameSituation + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             generateLegalMovesWhenInCheck(currentPlayer);
             return;
         } else {
@@ -209,7 +208,7 @@ public class Board implements MyObservable, Serializable {
             // if all pieces don't have potential legal moves, then it's checkmate, and stop the method
             if (emptyListsCounter == actualLegalMoves.keySet().size()) {
                 gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
-                System.out.println("Checkmate!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.exit(1);
                 return;
             }
         }
