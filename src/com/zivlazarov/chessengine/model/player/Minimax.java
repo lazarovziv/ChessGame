@@ -101,6 +101,7 @@ minimax(currentBoardNode, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)
             if (value <= alpha) break;
             beta = Math.min(alpha, beta);
         }
+        return value;
     }
     
     public static int max(Board board, int depth, int alpha, int beta) {
@@ -115,4 +116,5 @@ minimax(currentBoardNode, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)
             alpha = Math.max(alpha, beta);
         }
     }
+    return value;
 }
