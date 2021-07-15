@@ -195,7 +195,7 @@ public class BoardFrame {
 
 //                                    board.getCurrentPlayer().movePiece(playerPiece, destinationTile);
 
-                                    board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
+                                    //board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
 
                                     board.checkBoard(board.getCurrentPlayer());
 

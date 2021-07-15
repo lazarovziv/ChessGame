@@ -63,7 +63,7 @@ public class Move {
         player.getOpponentPlayer().resetPlayerScore();
         player.getOpponentPlayer().evaluatePlayerScore();
 
-        board.setCurrentPlayer(player);
+        board.setCurrentPlayer(player.getOpponentPlayer());
 
         return true;
     }
