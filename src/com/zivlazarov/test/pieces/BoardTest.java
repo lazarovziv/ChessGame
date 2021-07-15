@@ -4,6 +4,7 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.player.Minimax;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Memento;
 import org.junit.jupiter.api.Assertions;
@@ -29,17 +30,18 @@ public class BoardTest {
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
-        opponent.setOpponentPlayer(player);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
-        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], false, 0);
-        rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], true, 1);
-        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][4]);
-        knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], 0);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[3][4], 0);
-        opponentPawnPiece1 = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[5][0], 1);
-        opponentBishopPiece = new BishopPiece(opponent, board, PieceColor.BLACK, board.getBoard()[4][0], 0);
-        board.checkBoard(player);
+//        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], false, 0);
+//        rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], true, 1);
+//        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][4]);
+//        knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], 0);
+//        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[3][4], 0);
+//        opponentPawnPiece1 = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[5][0], 1);
+//        opponentBishopPiece = new BishopPiece(opponent, board, PieceColor.BLACK, board.getBoard()[4][0], 0);
+        board.initBoard();
+        board.setCurrentPlayer(player);
+        board.checkBoard(board.getCurrentPlayer());
     }
 
     @Test
@@ -107,5 +109,18 @@ public class BoardTest {
         board.restoreFromMemento(boardMemento);
         board.printBoard();
 
+    }
+
+    @Test
+    public void testIsSameBoard() {
+
+    }
+
+    @Test
+    public void testMinimax() {
+//        board.initBoard();
+//        board.checkBoard(player);
+        int value = new Minimax().minimax(board, 1200, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        System.out.println(value);
     }
 }
