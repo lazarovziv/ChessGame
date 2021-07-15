@@ -89,6 +89,27 @@ minimax(currentBoardNode, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)
         }
         return value;
     }
+    
+    public Move calculateBestMove(Board board, int depth) {
+      Move bestMove = null;
+      int value;
+      int highestValue = Integer.MIN_VALUE;
+      int lowestValue = Integer.MAX_VALUE;
+      
+      for (Move move : board.getCurrentPlayer().getMoves()) {
+        move.makeMove();
+        value = board.getCurrentPlayer().getPlayerColor() ? min(board, 6, highestValue, lowestValue) : max(board, 6, highestValue, lowestValue);
+        
+        if (board.getCurrentPlayer().getPlayerColor() == PieceColor.WHITE && value >= highestValue) {
+          highestValue = value;
+          bestMove = move;
+        } else if (board.getCurrentPlayer().getPlayerColor() == PieceColor.BLACK && value <= lowestValue) {
+          lowestValue = value;
+          bestMove = move;
+        }
+      }
+      return bestMove;
+    }
 
     public static int min(Board board, int depth, int alpha, int beta) {
         if (depth == 0 || checkmateSituationsList.contains(board.getGameSituation()) return board.getHeuristicScore();
