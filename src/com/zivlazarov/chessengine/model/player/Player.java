@@ -1,9 +1,7 @@
 package com.zivlazarov.chessengine.model.player;
 
 import com.zivlazarov.chessengine.controllers.PlayerController;
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.utils.Memento;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
@@ -32,6 +30,8 @@ public class Player implements MyObserver, Serializable {
 
     private Map<Piece, Pair<Tile, Tile>> lastMove;
 
+    private int playerScore = 0;
+
     public Player(Board b, PieceColor pc) {
         board = b;
         playerColor = pc;
@@ -54,6 +54,19 @@ public class Player implements MyObserver, Serializable {
             piece.refresh();
             legalMoves.addAll(piece.getPossibleMoves());
         }
+//        addAllPossibleNodes();
+    }
+
+    private void addAllPossibleNodes() {
+        for (Piece piece : alivePieces) {
+            if (!piece.canMove()) continue;
+            for (Tile tile : piece.getPossibleMoves()) {
+                if (movePiece(piece, tile)) {
+                    board.getCurrentNode().addChildNode(new BoardNode(board, this));
+                    board.unmakeLastMove(piece);
+                }
+            }
+        }
     }
 
     public void updatePieceAsDead(Piece piece) {
@@ -75,7 +88,9 @@ public class Player implements MyObserver, Serializable {
         lastMove.clear();
 
         Tile pieceTile = piece.getCurrentTile();
-        clearTileFromPiece(pieceTile);
+        if (pieceTile != null) {
+            clearTileFromPiece(pieceTile);
+        }
 
         // checking if an en passant or castling has been made to know if can continue to the rest of method's statements
         boolean isSpecialMove = false;
@@ -83,7 +98,7 @@ public class Player implements MyObserver, Serializable {
         if (piece instanceof PawnPiece) {
             isSpecialMove = handleEnPassantMove(piece, targetTile);
             ((PawnPiece) piece).setHasMoved(true);
-            handlePawnPromotion(piece);
+//            handlePawnPromotion(piece);
         }
         if (piece instanceof KingPiece) {
             isSpecialMove = handleKingSideCastling(piece, targetTile);
@@ -106,7 +121,18 @@ public class Player implements MyObserver, Serializable {
 
         lastMove.put(piece, new Pair<>(pieceTile, targetTile));
 
-        update();
+//        board.checkBoard(opponentPlayer);
+
+        resetPlayerScore();
+        evaluatePlayerScore();
+        opponentPlayer.resetPlayerScore();
+        opponentPlayer.evaluatePlayerScore();
+
+        board.setCurrentPlayer(opponentPlayer);
+        // set board's current node the node the player made
+//        for (BoardNode node : board.getCurrentNode().getChildren()) {
+//            if (node.getBoard().isSameBoard(board)) board.setCurrentNode(node);
+//        }
 
         return true;
     }
@@ -286,6 +312,9 @@ public class Player implements MyObserver, Serializable {
 
     public void setOpponentPlayer(Player opponent) {
         opponentPlayer = opponent;
+        if (opponentPlayer.getOpponentPlayer() == null) {
+            opponentPlayer.setOpponentPlayer(this);
+        }
 //        if (opponentPlayer.getOpponentPlayer() != null) {
 //            opponentPlayer.setOpponentPlayer(this);
 //        }
@@ -314,6 +343,18 @@ public class Player implements MyObserver, Serializable {
 
     public List<Tile> getLegalMoves() {
         return legalMoves;
+    }
+
+    public void evaluatePlayerScore() {
+        for (Piece piece : alivePieces) playerScore += piece.getValue();
+    }
+
+    public void resetPlayerScore() {
+        playerScore = 0;
+    }
+
+    public int getPlayerScore() {
+        return playerScore;
     }
 
     public void updateLegalMoves() {
