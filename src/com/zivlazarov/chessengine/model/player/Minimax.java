@@ -90,7 +90,29 @@ minimax(currentBoardNode, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)
         return value;
     }
 
-    public int min(Board board, int depth, int alpha, int beta) {
-        return 0;
+    public static int min(Board board, int depth, int alpha, int beta) {
+        if (depth == 0 || checkmateSituationsList.contains(board.getGameSituation()) return board.getHeuristicScore();
+        
+        int value = Integer.MAX_VALUE;
+        
+        for (Move move : board.getCurrentPlayer().getMoves()) {
+            move.makeMove();
+            value = Math.min(value, max(board, depth - 1, alpha, beta);
+            if (value <= alpha) break;
+            beta = Math.min(alpha, beta);
+        }
+    }
+    
+    public static int max(Board board, int depth, int alpha, int beta) {
+        if (depth == 0 || checkmateSituationsList.contains(board.getGameSituation()) return board.getHeuristicScore();
+        
+        int value = Integer.MIN_VALUE;
+        
+        for (Move move : board.getCurrentPlayer) {
+            move.makeMove();
+            value = Math.max(value, min(board, depth - 1, alpha, beta);
+            if (beta >= value) break;
+            alpha = Math.max(alpha, beta);
+        }
     }
 }
