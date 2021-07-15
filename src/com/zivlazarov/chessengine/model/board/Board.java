@@ -18,6 +18,7 @@ public class Board implements MyObservable, Serializable {
     private static volatile Board simulatedInstance;
 
     private BoardNode node;
+    private BoardNode currentNode;
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -37,6 +38,7 @@ public class Board implements MyObservable, Serializable {
 
     private Player whitePlayer;
     private Player blackPlayer;
+    private Player currentPlayer;
 
     private GameSituation gameSituation;
     private List<MyObserver> observers;
@@ -138,6 +140,7 @@ public class Board implements MyObservable, Serializable {
         PawnPiece blackPawn7 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][7], 7);
 
         node = new BoardNode(instance, whitePlayer);
+        currentNode = node;
     }
 
     public void checkBoard(Player currentPlayer) {
@@ -152,6 +155,7 @@ public class Board implements MyObservable, Serializable {
         if (currentPlayer.isInCheck()) {
             // reset all legal moves before proceeding to generation of legal moves in check situation
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
+            System.out.println(gameSituation + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             generateLegalMovesWhenInCheck(currentPlayer);
             return;
         } else {
@@ -165,7 +169,8 @@ public class Board implements MyObservable, Serializable {
     public void generateLegalMovesWhenInCheck(Player currentPlayer) {
         Map<Piece, List<Tile>> actualLegalMoves = new HashMap<>();
 
-        for (Piece piece : currentPlayer.getAlivePieces()) {
+        ArrayList<Piece> alivePiecesList = new ArrayList<>(currentPlayer.getAlivePieces());
+        for (Piece piece : alivePiecesList) {
             if (!piece.canMove()) continue;
             List<Tile> potentialLegalMovesForPiece = new ArrayList<>();
             synchronized (piece) {
@@ -204,6 +209,7 @@ public class Board implements MyObservable, Serializable {
             // if all pieces don't have potential legal moves, then it's checkmate, and stop the method
             if (emptyListsCounter == actualLegalMoves.keySet().size()) {
                 gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
+                System.out.println("Checkmate!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 return;
             }
         }
@@ -412,8 +418,24 @@ public class Board implements MyObservable, Serializable {
         return player.getPlayerScore() - player.getOpponentPlayer().getPlayerScore();
     }
 
-    public BoardNode getNode() {
-        return node;
+    public int getHeuristicScore() {
+        return whitePlayer.getPlayerScore() - blackPlayer.getPlayerScore();
+    }
+
+    public BoardNode getCurrentNode() {
+        return currentNode;
+    }
+
+    public void setCurrentNode(BoardNode node) {
+        currentNode = node;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
     }
 
     @Override
@@ -497,5 +519,19 @@ public class Board implements MyObservable, Serializable {
     @Override
     public void clearChanged() {
         changedState = false;
+    }
+
+    public boolean isSameBoard(Board other) {
+        for (int r = 0; r < board.length; r++) {
+            for (int c = 0; c < board.length; c++) {
+                Tile tile = board[r][c];
+                Tile otherTile = other.getBoard()[r][c];
+
+                if (!tile.isEmpty() && !otherTile.isEmpty()) {
+                    if (!tile.getPiece().equals(otherTile.getPiece())) return false;
+                }
+            }
+        }
+        return true;
     }
 }
