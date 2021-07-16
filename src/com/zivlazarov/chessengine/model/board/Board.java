@@ -421,8 +421,8 @@ public class Board implements MyObservable, Serializable {
     public int getHeuristicScore() {
         whitePlayer.resetPlayerScore();
         whitePlayer.evaluatePlayerScore();
-        blackPlayer.opponentPlayer.resetPlayerScore();
-        blackPlayer.opponentPlayer.evaluatePlayerScore();
+        blackPlayer.resetPlayerScore();
+        blackPlayer.evaluatePlayerScore();
 
         return whitePlayer.getPlayerScore() - blackPlayer.getPlayerScore();
     }

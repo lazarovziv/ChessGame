@@ -17,6 +17,8 @@ public class Player implements MyObserver, Serializable {
 
     private Player opponentPlayer;
 
+    private boolean isAI;
+
     private final Board board;
 
     private MyObservable observable;
@@ -71,6 +73,11 @@ public class Player implements MyObserver, Serializable {
             legalMoves.addAll(piece.getPossibleMoves());
         }
 //        addAllPossibleNodes();
+    }
+
+    public Move calculateNextMove(Minimax minimax, int depth) {
+        if (!isAI) return null;
+        return minimax.calculateBestMove(board, depth);
     }
 
     private void addAllPossibleNodes() {
@@ -376,6 +383,14 @@ public class Player implements MyObserver, Serializable {
 
     public int getPlayerScore() {
         return playerScore;
+    }
+
+    public boolean isAI() {
+        return isAI;
+    }
+
+    public void setAI(boolean AI) {
+        isAI = AI;
     }
 
     public void updateLegalMoves() {

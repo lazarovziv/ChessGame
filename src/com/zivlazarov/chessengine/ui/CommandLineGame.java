@@ -6,7 +6,9 @@ import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.GameSituation;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.player.Minimax;
 import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.HashMap;
@@ -21,6 +23,7 @@ public class CommandLineGame {
     private static PlayerController playerController;
     private static Player whitePlayer;
     private static Player blackPlayer;
+    private static Minimax minimax;
 
     private static GameSituation gameSituation;
 
@@ -28,9 +31,13 @@ public class CommandLineGame {
 
         whitePlayer = new Player(board, PieceColor.WHITE);
         blackPlayer = new Player(board, PieceColor.BLACK);
+        minimax = new Minimax();
 
         whitePlayer.setName("Ziv");
         blackPlayer.setName("Guy");
+
+        whitePlayer.setAI(true);
+        blackPlayer.setAI(true);
 
         Map<GameSituation, String> gameSituationsMap = new HashMap<>();
 
@@ -41,10 +48,13 @@ public class CommandLineGame {
         gameSituationsMap.put(GameSituation.DRAW, "It's a draw!");
 
         whitePlayer.setOpponentPlayer(blackPlayer);
-        blackPlayer.setOpponentPlayer(whitePlayer);
 
         board.setWhitePlayer(whitePlayer);
         board.setBlackPlayer(blackPlayer);
+
+        board.initBoard();
+
+        board.setCurrentPlayer(whitePlayer);
 
         boardController = new BoardController(board);
 
@@ -75,7 +85,24 @@ public class CommandLineGame {
         System.out.println("\nIt's a " + whitePlayer.getName() + " vs. " + blackPlayer.getName() + " SHOWDOWN!");
 
         // initializing all pieces
-        board.initBoard();
+//        board.initBoard();
+
+        String quit = "n";
+
+        while (!quit.equals("y")) {
+            board.printBoard();
+
+            Move move = minimax.calculateBestMove(board, 6);
+            move.makeMove();
+
+            board.checkBoard(board.getCurrentPlayer());
+            System.out.println(
+                    board.getGameHistoryMoves().lastElement().getFirst().getName()
+                            + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
+
+            quit = scanner.nextLine();
+            quit = quit.toLowerCase();
+        }
 
         // game loop
         while (gameStarted) {

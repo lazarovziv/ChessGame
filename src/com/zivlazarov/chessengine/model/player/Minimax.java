@@ -2,7 +2,9 @@ package com.zivlazarov.chessengine.model.player;
 
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.GameSituation;
+import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 
 import java.util.ArrayList;
@@ -12,8 +14,8 @@ import java.util.List;
 
 public class Minimax {
 
-    GameSituation[] checkmateSituations = new GameSituation[]{GameSituation.BLACK_CHECKMATED, GameSituation.WHITE_CHECKMATED};
-    List<GameSituation> checkmateSituationsList = new ArrayList<GameSituation>(Arrays.asList(checkmateSituations));
+    private static final GameSituation[] checkmateSituations = new GameSituation[]{GameSituation.BLACK_CHECKMATED, GameSituation.WHITE_CHECKMATED};
+    public static final List<GameSituation> checkmateSituationsList = new ArrayList<GameSituation>(Arrays.asList(checkmateSituations));
 
     /*
     taken from wikipedia
@@ -39,7 +41,7 @@ minimax(currentBoardNode, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)
     // add the board's state after the move as a child node to the current node, undo the move, and set the current node as the current board state
 
     // adding the minimax algorithm here, and even optioning human players to be advised for best possible move at any given moment of their turn
-
+/*
     public int minimax(Board board, int depth, int alpha, int beta, boolean isMaximizingPlayer) {
         if (depth == 0 || checkmateSituationsList.contains(board.getGameSituation())) return board.getHeuristicScore();
 
@@ -89,53 +91,57 @@ minimax(currentBoardNode, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)
         }
         return value;
     }
-    
+    */
+
     public Move calculateBestMove(Board board, int depth) {
-      Move bestMove = null;
-      int value;
-      int highestValue = Integer.MIN_VALUE;
-      int lowestValue = Integer.MAX_VALUE;
-      
-      for (Move move : board.getCurrentPlayer().getMoves()) {
-        move.makeMove();
-        value = board.getCurrentPlayer().getPlayerColor() ? min(board, 6, highestValue, lowestValue) : max(board, 6, highestValue, lowestValue);
-        
-        if (board.getCurrentPlayer().getPlayerColor() == PieceColor.WHITE && value >= highestValue) {
-          highestValue = value;
-          bestMove = move;
-        } else if (board.getCurrentPlayer().getPlayerColor() == PieceColor.BLACK && value <= lowestValue) {
-          lowestValue = value;
-          bestMove = move;
+        Move bestMove = null;
+        int value;
+        int highestValue = Integer.MIN_VALUE;
+        int lowestValue = Integer.MAX_VALUE;
+
+        for (Move move : board.getCurrentPlayer().getMoves()) {
+            board.printBoard();
+            move.makeMove();
+            value = board.getCurrentPlayer().getPlayerColor() == PieceColor.WHITE ? min(board, depth, highestValue, lowestValue) : max(board, depth, highestValue, lowestValue);
+
+            if (board.getCurrentPlayer().getPlayerColor() == PieceColor.WHITE && value >= highestValue) {
+                highestValue = value;
+                bestMove = move;
+            } else if (board.getCurrentPlayer().getPlayerColor() == PieceColor.BLACK && value <= lowestValue) {
+                lowestValue = value;
+                bestMove = move;
+            }
         }
-      }
-      return bestMove;
+        return bestMove;
     }
 
     public static int min(Board board, int depth, int alpha, int beta) {
-        if (depth == 0 || checkmateSituationsList.contains(board.getGameSituation()) return board.getHeuristicScore();
-        
+        if (depth == 0) /* || checkmateSituationsList.contains(board.getGameSituation())) */
+            return board.getHeuristicScore();
+
         int value = Integer.MAX_VALUE;
-        
+
         for (Move move : board.getCurrentPlayer().getMoves()) {
             move.makeMove();
-            value = Math.min(value, max(board, depth - 1, alpha, beta);
+            value = Math.min(value, max(board, depth - 1, alpha, beta));
             if (value <= alpha) break;
             beta = Math.min(alpha, beta);
         }
         return value;
     }
-    
+
     public static int max(Board board, int depth, int alpha, int beta) {
-        if (depth == 0 || checkmateSituationsList.contains(board.getGameSituation()) return board.getHeuristicScore();
-        
+        if (depth == 0) /* || checkmateSituationsList.contains(board.getGameSituation())) */
+            return board.getHeuristicScore();
+
         int value = Integer.MIN_VALUE;
-        
-        for (Move move : board.getCurrentPlayer) {
+
+        for (Move move : board.getCurrentPlayer().getMoves()) {
             move.makeMove();
-            value = Math.max(value, min(board, depth - 1, alpha, beta);
+            value = Math.max(value, min(board, depth - 1, alpha, beta));
             if (beta >= value) break;
             alpha = Math.max(alpha, beta);
         }
+        return value;
     }
-    return value;
 }

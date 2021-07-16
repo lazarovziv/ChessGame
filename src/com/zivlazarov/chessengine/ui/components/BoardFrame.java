@@ -3,6 +3,7 @@ package com.zivlazarov.chessengine.ui.components;
 import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.Piece;
+import com.zivlazarov.chessengine.model.player.Minimax;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.ui.CommandLineGame;
 
@@ -35,15 +36,21 @@ public class BoardFrame {
     private static Player whitePlayer;
     private static Player blackPlayer;
 
+    private static Minimax minimax;
+
     private static Tile sourceTile;
     private static Tile destinationTile;
     private static Piece playerPiece;
-    
+
     public BoardFrame() {
         board = Board.getInstance();
 
         whitePlayer = new Player(board, PieceColor.WHITE);
         blackPlayer = new Player(board, PieceColor.BLACK);
+        minimax = new Minimax();
+
+        whitePlayer.setAI(false);
+        blackPlayer.setAI(true);
 
         whitePlayer.setOpponentPlayer(blackPlayer);
 //        blackPlayer.setOpponentPlayer(whitePlayer);
@@ -76,22 +83,22 @@ public class BoardFrame {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // setting window in center
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        gameFrame.setLocation(dim.width/2-gameFrame.getSize().width/2, dim.height/2-gameFrame.getSize().height/2);
-    
+        gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
+
     }
-    
+
     private static class BoardPanel extends JPanel {
-        
+
         final ArrayList<TilePanel> tilePanels;
         final Map<Tile, TilePanel> tilePanelMap;
         final Map<TilePanel, Tile> tilePanelTileMap;
-        
+
         BoardPanel(Board board) {
-            super(new GridLayout(8,8));
+            super(new GridLayout(8, 8));
             tilePanels = new ArrayList();
             tilePanelMap = new HashMap<>();
             tilePanelTileMap = new HashMap<>();
-            
+
             for (int r = 0; r < 8; r++) {
                 for (int c = 0; c < 8; c++) {
                     Tile tile = board.getBoard()[r][c];
@@ -117,7 +124,7 @@ public class BoardFrame {
             repaint();
         }
     }
-    
+
     private static class TilePanel extends JPanel {
 
         private final Tile tile;
@@ -134,7 +141,7 @@ public class BoardFrame {
         private static ArrayList<Tile> markedTiles;
 
         private static boolean drawPossibleMoves = false;
-        
+
         TilePanel(BoardPanel boardPanel, Tile tile) {
             super(new GridBagLayout());
             this.tile = tile;
@@ -145,6 +152,7 @@ public class BoardFrame {
 
             drawTile();
 
+//            if (!board.getCurrentPlayer().isAI()) {
             addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -310,6 +318,22 @@ public class BoardFrame {
 
                 }
             });
+//            } else if (board.getCurrentPlayer().isAI()) {
+//                Move move = board.getCurrentPlayer().calculateNextMove(new Minimax(), 6);
+//                System.out.println(move);
+//                move.makeMove();
+//
+//                board.checkBoard(board.getCurrentPlayer());
+//
+//                System.out.println(board.getGameSituation());
+//
+//                System.out.println();
+//                System.out.println(
+//                        board.getGameHistoryMoves().lastElement().getFirst().getName()
+//                                + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
+//
+//                SwingUtilities.invokeLater(boardPanel::drawBoard);
+//            }
 
             validate();
         }
@@ -341,8 +365,7 @@ public class BoardFrame {
                 try {
                     BufferedImage image = ImageIO.read(new File(currentPath + "/src/" + piece.getImageName()));
                     return new ImageIcon(image);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }

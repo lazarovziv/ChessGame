@@ -1,6 +1,7 @@
 package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
@@ -120,7 +121,7 @@ public class BoardTest {
     public void testMinimax() {
 //        board.initBoard();
 //        board.checkBoard(player);
-        int value = new Minimax().minimax(board, 200, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
-        System.out.println(value);
+        Move move = new Minimax().calculateBestMove(board, 6);
+        System.out.println(move);
     }
 }

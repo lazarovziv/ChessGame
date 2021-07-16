@@ -81,7 +81,7 @@ public class Move {
     }
     
     public String toString() {
-      return movingPiece.getName + " -> " + targetTile;
+      return movingPiece.getName() + ": " + movingPiece.getCurrentTile() + " -> " + targetTile;
     }
 
     public static class Builder {
