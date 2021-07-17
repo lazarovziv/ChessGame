@@ -36,6 +36,7 @@ public class PawnPiece implements Piece, Cloneable {
     private PieceColor pieceColor;
     private String imageName;
     private boolean hasMoved = false;
+    private boolean executedEnPassant = false;
 
     private Tile enPassantTile;
     private Icon imageIcon;
@@ -140,9 +141,8 @@ public class PawnPiece implements Piece, Cloneable {
         || x - 2 * player.getOpponentPlayer().getPlayerDirection() < 0) return false;
 
         // checking if piece next to pawn is of type pawn and is opponent's piece
-        if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece &&
-                board.getBoard()[x][y + eatingDirection].getPiece().getPieceColor() != pieceColor) {
-            PawnPiece pawn = (PawnPiece) board.getBoard()[x][y + eatingDirection].getPiece();
+        if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece pawn &&
+               pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant()) {
             // checking to see if opponent's last move is pawn's move 2 tiles forward
             if (board.getGameHistoryMoves().lastElement()/*.getSecond()*/.equals(new Pair<>(
 //                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
@@ -209,6 +209,14 @@ public class PawnPiece implements Piece, Cloneable {
 
     public int getPieceCounter() {
         return pieceCounter;
+    }
+
+    public boolean hasExecutedEnPassant() {
+        return executedEnPassant;
+    }
+
+    public void setExecutedEnPassant(boolean executedEnPassant) {
+        this.executedEnPassant = executedEnPassant;
     }
 
     public Player getPlayer() {
