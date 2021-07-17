@@ -426,9 +426,9 @@ public class Board implements MyObservable, Serializable {
         blackPlayer.resetPlayerScore();
         blackPlayer.evaluatePlayerScore();
 
-        int perspective = currentPlayer.getPlayerColor() == PieceColor.WHITE ? 1 : -1;
+//        int perspective = currentPlayer.getPlayerColor() == PieceColor.WHITE ? 1 : -1;
 
-        return perspective * (whitePlayer.getPlayerScore() - blackPlayer.getPlayerScore());
+        return /*perspective * */(whitePlayer.getPlayerScore() - blackPlayer.getPlayerScore());
     }
 
     public BoardNode getCurrentNode() {
