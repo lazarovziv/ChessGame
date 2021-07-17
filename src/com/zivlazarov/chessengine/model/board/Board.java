@@ -414,17 +414,19 @@ public class Board implements MyObservable, Serializable {
         return gameHistoryMoves;
     }
 
-    public int getHeuristicScore(Player player) {
+    public int evaluateBoard(Player player) {
         return player.getPlayerScore() - player.getOpponentPlayer().getPlayerScore();
     }
 
-    public int getHeuristicScore() {
+    public int evaluateBoard() {
         whitePlayer.resetPlayerScore();
         whitePlayer.evaluatePlayerScore();
         blackPlayer.resetPlayerScore();
         blackPlayer.evaluatePlayerScore();
 
-        return whitePlayer.getPlayerScore() - blackPlayer.getPlayerScore();
+        int perspective = currentPlayer.getPlayerColor() == PieceColor.WHITE ? 1 : -1;
+
+        return perspective * (whitePlayer.getPlayerScore() - blackPlayer.getPlayerScore());
     }
 
     public BoardNode getCurrentNode() {

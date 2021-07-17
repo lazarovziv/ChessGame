@@ -75,11 +75,6 @@ public class Player implements MyObserver, Serializable {
 //        addAllPossibleNodes();
     }
 
-    public Move calculateNextMove(Minimax minimax, int depth) {
-        if (!isAI) return null;
-        return minimax.calculateBestMove(board, depth);
-    }
-
     private void addAllPossibleNodes() {
         for (Piece piece : alivePieces) {
             if (!piece.canMove()) continue;
@@ -195,16 +190,20 @@ public class Player implements MyObserver, Serializable {
             // clearing piece from it's tile to set a new piece
             targetTile.setPiece(null);
 
-            char chosenPiece = PlayerController.receivePawnPromotionChoice();
-
-            switch (chosenPiece) {
-                case 'q' -> convertedPiece = new QueenPiece(this, board, playerColor, targetTile);
-                case 'b' -> convertedPiece = new BishopPiece(this, board, playerColor, targetTile, 3);
-                case 'n' -> convertedPiece = new KnightPiece(this, board, playerColor, targetTile, 3);
-                case 'r' -> convertedPiece = new RookPiece(this, board, playerColor, targetTile, false, 3);
-
-            }
-            if (convertedPiece != null) addPieceToAlive(convertedPiece);
+            // promoting the pawn to queen
+            convertedPiece = new QueenPiece(this, board, playerColor, targetTile);
+            addPieceToAlive(convertedPiece);
+//
+//            char chosenPiece = PlayerController.receivePawnPromotionChoice();
+//
+//            switch (chosenPiece) {
+//                case 'q' -> convertedPiece = new QueenPiece(this, board, playerColor, targetTile);
+//                case 'b' -> convertedPiece = new BishopPiece(this, board, playerColor, targetTile, 3);
+//                case 'n' -> convertedPiece = new KnightPiece(this, board, playerColor, targetTile, 3);
+//                case 'r' -> convertedPiece = new RookPiece(this, board, playerColor, targetTile, false, 3);
+//
+//            }
+//            if (convertedPiece != null) addPieceToAlive(convertedPiece);
         }
     }
 
@@ -288,6 +287,7 @@ public class Player implements MyObserver, Serializable {
     }
 
     public void addPieceToDead(Piece piece) {
+        if (piece == null) return;
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
             alivePieces.remove(piece);
@@ -374,7 +374,7 @@ public class Player implements MyObserver, Serializable {
     }
 
     public void evaluatePlayerScore() {
-        for (Piece piece : alivePieces) playerScore += piece.getValue();
+        for (Piece piece : alivePieces) playerScore += 100 * piece.getValue();
     }
 
     public void resetPlayerScore() {

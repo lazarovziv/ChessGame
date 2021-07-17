@@ -16,7 +16,7 @@ public class BoardNode {
     public BoardNode(Board board, Player player) {
         this.board = board;
         this.currentPlayer = player;
-        this.value = this.board.getHeuristicScore(player);
+        this.value = this.board.evaluateBoard(player);
         children = new ArrayList<>();
     }
 

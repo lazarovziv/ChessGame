@@ -5,7 +5,6 @@ import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.player.Minimax;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Memento;
 import org.junit.jupiter.api.Assertions;
@@ -115,13 +114,5 @@ public class BoardTest {
     @Test
     public void testIsSameBoard() {
 
-    }
-
-    @Test
-    public void testMinimax() {
-//        board.initBoard();
-//        board.checkBoard(player);
-        Move move = new Minimax().calculateBestMove(board, 6);
-        System.out.println(move);
     }
 }

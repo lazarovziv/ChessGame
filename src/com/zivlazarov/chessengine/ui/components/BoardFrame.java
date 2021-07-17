@@ -3,9 +3,7 @@ package com.zivlazarov.chessengine.ui.components;
 import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.Piece;
-import com.zivlazarov.chessengine.model.player.Minimax;
 import com.zivlazarov.chessengine.model.player.Player;
-import com.zivlazarov.chessengine.ui.CommandLineGame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -36,8 +34,6 @@ public class BoardFrame {
     private static Player whitePlayer;
     private static Player blackPlayer;
 
-    private static Minimax minimax;
-
     private static Tile sourceTile;
     private static Tile destinationTile;
     private static Piece playerPiece;
@@ -47,7 +43,6 @@ public class BoardFrame {
 
         whitePlayer = new Player(board, PieceColor.WHITE);
         blackPlayer = new Player(board, PieceColor.BLACK);
-        minimax = new Minimax();
 
         whitePlayer.setAI(false);
         blackPlayer.setAI(true);
@@ -163,6 +158,7 @@ public class BoardFrame {
                             if (!sourceTile.isEmpty()) {
                                 if (sourceTile.getPiece().getPieceColor() == board.getCurrentPlayer().getPlayerColor()) {
                                     if (!sourceTile.getPiece().canMove()) {
+                                        System.out.println(sourceTile.getPiece().getName() + " can't move!");
                                         sourceTile = null;
                                         return;
                                     }
@@ -208,6 +204,8 @@ public class BoardFrame {
                                     board.checkBoard(board.getCurrentPlayer());
 
                                     System.out.println(board.getGameSituation());
+
+                                    System.out.println("Board evaluation: " + board.evaluateBoard());
 
                                     System.out.println();
                                     System.out.println(
