@@ -97,8 +97,8 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void initBoard() {
-        RookPiece whiteRookKingSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][0], true, 0);
-        RookPiece whiteRookQueenSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][7], false, 1);
+        RookPiece whiteRookKingSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][7], true, 0);
+        RookPiece whiteRookQueenSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][0], false, 1);
 
         RookPiece blackRookQueenSide = new RookPiece(blackPlayer, instance, PieceColor.BLACK, board[7][0], false, 0);
         RookPiece blackRookKingSide = new RookPiece(blackPlayer, instance, PieceColor.BLACK, board[7][7], true, 1);
@@ -115,10 +115,10 @@ public class Board implements MyObservable, Serializable {
         BishopPiece blackBishopKingSide = new BishopPiece(blackPlayer, instance, PieceColor.BLACK, board[7][5], 0);
         BishopPiece blackBishopQueenSide = new BishopPiece(blackPlayer, instance, PieceColor.BLACK, board[7][2], 1);
 
-        QueenPiece whiteQueen = new QueenPiece(whitePlayer, instance, PieceColor.WHITE, board[0][4]);
+        QueenPiece whiteQueen = new QueenPiece(whitePlayer, instance, PieceColor.WHITE, board[0][3]);
         QueenPiece blackQueen = new QueenPiece(blackPlayer, instance, PieceColor.BLACK, board[7][3]);
 
-        KingPiece whiteKing = new KingPiece(whitePlayer, instance, PieceColor.WHITE, board[0][3]);
+        KingPiece whiteKing = new KingPiece(whitePlayer, instance, PieceColor.WHITE, board[0][4]);
         KingPiece blackKing = new KingPiece(blackPlayer, instance, PieceColor.BLACK, board[7][4]);
 
         PawnPiece whitePawn0 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][0], 0);
@@ -307,7 +307,7 @@ public class Board implements MyObservable, Serializable {
         for (int r = 0; r < board.length; r++) {
             System.out.println();
             for (int c = 0; c < board.length; c++) {
-                if (c == 0) /*System.out.print(letters[r] + " ");*/ System.out.print(nums[r] + " ");
+                if (c == 0) /*System.out.print(letters[r] + " ");*/ System.out.print(letters[r] + " ");
                 if (board[r][c].getPiece() != null) {
                     System.out.print(board[r][c].getPiece().getName() + " ");
                 } else System.out.print("-- ");
@@ -323,12 +323,13 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void printBoardUpsideDown() {
+        char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
         int[] nums = {1, 2, 3, 4, 5, 6, 7, 8};
 
         for (int r = board.length - 1; r >= 0; r--) {
             System.out.println();
             for (int c = board.length - 1; c >= 0; c--) {
-                if (c == board.length - 1) System.out.print(nums[r] + " ");
+                if (c == board.length - 1) System.out.print(letters[r] + " ");
                 if (board[r][c].getPiece() != null) {
                     System.out.print(board[r][c].getPiece().getName() + " ");
                 } else System.out.print("-- ");
@@ -350,7 +351,7 @@ public class Board implements MyObservable, Serializable {
         for (int r = 0; r < board.length; r++) {
             System.out.println();
             for (int c = 0; c < board.length; c++) {
-                if (c == 0) /*System.out.print(letters[r] + " ");*/ System.out.print(nums[r] + " ");
+                if (c == 0) /*System.out.print(letters[r] + " ");*/ System.out.print(letters[r] + " ");
                 if (board[r][c].getPiece() != null) {
                     if (board[r][c] == tileChosen) {
                         System.out.print(ANSI_RED + board[r][c].getPiece().getName() + " " + ANSI_RESET);
@@ -368,12 +369,13 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void printBoardUpsideDown(Tile tileChosen) {
+        char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
         int[] nums = {1, 2, 3, 4, 5, 6, 7, 8};
 
         for (int r = board.length - 1; r >= 0; r--) {
             System.out.println();
             for (int c = board.length - 1; c >= 0; c--) {
-                if (c == board.length - 1) /*System.out.print(letters[r] + " ");*/ System.out.print(nums[r] + " ");
+                if (c == board.length - 1) /*System.out.print(letters[r] + " ");*/ System.out.print(letters[r] + " ");
                 if (board[r][c].getPiece() != null) {
                     if (board[r][c] == tileChosen) {
                         System.out.print(ANSI_RED + board[r][c].getPiece().getName() + " " + ANSI_RESET);

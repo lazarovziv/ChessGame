@@ -59,15 +59,15 @@ public class KingPiece implements Piece, Cloneable {
         if (pieceColor == PieceColor.BLACK) {
             name = "bK";
             imageName = "blackKing.png";
-            kingSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
-            queenSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wK";
             imageName = "whiteKing.png";
-            kingSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
-            queenSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
         }
+
+        kingSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
+        queenSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
+
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
@@ -120,27 +120,40 @@ public class KingPiece implements Piece, Cloneable {
                 }
             }
         }
-        // adding castling to tilesToMoveTo
-        int whiteRookKingSideColumn = 0;
-        int whiteRookQueenSideColumn = 7;
-        int blackRookKingSideColumn = 7;
-        int blackRookQueenSideColumn = 0;
 
-        if (pieceColor == PieceColor.WHITE) {
-            if (canKingSideCastle()) {
-                possibleMoves.add(board.getBoard()[x][whiteRookKingSideColumn+1]);
-            }
-            if (canQueenSideCastle()) {
-                possibleMoves.add(board.getBoard()[x][whiteRookQueenSideColumn-2]);
-            }
-        } else if (pieceColor == PieceColor.BLACK) {
-            if (canKingSideCastle()) {
-                possibleMoves.add(board.getBoard()[x][blackRookKingSideColumn-1]);
-            }
-            if (canQueenSideCastle()) {
-                possibleMoves.add(board.getBoard()[x][blackRookQueenSideColumn+2]);
-            }
+        if (y + 2 <= 7) {
+            if (canKingSideCastle()) possibleMoves.add(board.getBoard()[x][y+2]);
         }
+
+        if (y - 2 >= 0) {
+            if (canQueenSideCastle()) possibleMoves.add(board.getBoard()[x][y-2]);
+        }
+//
+//        // adding castling to tilesToMoveTo
+//        int whiteRookKingSideColumn = 0;
+//        int whiteRookQueenSideColumn = 7;
+//        int blackRookKingSideColumn = 7;
+//        int blackRookQueenSideColumn = 0;y
+//
+//        if (pieceColor == PieceColor.WHITE) {
+//
+//        }
+//
+//        if (pieceColor == PieceColor.WHITE) {
+//            if (canKingSideCastle()) {
+//                possibleMoves.add(board.getBoard()[x][whiteRookKingSideColumn+1]);
+//            }
+//            if (canQueenSideCastle()) {
+//                possibleMoves.add(board.getBoard()[x][whiteRookQueenSideColumn-2]);
+//            }
+//        } else if (pieceColor == PieceColor.BLACK) {
+//            if (canKingSideCastle()) {
+//                possibleMoves.add(board.getBoard()[x][blackRookKingSideColumn-1]);
+//            }
+//            if (canQueenSideCastle()) {
+//                possibleMoves.add(board.getBoard()[x][blackRookQueenSideColumn+2]);
+//            }
+//        }
 
         for (Tile tile : possibleMoves) {
             if (!tile.isEmpty()) {
@@ -165,19 +178,31 @@ public class KingPiece implements Piece, Cloneable {
         int y = currentTile.getCol();
 
         if (pieceColor == PieceColor.WHITE) {
-            // 0 is white king side rook column
-            for (int i = 1; y-i > 0; i++) {
-                if (board.getBoard()[x][0].getPiece() == null) return false;
-                if (!board.getBoard()[x][y-i].isEmpty() || hasMoved || board.getBoard()[x][0].getPiece().hasMoved()
-                        || isInDanger || board.getBoard()[x][y-i].isThreatenedByBlack()) return false;
-            }
-        } else {
-            // 7 is black king side rook column
             for (int i = 1; y+i < 7; i++) {
                 if (board.getBoard()[x][7].getPiece() == null) return false;
                 if (!board.getBoard()[x][y+i].isEmpty() || hasMoved || board.getBoard()[x][7].getPiece().hasMoved()
-                        || isInDanger || board.getBoard()[x][y+i].isThreatenedByWhite()) return false;
+                || isInDanger || board.getBoard()[x][y+i].isThreatenedByBlack()
+                || board.getBoard()[x][7].isThreatenedByBlack()) return false;
             }
+//            // 0 is white king side rook column
+//            for (int i = 1; y-i > 0; i++) {
+//                if (board.getBoard()[x][0].getPiece() == null) return false;
+//                if (!board.getBoard()[x][y-i].isEmpty() || hasMoved || board.getBoard()[x][0].getPiece().hasMoved()
+//                        || isInDanger || board.getBoard()[x][y-i].isThreatenedByBlack()) return false;
+//            }
+        } else {
+            for (int i = 1; y+i < 7; i++) {
+                if (board.getBoard()[x][7].getPiece() == null) return false;
+                if (!board.getBoard()[x][y+i].isEmpty() || hasMoved || board.getBoard()[x][7].getPiece().hasMoved()
+                        || isInDanger || board.getBoard()[x][y+i].isThreatenedByWhite()
+                        || board.getBoard()[x][7].isThreatenedByWhite()) return false;
+            }
+            // 7 is black king side rook column
+//            for (int i = 1; y+i < 7; i++) {
+//                if (board.getBoard()[x][7].getPiece() == null) return false;
+//                if (!board.getBoard()[x][y+i].isEmpty() || hasMoved || board.getBoard()[x][7].getPiece().hasMoved()
+//                        || isInDanger || board.getBoard()[x][y+i].isThreatenedByWhite()) return false;
+//            }
         }
         // just move the 2 pieces
         // logic will be handled on generateTilesToMoveTo() method
@@ -193,6 +218,11 @@ public class KingPiece implements Piece, Cloneable {
         int y = currentTile.getCol();
 
         if (pieceColor == PieceColor.BLACK) {
+            for (int i = 1; y-i > 0; i++) {
+                if (board.getBoard()[x][0].getPiece() == null) return false;
+                if (!board.getBoard()[x][y-i].isEmpty() || hasMoved || board.getBoard()[x][0].getPiece().hasMoved()
+                || isInDanger || board.getBoard()[x][y-i].isThreatenedByBlack()) return false;
+            }
             // 0 is black queen side rook column
             for (int i = 1; y-i > 0; i++) {
                 if (board.getBoard()[x][0].getPiece() == null) return false;
@@ -200,12 +230,17 @@ public class KingPiece implements Piece, Cloneable {
                         || isInDanger || board.getBoard()[x][y-i].isThreatenedByWhite()) return false;
             }
         } else {
-            // 7 is white queen side rook column
-            for (int i = 1; y+i < 7; i++) {
-                if (board.getBoard()[x][7].getPiece() == null) return false;
-                if (!board.getBoard()[x][y+i].isEmpty() || hasMoved || board.getBoard()[x][7].getPiece().hasMoved()
-                        || isInDanger || board.getBoard()[x][y+i].isThreatenedByBlack()) return false;
+            for (int i = 1; y-i > 0; i++) {
+                if (board.getBoard()[x][0].getPiece() == null) return false;
+                if (!board.getBoard()[x][y-i].isEmpty() || hasMoved || board.getBoard()[x][0].getPiece().hasMoved()
+                        || isInDanger || board.getBoard()[x][y-i].isThreatenedByWhite()) return false;
             }
+//            // 7 is white queen side rook column
+//            for (int i = 1; y+i < 7; i++) {
+//                if (board.getBoard()[x][7].getPiece() == null) return false;
+//                if (!board.getBoard()[x][y+i].isEmpty() || hasMoved || board.getBoard()[x][7].getPiece().hasMoved()
+//                        || isInDanger || board.getBoard()[x][y+i].isThreatenedByBlack()) return false;
+//            }
         }
         // just move the 2 pieces
         // logic will be handled on generateTilesToMoveTo() method

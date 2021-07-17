@@ -66,19 +66,16 @@ public class RookPiece implements Piece, Cloneable {
         if (pieceColor == PieceColor.BLACK) {
             name = "bR";
             imageName = "blackRook.png";
-
-            if (isKingSide) {
-                kingSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
-            } else queenSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 3];
         }
         if (pieceColor == PieceColor.WHITE) {
             name = "wR";
             imageName = "whiteRook.png";
-
-            if (isKingSide) {
-                kingSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
-            } else queenSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 3];
         }
+
+        if (isKingSide) {
+            kingSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
+        } else queenSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 3];
+
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
