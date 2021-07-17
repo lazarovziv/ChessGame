@@ -2,6 +2,7 @@ package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.BishopPiece;
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
@@ -51,7 +52,8 @@ public class PlayerTest {
             System.out.println(piece.getName() + " - " + piece.getCurrentTile());
         }
         System.out.println("Opponent pieces: ");
-        for (Piece piece : opponent.getAlivePieces()) System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+        for (Piece piece : opponent.getAlivePieces())
+            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
 
         player.saveState();
         player.getOpponentPlayer().saveState();
@@ -83,5 +85,15 @@ public class PlayerTest {
             player.undoLastMove();
             board.printBoard();
         }
+    }
+
+    @Test
+    public void testUnmakeMove() {
+        Move move = player.getMoves().get(0);
+        System.out.println(move);
+        move.makeMove();
+        board.printBoard();
+        move.unmakeMove();
+        board.printBoard();
     }
 }

@@ -8,6 +8,8 @@ import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
+import java.util.ArrayList;
+
 public class Move {
 
     private final Board board;
@@ -65,7 +67,33 @@ public class Move {
 
         board.setCurrentPlayer(player.getOpponentPlayer());
 
+        board.checkBoard(board.getCurrentPlayer());
+
         return true;
+    }
+
+    public void unmakeMove() {
+        Piece piece = new ArrayList<>(player.getLastMove().keySet()).get(0);
+        Tile previousTile = player.getLastMove().get(piece).getFirst();
+        Tile currentTile = player.getLastMove().get(piece).getSecond();
+
+        Piece eatenPiece = null;
+
+        // getting last eaten piece
+        if (piece.getPiecesEaten().size() != 0) {
+            eatenPiece = piece.getLastPieceEaten();
+
+            // if eaten piece's last tile is the last move's previous tile, return the eaten piece to the game
+            // and place eaten piece in that tile while clearing the current piece from there
+            if (currentTile.equals(eatenPiece.getLastTile())) {
+                player.addPieceToAlive(eatenPiece);
+                player.clearTileFromPiece(currentTile);
+                eatenPiece.setCurrentTile(currentTile);
+            }
+        }
+        // if last tile is not empty then clear it and set piece to it's previous tile
+        if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
+        piece.setCurrentTile(previousTile);
     }
 
     public Player getPlayer() {
