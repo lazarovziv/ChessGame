@@ -1,7 +1,9 @@
 package com.zivlazarov.chessengine.model.player;
 
-import com.zivlazarov.chessengine.controllers.PlayerController;
-import com.zivlazarov.chessengine.model.board.*;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.BoardNode;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.utils.Memento;
@@ -28,6 +30,7 @@ public class Player implements MyObserver, Serializable {
     private final List<Piece> alivePieces;
     private final List<Piece> deadPieces;
     private final List<Tile> legalMoves;
+    private final List<Piece> threatenedPiecesByPlayer;
 
     private final int playerDirection;
 
@@ -44,6 +47,7 @@ public class Player implements MyObserver, Serializable {
         deadPieces = new ArrayList<Piece>();
         legalMoves = new ArrayList<>();
         lastMove = new HashMap<>();
+        threatenedPiecesByPlayer = new ArrayList<>();
 
         moves = new ArrayList<>();
 
@@ -58,6 +62,7 @@ public class Player implements MyObserver, Serializable {
     public void refreshPieces() {
         legalMoves.clear();
         moves.clear();
+        threatenedPiecesByPlayer.clear();
         for (Piece piece : alivePieces) {
             piece.refresh();
             for (Tile tile : piece.getPossibleMoves()) {
@@ -71,6 +76,7 @@ public class Player implements MyObserver, Serializable {
 //                legalMoves.add(tile);
             }
             legalMoves.addAll(piece.getPossibleMoves());
+            threatenedPiecesByPlayer.addAll(piece.getPiecesUnderThreat());
         }
 //        addAllPossibleNodes();
     }
@@ -214,6 +220,7 @@ public class Player implements MyObserver, Serializable {
                         board.getBoard()[((PawnPiece)piece).getEnPassantTile().getRow()-playerDirection]
                                 [((PawnPiece)piece).getEnPassantTile().getCol()]
                                 .getPiece());
+                ((PawnPiece) piece).setExecutedEnPassant(true);
                 return true;
             }
         }
@@ -374,7 +381,12 @@ public class Player implements MyObserver, Serializable {
     }
 
     public void evaluatePlayerScore() {
-        for (Piece piece : alivePieces) playerScore += 100 * piece.getValue();
+        for (Piece piece : alivePieces) {
+            playerScore += 100 * piece.getValue();
+            for (Piece threatenedPiece : piece.getPiecesUnderThreat()) {
+                playerScore += 25 * threatenedPiece.getValue();
+            }
+        }
     }
 
     public void resetPlayerScore() {
