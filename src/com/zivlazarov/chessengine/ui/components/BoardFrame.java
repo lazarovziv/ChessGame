@@ -223,7 +223,7 @@ public class BoardFrame {
 
                                     //board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
 
-                                    board.checkBoard(board.getCurrentPlayer());
+//                                    board.checkBoard(board.getCurrentPlayer());
 
                                     System.out.println(board.getGameSituation());
 
