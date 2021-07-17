@@ -69,6 +69,14 @@ public class Tile implements Serializable {
 		return isThreatenedByBlack;
 	}
 
+	public boolean isThreatenedByColor(PieceColor color) {
+		if (color == PieceColor.WHITE) {
+			return isThreatenedByWhite;
+		} else {
+			return isThreatenedByBlack;
+		}
+	}
+
 	public void setRow(int row) {
 		this.row = row;
 	}
