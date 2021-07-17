@@ -4,12 +4,17 @@ import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.xml.transform.TransformerException;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -118,6 +123,21 @@ public class BoardFrame {
             validate();
             repaint();
         }
+
+        public void displayAlertDialogWhenCheckmate() {
+            if (board.getGameSituation() == GameSituation.BLACK_CHECKMATED ||
+                    board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
+                Alert alertDialog = new Alert(Alert.AlertType.NONE,
+                        "Checkmate! Exit?",
+                        ButtonType.OK,
+                        ButtonType.YES);
+
+                alertDialog.showAndWait();
+
+                if (alertDialog.getResult() == ButtonType.YES) System.exit(1);
+                else if (alertDialog.getResult() == ButtonType.OK) System.exit(1);
+            }
+        }
     }
 
     private static class TilePanel extends JPanel {
@@ -136,6 +156,8 @@ public class BoardFrame {
         private static ArrayList<Tile> markedTiles;
 
         private static boolean drawPossibleMoves = false;
+
+        private MouseEvent mouseEvent;
 
         TilePanel(BoardPanel boardPanel, Tile tile) {
             super(new GridBagLayout());
