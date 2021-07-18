@@ -8,6 +8,7 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.board.TileColor;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.ui.game.CommandLineGame;
 
 import javax.swing.*;
 import java.awt.*;

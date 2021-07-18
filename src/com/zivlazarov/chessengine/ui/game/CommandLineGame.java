@@ -1,4 +1,4 @@
-package com.zivlazarov.chessengine.ui;
+package com.zivlazarov.chessengine.ui.game;
 
 import com.zivlazarov.chessengine.controllers.BoardController;
 import com.zivlazarov.chessengine.controllers.PlayerController;
