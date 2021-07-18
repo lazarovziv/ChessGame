@@ -30,7 +30,6 @@ public class Player implements MyObserver, Serializable {
     private final List<Piece> alivePieces;
     private final List<Piece> deadPieces;
     private final List<Tile> legalMoves;
-    private final List<Piece> threatenedPiecesByPlayer;
 
     private final int playerDirection;
 
@@ -47,7 +46,6 @@ public class Player implements MyObserver, Serializable {
         deadPieces = new ArrayList<Piece>();
         legalMoves = new ArrayList<>();
         lastMove = new HashMap<>();
-        threatenedPiecesByPlayer = new ArrayList<>();
 
         moves = new ArrayList<>();
 
@@ -62,7 +60,6 @@ public class Player implements MyObserver, Serializable {
     public void refreshPieces() {
         legalMoves.clear();
         moves.clear();
-        threatenedPiecesByPlayer.clear();
         for (Piece piece : alivePieces) {
             piece.refresh();
             for (Tile tile : piece.getPossibleMoves()) {
@@ -76,7 +73,6 @@ public class Player implements MyObserver, Serializable {
 //                legalMoves.add(tile);
             }
             legalMoves.addAll(piece.getPossibleMoves());
-            threatenedPiecesByPlayer.addAll(piece.getPiecesUnderThreat());
         }
 //        addAllPossibleNodes();
     }
@@ -131,7 +127,7 @@ public class Player implements MyObserver, Serializable {
         }
         // eat move
         if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != playerColor) {
-            piece.getPiecesEaten().push(targetTile.getPiece());
+            piece.getCapturedPieces().push(targetTile.getPiece());
             opponentPlayer.addPieceToDead(targetTile.getPiece());
         }
 
@@ -170,7 +166,7 @@ public class Player implements MyObserver, Serializable {
         Piece eatenPiece = null;
 
         // getting last eaten piece
-        if (piece.getPiecesEaten().size() != 0) {
+        if (piece.getCapturedPieces().size() != 0) {
             eatenPiece = piece.getLastPieceEaten();
 
             // if eaten piece's last tile is the last move's previous tile, return the eaten piece to the game
@@ -186,30 +182,23 @@ public class Player implements MyObserver, Serializable {
         piece.setCurrentTile(previousTile);
     }
 
-    public void handlePawnPromotion(Piece piece) {
-        if (piece.getCurrentTile().getRow() == playerDirection * (board.getBoard().length - 1)) {
+    public void handlePawnPromotion(Piece piece, Tile tile) {
+        if (tile.getRow() == playerDirection * (board.getBoard().length - 1)) {
             // setting it as dead and adding it to deadPieces list
-            piece.setIsAlive(false);
-            addPieceToDead(piece);
-            Tile targetTile = piece.getCurrentTile();
-            Piece convertedPiece = null;
+//            piece.setIsAlive(false);
+//            addPieceToDead(piece);
+//            Tile targetTile = piece.getCurrentTile();
             // clearing piece from it's tile to set a new piece
-            targetTile.setPiece(null);
+//            clearTileFromPiece(targetTile);
+//            targetTile.setPiece(null);
 
-            // promoting the pawn to queen
-            convertedPiece = new QueenPiece(this, board, playerColor, targetTile);
-            addPieceToAlive(convertedPiece);
-//
-//            char chosenPiece = PlayerController.receivePawnPromotionChoice();
-//
-//            switch (chosenPiece) {
-//                case 'q' -> convertedPiece = new QueenPiece(this, board, playerColor, targetTile);
-//                case 'b' -> convertedPiece = new BishopPiece(this, board, playerColor, targetTile, 3);
-//                case 'n' -> convertedPiece = new KnightPiece(this, board, playerColor, targetTile, 3);
-//                case 'r' -> convertedPiece = new RookPiece(this, board, playerColor, targetTile, false, 3);
-//
-//            }
-//            if (convertedPiece != null) addPieceToAlive(convertedPiece);
+            addPieceToDead(piece);
+
+//            piece.setPieceType(PieceType.QUEEN);
+            piece = new ChessPiece(this, board, PieceType.QUEEN, playerColor, tile);
+            addPieceToAlive(piece);
+//            piece = new QueenPiece(this, board, playerColor, tile);
+//            addPieceToAlive(piece);
         }
     }
 
@@ -382,9 +371,9 @@ public class Player implements MyObserver, Serializable {
 
     public void evaluatePlayerScore() {
         for (Piece piece : alivePieces) {
-            playerScore += 100 * piece.getValue();
+            playerScore += playerDirection * 100 * piece.getValue();
             for (Piece threatenedPiece : piece.getPiecesUnderThreat()) {
-                playerScore += 25 * threatenedPiece.getValue();
+                playerScore += playerDirection * 25 * threatenedPiece.getValue();
             }
         }
     }
