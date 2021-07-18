@@ -39,7 +39,7 @@ public class Move {
         if (movingPiece instanceof PawnPiece) {
             isSpecialMove = player.handleEnPassantMove(movingPiece, targetTile);
             ((PawnPiece) movingPiece).setHasMoved(true);
-            player.handlePawnPromotion(movingPiece);
+            player.handlePawnPromotion(movingPiece, targetTile);
         } else if (movingPiece instanceof KingPiece) {
             isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
             if (!isSpecialMove) isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
@@ -47,7 +47,7 @@ public class Move {
         }
 
         if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != player.getPlayerColor()) {
-            movingPiece.getPiecesEaten().push(targetTile.getPiece());
+            movingPiece.getCapturedPieces().push(targetTile.getPiece());
             player.getOpponentPlayer().addPieceToDead(targetTile.getPiece());
         }
 
@@ -79,8 +79,8 @@ public class Move {
 
         Piece eatenPiece = null;
 
-        // getting last eaten piece
-        if (piece.getPiecesEaten().size() != 0) {
+        // getting last captured piece
+        if (piece.getCapturedPieces().size() != 0) {
             eatenPiece = piece.getLastPieceEaten();
 
             // if eaten piece's last tile is the last move's previous tile, return the eaten piece to the game
@@ -94,6 +94,8 @@ public class Move {
         // if last tile is not empty then clear it and set piece to it's previous tile
         if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
         piece.setCurrentTile(previousTile);
+        board.checkBoard(player);
+//        board.checkBoard(player);
     }
 
     public Player getPlayer() {
