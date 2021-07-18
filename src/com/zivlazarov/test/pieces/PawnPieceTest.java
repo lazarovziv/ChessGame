@@ -1,13 +1,11 @@
 package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.controllers.PlayerController;
-import com.zivlazarov.chessengine.model.pieces.KingPiece;
-import com.zivlazarov.chessengine.model.pieces.KnightPiece;
-import com.zivlazarov.chessengine.model.pieces.PawnPiece;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -96,9 +94,18 @@ public class PawnPieceTest {
 
     @Test
     public void testPromotion() {
-        PawnPiece pawn = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[6][4], 3);
+        ChessPiece pawn = new ChessPiece(player, board, PieceType.PAWN, PieceColor.WHITE, board.getBoard()[6][3]);
         board.printBoard();
-        pawn.refresh();
+        board.checkBoard(player);
+
+        Move move = new Move.Builder()
+                .board(board)
+                .player(player)
+                .movingPiece(pawn)
+                .targetTile(board.getBoard()[7][3])
+                .build();
+
+        move.makeMove();
         board.printBoard();
     }
 

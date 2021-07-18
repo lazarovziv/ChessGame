@@ -7,7 +7,6 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.image.ImageView;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -21,11 +20,13 @@ public class PawnPiece implements Piece, Cloneable {
 
     private ObjectProperty<Tile> currentTileProperty;
 
+    private PieceType pieceType;
+
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
-    private Stack<Piece> piecesEaten;
+    private Stack<Piece> capturedPieces;
     private final Board board;
     private Player player;
     private String name;
@@ -52,7 +53,7 @@ public class PawnPiece implements Piece, Cloneable {
         possibleMoves = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
-        piecesEaten = new Stack<>();
+        capturedPieces = new Stack<>();
 
         currentTile = initTile;
         lastTile = currentTile;
@@ -284,7 +285,7 @@ public class PawnPiece implements Piece, Cloneable {
                     currentTile = tile;
                     currentTile.setPiece(this);
                     possibleMoves.clear();
-                    piecesEaten.push(
+                    capturedPieces.push(
                             board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].getPiece());
                     player.getOpponentPlayer().addPieceToDead(
                             board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].getPiece());
@@ -295,7 +296,7 @@ public class PawnPiece implements Piece, Cloneable {
 
             // check if tile has opponent's piece and if so, mark as not alive
             if (!tile.isEmpty()) {
-                piecesEaten.push(tile.getPiece());
+                capturedPieces.push(tile.getPiece());
                 tile.getPiece().setIsAlive(false);
                 player.getOpponentPlayer().addPieceToDead(tile.getPiece());
                 tile.setPiece(null);
@@ -318,9 +319,9 @@ public class PawnPiece implements Piece, Cloneable {
         if (historyMoves.size() == 0) return;
         Tile previousTile = historyMoves.pop();
 
-        if (piecesEaten.size() > 0) {
-            if (piecesEaten.peek().getHistoryMoves().peek().equals(currentTile)) {
-                Piece piece = piecesEaten.pop();
+        if (capturedPieces.size() > 0) {
+            if (capturedPieces.peek().getHistoryMoves().peek().equals(currentTile)) {
+                Piece piece = capturedPieces.pop();
                 currentTile.setPiece(piece);
                 piece.setIsAlive(true);
                 player.getOpponentPlayer().addPieceToAlive(piece);
@@ -370,8 +371,8 @@ public class PawnPiece implements Piece, Cloneable {
 
     @Override
     public Piece getLastPieceEaten() {
-        if (piecesEaten.size() == 0) return null;
-        return piecesEaten.peek();
+        if (capturedPieces.size() == 0) return null;
+        return capturedPieces.peek();
     }
 
     @Override
@@ -387,8 +388,8 @@ public class PawnPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Stack<Piece> getPiecesEaten() {
-        return piecesEaten;
+    public Stack<Piece> getCapturedPieces() {
+        return capturedPieces;
     }
 
     @Override
@@ -423,5 +424,15 @@ public class PawnPiece implements Piece, Cloneable {
 
     public void setCurrentTileProperty(Tile currentTileProperty) {
         this.currentTileProperty.set(currentTileProperty);
+    }
+
+    @Override
+    public PieceType getPieceType() {
+        return pieceType;
+    }
+
+    @Override
+    public void setPieceType(PieceType pieceType) {
+        this.pieceType = pieceType;
     }
 }

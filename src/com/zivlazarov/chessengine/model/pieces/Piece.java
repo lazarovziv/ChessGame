@@ -47,6 +47,9 @@ public interface Piece extends Cloneable, Serializable {
     void setPieceColor(PieceColor pieceColor);
     void setCurrentTile(Tile tile);
 
+    void setPieceType(PieceType pieceType);
+    PieceType getPieceType();
+
     Tile getCurrentTileProperty();
     ObjectProperty<Tile> currentTilePropertyProperty();
     void setCurrentTileProperty(Tile currentTileProperty);
@@ -62,7 +65,7 @@ public interface Piece extends Cloneable, Serializable {
 
     Piece getLastPieceEaten();
 
-    Stack<Piece> getPiecesEaten();
+    Stack<Piece> getCapturedPieces();
 
     void generateMoves();
 
