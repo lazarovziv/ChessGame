@@ -26,7 +26,7 @@ public class ChessPiece implements Piece {
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
-    private Stack<Piece> piecesEaten;
+    private Stack<Piece> capturedPieces;
     private final Board board;
     private PieceType pieceType;
     private String name;
@@ -542,11 +542,11 @@ public class ChessPiece implements Piece {
 
     @Override
     public Stack<Piece> getCapturedPieces() {
-        return piecesEaten;
+        return capturedPieces;
     }
 
-    public void setPiecesEaten(Stack<Piece> piecesEaten) {
-        this.piecesEaten = piecesEaten;
+    public void setCapturedPieces(Stack<Piece> capturedPieces) {
+        this.capturedPieces = capturedPieces;
     }
 
     public PieceType getPieceType() {
@@ -751,9 +751,9 @@ public class ChessPiece implements Piece {
         if (historyMoves.size() == 0) return;
         Tile previousTile = historyMoves.pop();
 
-        if (piecesEaten.size() > 0) {
-            if (piecesEaten.peek().getHistoryMoves().peek().equals(currentTile)) {
-                Piece piece = piecesEaten.pop();
+        if (capturedPieces.size() > 0) {
+            if (capturedPieces.peek().getHistoryMoves().peek().equals(currentTile)) {
+                Piece piece = capturedPieces.pop();
                 currentTile.setPiece(piece);
                 piece.setIsAlive(true);
                 player.getOpponentPlayer().addPieceToAlive(piece);
@@ -768,8 +768,8 @@ public class ChessPiece implements Piece {
 
     @Override
     public Piece getLastPieceEaten() {
-        if (piecesEaten.size() == 0) return null;
-        return piecesEaten.peek();
+        if (capturedPieces.size() == 0) return null;
+        return capturedPieces.peek();
     }
 
     @Override

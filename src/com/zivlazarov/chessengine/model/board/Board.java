@@ -143,6 +143,51 @@ public class Board implements MyObservable, Serializable {
         currentNode = node;
     }
 
+    public void initChessPieces() {
+        ChessPiece whiteRookKingSide = new ChessPiece(whitePlayer, instance, PieceType.ROOK, PieceColor.WHITE, board[0][7]);
+        ChessPiece whiteRookQueenSide = new ChessPiece(whitePlayer, instance, PieceType.ROOK, PieceColor.WHITE, board[0][0]);
+
+        ChessPiece blackRookKingSide = new ChessPiece(blackPlayer, instance, PieceType.ROOK, PieceColor.BLACK, board[7][7]);
+        ChessPiece blackRookQueenSide = new ChessPiece(blackPlayer, instance, PieceType.ROOK, PieceColor.BLACK, board[7][0]);
+
+        ChessPiece whiteKnightKingSide = new ChessPiece(whitePlayer, instance, PieceType.KNIGHT, PieceColor.WHITE, board[0][6]);
+        ChessPiece whiteKnightQueenSide = new ChessPiece(whitePlayer, instance, PieceType.KNIGHT, PieceColor.WHITE, board[0][1]);
+
+        ChessPiece blackKnightKingSide = new ChessPiece(blackPlayer, instance, PieceType.KNIGHT, PieceColor.BLACK, board[7][6]);
+        ChessPiece blackKnightQueenSide = new ChessPiece(blackPlayer, instance, PieceType.KNIGHT, PieceColor.BLACK, board[7][1]);
+
+        ChessPiece whiteBishopKingSide = new ChessPiece(whitePlayer, instance, PieceType.BISHOP, PieceColor.WHITE, board[0][5]);
+        ChessPiece whiteBishopQueenSide = new ChessPiece(whitePlayer, instance, PieceType.BISHOP, PieceColor.WHITE, board[0][2]);
+
+        ChessPiece blackBishopKingSide = new ChessPiece(blackPlayer, instance, PieceType.BISHOP, PieceColor.BLACK, board[7][5]);
+        ChessPiece blackBishopQueenSide = new ChessPiece(blackPlayer, instance, PieceType.BISHOP, PieceColor.BLACK, board[7][2]);
+
+        ChessPiece whiteQueen = new ChessPiece(whitePlayer, instance, PieceType.QUEEN, PieceColor.WHITE, board[0][3]);
+        ChessPiece blackQueen = new ChessPiece(blackPlayer, instance, PieceType.QUEEN, PieceColor.BLACK, board[7][3]);
+
+        ChessPiece whiteKing = new ChessPiece(whitePlayer, instance, PieceType.KING, PieceColor.WHITE, board[0][4]);
+        ChessPiece blackKing = new ChessPiece(blackPlayer, instance, PieceType.KING, PieceColor.BLACK, board[7][4]);
+
+        ChessPiece whitePawn0 = new ChessPiece(whitePlayer, instance, PieceType.PAWN, PieceColor.WHITE, board[1][0]);
+        ChessPiece whitePawn1 = new ChessPiece(whitePlayer, instance, PieceType.PAWN, PieceColor.WHITE, board[1][1]);
+        ChessPiece whitePawn2 = new ChessPiece(whitePlayer, instance, PieceType.PAWN, PieceColor.WHITE, board[1][2]);
+        ChessPiece whitePawn3 = new ChessPiece(whitePlayer, instance, PieceType.PAWN, PieceColor.WHITE, board[1][3]);
+        ChessPiece whitePawn4 = new ChessPiece(whitePlayer, instance, PieceType.PAWN, PieceColor.WHITE, board[1][4]);
+        ChessPiece whitePawn5 = new ChessPiece(whitePlayer, instance, PieceType.PAWN, PieceColor.WHITE, board[1][5]);
+        ChessPiece whitePawn6 = new ChessPiece(whitePlayer, instance, PieceType.PAWN, PieceColor.WHITE, board[1][6]);
+        ChessPiece whitePawn7 = new ChessPiece(whitePlayer, instance, PieceType.PAWN, PieceColor.WHITE, board[1][7]);
+
+        ChessPiece blackPawn0 = new ChessPiece(blackPlayer, instance, PieceType.PAWN, PieceColor.BLACK, board[6][0]);
+        ChessPiece blackPawn1 = new ChessPiece(blackPlayer, instance, PieceType.PAWN, PieceColor.BLACK, board[6][1]);
+        ChessPiece blackPawn2 = new ChessPiece(blackPlayer, instance, PieceType.PAWN, PieceColor.BLACK, board[6][2]);
+        ChessPiece blackPawn3 = new ChessPiece(blackPlayer, instance, PieceType.PAWN, PieceColor.BLACK, board[6][3]);
+        ChessPiece blackPawn4 = new ChessPiece(blackPlayer, instance, PieceType.PAWN, PieceColor.BLACK, board[6][4]);
+        ChessPiece blackPawn5 = new ChessPiece(blackPlayer, instance, PieceType.PAWN, PieceColor.BLACK, board[6][5]);
+        ChessPiece blackPawn6 = new ChessPiece(blackPlayer, instance, PieceType.PAWN, PieceColor.BLACK, board[6][6]);
+        ChessPiece blackPawn7 = new ChessPiece(blackPlayer, instance, PieceType.PAWN, PieceColor.BLACK, board[6][7]);
+
+    }
+
     public void checkBoard(Player currentPlayer) {
         // resetting tiles threatened state before every board check
         resetThreatsOnTiles();
