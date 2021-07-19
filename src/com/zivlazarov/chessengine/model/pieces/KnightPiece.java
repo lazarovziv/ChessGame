@@ -2,6 +2,7 @@ package com.zivlazarov.chessengine.model.pieces;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -21,6 +22,7 @@ public class KnightPiece implements Piece, Cloneable {
 
     private PieceType pieceType;
 
+    private final ArrayList<Move> moves;
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
@@ -50,6 +52,7 @@ public class KnightPiece implements Piece, Cloneable {
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
         capturedPieces = new Stack<>();
+        moves = new ArrayList<>();
 
         currentTile = initTile;
         lastTile = currentTile;
@@ -83,6 +86,9 @@ public class KnightPiece implements Piece, Cloneable {
         if (piecesUnderThreat.size() != 0) {
             piecesUnderThreat.clear();
         }
+        if (moves.size() != 0) {
+            moves.clear();
+        }
         generateMoves();
     }
 
@@ -110,12 +116,21 @@ public class KnightPiece implements Piece, Cloneable {
             if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(player)
+                        .movingPiece(this)
+                        .targetTile(targetTile)
+                        .build();
+                moves.add(move);
                 possibleMoves.add(targetTile);
                 if (!targetTile.isEmpty()) {
                     if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
                 }
             }
         }
+        player.getLegalMoves().addAll(possibleMoves);
+        player.getMoves().addAll(moves);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.zivlazarov.chessengine.model.pieces;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -21,6 +22,7 @@ public class KingPiece implements Piece, Cloneable {
 
     private PieceType pieceType;
 
+    private final ArrayList<Move> moves;
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
@@ -39,7 +41,7 @@ public class KingPiece implements Piece, Cloneable {
     private final Tile kingSideCastleTile;
     private final Tile queenSideCastleTile;
 
-    private final int value = 100;
+    private final int value = 0;
 
     private final Object[] allFields;
 
@@ -53,6 +55,7 @@ public class KingPiece implements Piece, Cloneable {
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
         capturedPieces = new Stack<>();
+        moves = new ArrayList<>();
 
         hasMoved = false;
 
@@ -91,6 +94,9 @@ public class KingPiece implements Piece, Cloneable {
         if (piecesUnderThreat.size() != 0) {
             piecesUnderThreat.clear();
         }
+        if (moves.size() != 0) {
+            moves.clear();
+        }
         generateMoves();
     }
 
@@ -120,6 +126,13 @@ public class KingPiece implements Piece, Cloneable {
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
                 if (!isThreatenedAtTile(targetTile)) {
+                    Move move = new Move.Builder()
+                            .board(board)
+                            .player(player)
+                            .movingPiece(this)
+                            .targetTile(targetTile)
+                            .build();
+                    moves.add(move);
                     possibleMoves.add(targetTile);
                     if (!targetTile.isEmpty()) {
                         if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
@@ -129,11 +142,29 @@ public class KingPiece implements Piece, Cloneable {
         }
 
         if (y + 2 <= 7) {
-            if (canKingSideCastle()) possibleMoves.add(board.getBoard()[x][y+2]);
+            if (canKingSideCastle()) {
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(player)
+                        .movingPiece(this)
+                        .targetTile(board.getBoard()[x][y+2])
+                        .build();
+                moves.add(move);
+                possibleMoves.add(board.getBoard()[x][y + 2]);
+            }
         }
 
         if (y - 2 >= 0) {
-            if (canQueenSideCastle()) possibleMoves.add(board.getBoard()[x][y-2]);
+            if (canQueenSideCastle()) {
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(player)
+                        .movingPiece(this)
+                        .targetTile(board.getBoard()[x][y-2])
+                        .build();
+                moves.add(move);
+                possibleMoves.add(board.getBoard()[x][y - 2]);
+            }
         }
 
         for (Tile tile : possibleMoves) {
@@ -143,6 +174,8 @@ public class KingPiece implements Piece, Cloneable {
                 }
             }
         }
+        player.getLegalMoves().addAll(possibleMoves);
+        player.getMoves().addAll(moves);
     }
 
 // castling rules

@@ -3,6 +3,7 @@ package com.zivlazarov.chessengine.model.pieces;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import javafx.beans.property.ObjectProperty;
@@ -24,6 +25,7 @@ public class BishopPiece implements Piece, Cloneable {
 
     private PieceType pieceType;
 
+    private final ArrayList<Move> moves;
     private final ArrayList<Tile> possibleMoves;
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
@@ -53,6 +55,7 @@ public class BishopPiece implements Piece, Cloneable {
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<Tile>();
         capturedPieces = new Stack<>();
+        moves = new ArrayList<>();
 
         currentTile = initTile;
         lastTile = currentTile;
@@ -87,6 +90,9 @@ public class BishopPiece implements Piece, Cloneable {
         if (piecesUnderThreat.size() != 0) {
             piecesUnderThreat.clear();
         }
+        if (moves.size() != 0) {
+            moves.clear();
+        }
         generateMoves();
     }
 
@@ -113,8 +119,22 @@ public class BishopPiece implements Piece, Cloneable {
                 if (x+r*i > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
                 Tile targetTile = board.getBoard()[x+r*i][y+c*i];
                 if (targetTile.isEmpty()) {
+                    Move move = new Move.Builder()
+                            .board(board)
+                            .player(player)
+                            .movingPiece(this)
+                            .targetTile(targetTile)
+                            .build();
+                    moves.add(move);
                     possibleMoves.add(targetTile);
                 } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
+                    Move move = new Move.Builder()
+                            .board(board)
+                            .player(player)
+                            .movingPiece(this)
+                            .targetTile(targetTile)
+                            .build();
+                    moves.add(move);
                     possibleMoves.add(targetTile);
                     piecesUnderThreat.add(targetTile.getPiece());
                     break;
@@ -122,6 +142,8 @@ public class BishopPiece implements Piece, Cloneable {
                 if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
             }
         }
+        player.getLegalMoves().addAll(possibleMoves);
+        player.getMoves().addAll(moves);
     }
 
     @Override
