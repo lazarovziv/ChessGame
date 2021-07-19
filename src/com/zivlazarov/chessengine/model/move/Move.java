@@ -14,7 +14,7 @@ public class Move {
 
     private final Board board;
     private final Player player;
-    private final Piece movingPiece;
+    private Piece movingPiece;
     private final Tile targetTile;
 
     private Move(Board board, Player player, Piece movingPiece, Tile targetTile) {
@@ -39,7 +39,7 @@ public class Move {
         if (movingPiece instanceof PawnPiece) {
             isSpecialMove = player.handleEnPassantMove(movingPiece, targetTile);
             ((PawnPiece) movingPiece).setHasMoved(true);
-            player.handlePawnPromotion(movingPiece, targetTile);
+            movingPiece = player.handlePawnPromotion(movingPiece, targetTile);
         } else if (movingPiece instanceof KingPiece) {
             isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
             if (!isSpecialMove) isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);

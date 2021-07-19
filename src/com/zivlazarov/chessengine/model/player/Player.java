@@ -182,24 +182,19 @@ public class Player implements MyObserver, Serializable {
         piece.setCurrentTile(previousTile);
     }
 
-    public void handlePawnPromotion(Piece piece, Tile tile) {
-        if (tile.getRow() == playerDirection * (board.getBoard().length - 1)) {
-            // setting it as dead and adding it to deadPieces list
-//            piece.setIsAlive(false);
-//            addPieceToDead(piece);
-//            Tile targetTile = piece.getCurrentTile();
-            // clearing piece from it's tile to set a new piece
-//            clearTileFromPiece(targetTile);
-//            targetTile.setPiece(null);
-
-            addPieceToDead(piece);
-
-//            piece.setPieceType(PieceType.QUEEN);
-            piece = new ChessPiece(this, board, PieceType.QUEEN, playerColor, tile);
-            addPieceToAlive(piece);
-//            piece = new QueenPiece(this, board, playerColor, tile);
-//            addPieceToAlive(piece);
+    public Piece handlePawnPromotion(Piece piece, Tile tile) {
+        if (piece.getPieceColor() == PieceColor.WHITE) {
+            if (tile.getRow() == 7) {
+                addPieceToDead(piece);
+                piece = new QueenPiece(this, board, playerColor, tile);
+            }
+        } else {
+            if (tile.getRow() == 0) {
+                addPieceToDead(piece);
+                piece = new QueenPiece(this, board, playerColor, tile);
+            }
         }
+        return piece;
     }
 
     public boolean handleEnPassantMove(Piece piece, Tile tile) {

@@ -110,6 +110,29 @@ public class PawnPieceTest {
     }
 
     @Test
+    public void testPawnPromotion() {
+        Piece pawn = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[6][3], 6);
+        board.printBoard();
+        board.checkBoard(player);
+
+        Move move = new Move.Builder()
+                .board(board)
+                .player(player)
+                .movingPiece(pawn)
+                .targetTile(board.getBoard()[7][3])
+                .build();
+
+        move.makeMove();
+
+//        player.addPieceToDead(pawn);
+//
+//        pawn = new QueenPiece(player, board, player.getPlayerColor(), board.getBoard()[7][3]);
+        board.printBoard();
+//        board.checkBoard(player);
+        pawn.getPossibleMoves().forEach(System.out::println);
+    }
+
+    @Test
     public void testFirstMove() {
         board.printBoard();
         for (Tile tile : pawnPiece.getPossibleMoves()) System.out.println(tile);
