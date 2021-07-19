@@ -22,6 +22,8 @@ public class Tile implements Serializable {
 	private JLabel label;
 	private JButton button;
 
+	private final char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+
 	public Tile(int row, int col, TileColor tc) {
 		this.row = row;
 		this.col = col;
@@ -132,7 +134,7 @@ public class Tile implements Serializable {
 
 	@Override
 	public String toString() {
-		return "[" + (row+1) + ", " + (col+1) + "]";
+		return "[" + letters[row] /*+ ", " */+ (col+1) + "]";
 	}
 
 	public JLabel getLabel() {
