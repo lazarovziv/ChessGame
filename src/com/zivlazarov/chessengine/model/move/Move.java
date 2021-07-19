@@ -51,8 +51,8 @@ public class Move {
             player.getOpponentPlayer().addPieceToDead(targetTile.getPiece());
         }
 
+        movingPiece.setLastTile(currentTile);
         movingPiece.setCurrentTile(targetTile);
-        movingPiece.setLastTile(targetTile);
 
         movingPiece.getHistoryMoves().push(targetTile);
         board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
@@ -77,23 +77,27 @@ public class Move {
         Tile previousTile = player.getLastMove().get(piece).getFirst();
         Tile currentTile = player.getLastMove().get(piece).getSecond();
 
-        Piece eatenPiece = null;
+        Piece capturedPiece;
 
         // getting last captured piece
         if (piece.getCapturedPieces().size() != 0) {
-            eatenPiece = piece.getLastPieceEaten();
+            capturedPiece = piece.getLastPieceEaten();
 
-            // if eaten piece's last tile is the last move's previous tile, return the eaten piece to the game
-            // and place eaten piece in that tile while clearing the current piece from there
-            if (currentTile.equals(eatenPiece.getLastTile())) {
-                player.addPieceToAlive(eatenPiece);
+            // if captured piece's last tile is the last move's previous tile, return the captured piece to the game
+            // and place captured piece in that tile while clearing the current piece from there
+            if (currentTile.equals(capturedPiece.getLastTile())) {
+                player.getOpponentPlayer().addPieceToAlive(capturedPiece);
+                piece.getCapturedPieces().remove(piece.getCapturedPieces().size() - 1);
                 player.clearTileFromPiece(currentTile);
-                eatenPiece.setCurrentTile(currentTile);
+                capturedPiece.setCurrentTile(currentTile);
             }
         }
         // if last tile is not empty then clear it and set piece to it's previous tile
         if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
         piece.setCurrentTile(previousTile);
+
+        board.setCurrentPlayer(player);
+
         board.checkBoard(player);
 //        board.checkBoard(player);
     }
