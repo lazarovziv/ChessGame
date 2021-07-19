@@ -25,7 +25,7 @@ public class KingPiece implements Piece, Cloneable {
     private final ArrayList<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
-    private Stack<Piece> capturedPieces;
+    private final Stack<Piece> capturedPieces;
     private final Board board;
     private String name;
     private boolean isAlive = true;
@@ -36,10 +36,10 @@ public class KingPiece implements Piece, Cloneable {
     private String imageName;
     private Icon imageIcon;
 
-    private Tile kingSideCastleTile;
-    private Tile queenSideCastleTile;
+    private final Tile kingSideCastleTile;
+    private final Tile queenSideCastleTile;
 
-    private int value = 0;
+    private final int value = 100;
 
     private final Object[] allFields;
 
