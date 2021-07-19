@@ -163,18 +163,18 @@ public class Player implements MyObserver, Serializable {
         Tile previousTile = lastMove.get(piece).getFirst();
         Tile currentTile = lastMove.get(piece).getSecond();
 
-        Piece eatenPiece = null;
+        Piece capturedPiece = null;
 
         // getting last eaten piece
         if (piece.getCapturedPieces().size() != 0) {
-            eatenPiece = piece.getLastPieceEaten();
+            capturedPiece = piece.getLastPieceEaten();
 
             // if eaten piece's last tile is the last move's previous tile, return the eaten piece to the game
             // and place eaten piece in that tile while clearing the current piece from there
-            if (currentTile.equals(eatenPiece.getLastTile())) {
-                addPieceToAlive(eatenPiece);
+            if (currentTile.equals(capturedPiece.getLastTile())) {
+                addPieceToAlive(capturedPiece);
                 clearTileFromPiece(currentTile);
-                eatenPiece.setCurrentTile(currentTile);
+                capturedPiece.setCurrentTile(currentTile);
             }
         }
         // if last tile is not empty then clear it and set piece to it's previous tile

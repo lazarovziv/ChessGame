@@ -219,20 +219,15 @@ public class BoardFrame {
 
                                     move.makeMove();
 
-//                                    board.getCurrentPlayer().movePiece(playerPiece, destinationTile);
-
-                                    //board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
-
-//                                    board.checkBoard(board.getCurrentPlayer());
-
                                     System.out.println(board.getGameSituation());
 
                                     System.out.println("Board evaluation: " + board.evaluateBoard());
 
                                     System.out.println();
                                     System.out.println(
-                                            board.getGameHistoryMoves().lastElement().getFirst().getName()
-                                                    + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
+                                            playerPiece.getName() + ": " +
+                                                    playerPiece.getLastTile()
+                                                    + " -> " + playerPiece.getCurrentTile());
 
                                     int result = JOptionPane.showOptionDialog(boardPanel, "Undo move? ",
                                             null, JOptionPane.YES_NO_OPTION,

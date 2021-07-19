@@ -85,6 +85,7 @@ public class PlayerTest {
             player.undoLastMove();
             board.printBoard();
         }
+        opponentPawnPiece.getPossibleMoves().forEach(System.out::println);
     }
 
     @Test
