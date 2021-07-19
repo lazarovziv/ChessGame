@@ -15,7 +15,7 @@ import java.util.Stack;
 
 public class RookPiece implements Piece, Cloneable {
 
-    private final Player player;
+    private Player player;
 
     private ObjectProperty<Tile> currentTileProperty;
 
@@ -43,6 +43,8 @@ public class RookPiece implements Piece, Cloneable {
     private Icon imageIcon;
 
     private int value = 5;
+
+    private final Object[] allFields;
 
     public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean isKingSide, int pieceCounter) {
         this.player = player;
@@ -83,6 +85,10 @@ public class RookPiece implements Piece, Cloneable {
 
         currentTileProperty = new SimpleObjectProperty<>(this, "currentTile", currentTile);
 //        generateTilesToMoveTo();
+        allFields = new Object[] {player, pieceType, possibleMoves, piecesUnderThreat,
+                historyMoves, lastTile, capturedPieces,
+                name, pieceCounter, isAlive, isInDanger, currentTile,
+                pieceColor, imageName, imageIcon};
     }
 
     @Override
@@ -387,5 +393,15 @@ public class RookPiece implements Piece, Cloneable {
     @Override
     public void setPieceType(PieceType pieceType) {
         this.pieceType = pieceType;
+    }
+
+    @Override
+    public Object[] getAllFields() {
+        return allFields;
+    }
+
+    @Override
+    public void setPlayer(Player player)  {
+        this.player = player;
     }
 }

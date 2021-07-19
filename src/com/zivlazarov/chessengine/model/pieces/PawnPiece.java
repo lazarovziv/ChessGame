@@ -44,6 +44,8 @@ public class PawnPiece implements Piece, Cloneable {
 
     private int value = 1;
 
+    private final Object[] allFields;
+
     public PawnPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
         this.board = board;
@@ -74,6 +76,10 @@ public class PawnPiece implements Piece, Cloneable {
 
         currentTileProperty = new SimpleObjectProperty<>(this, "currentTile", currentTile);
 //        generateTilesToMoveTo();
+        allFields = new Object[] {player, pieceType, possibleMoves, piecesUnderThreat,
+                historyMoves, lastTile, capturedPieces,
+                name, pieceCounter, isAlive, isInDanger, currentTile,
+                pieceColor, imageName, imageIcon};
     }
 
     @Override
@@ -434,5 +440,15 @@ public class PawnPiece implements Piece, Cloneable {
     @Override
     public void setPieceType(PieceType pieceType) {
         this.pieceType = pieceType;
+    }
+
+    @Override
+    public Object[] getAllFields() {
+        return allFields;
+    }
+
+    @Override
+    public void setPlayer(Player player)  {
+        this.player = player;
     }
 }

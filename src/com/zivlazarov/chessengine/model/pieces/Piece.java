@@ -50,6 +50,8 @@ public interface Piece extends Cloneable, Serializable {
     void setPieceType(PieceType pieceType);
     PieceType getPieceType();
 
+    Object[] getAllFields();
+
     Tile getCurrentTileProperty();
     ObjectProperty<Tile> currentTilePropertyProperty();
     void setCurrentTileProperty(Tile currentTileProperty);
@@ -82,4 +84,6 @@ public interface Piece extends Cloneable, Serializable {
     boolean hasMoved();
 
     boolean equals(Piece piece);
+
+    void setPlayer(Player player);
 }

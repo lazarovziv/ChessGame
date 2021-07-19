@@ -41,6 +41,8 @@ public class BishopPiece implements Piece, Cloneable {
 
     private int value = 3;
 
+    private final Object[] allFields;
+
     public BishopPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
         this.board = board;
@@ -70,6 +72,11 @@ public class BishopPiece implements Piece, Cloneable {
         currentTile.setPiece(this);
 
         currentTileProperty = new SimpleObjectProperty<>(this, "currentTile", currentTile);
+
+        allFields = new Object[] {player, pieceType, possibleMoves, piecesUnderThreat,
+                historyMoves, lastTile, capturedPieces,
+                name, pieceCounter, isAlive, isInDanger, currentTile,
+                pieceColor, imageName, imageIcon};
     }
 
     @Override
@@ -343,5 +350,15 @@ public class BishopPiece implements Piece, Cloneable {
     @Override
     public void setPieceType(PieceType pieceType) {
         this.pieceType = pieceType;
+    }
+
+    @Override
+    public Object[] getAllFields() {
+        return allFields;
+    }
+
+    @Override
+    public void setPlayer(Player player)  {
+        this.player = player;
     }
 }

@@ -54,6 +54,8 @@ public class ChessPiece implements Piece {
 
     private int value;
 
+    private final Object[] allFields;
+
     public ChessPiece(Player player, Board board, PieceType pieceType, PieceColor pieceColor, Tile initTile) {
         this.player = player;
         this.board = board;
@@ -153,12 +155,17 @@ public class ChessPiece implements Piece {
                 kingSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
                 queenSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
 
-                value = 1000;
+                value = 100;
             }
         }
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
+
+        allFields = new Object[] {player, pieceType, possibleMoves, piecesUnderThreat,
+                historyMoves, lastTile, capturedPieces,
+                name, pieceCounter, isAlive, isInDanger, currentTile,
+                pieceColor, imageName, imageIcon};
     }
 
     @Override
@@ -804,5 +811,10 @@ public class ChessPiece implements Piece {
     @Override
     public boolean equals(Piece piece) {
         return piece.getPieceType() == pieceType && piece.getCurrentTile() == currentTile;
+    }
+
+    @Override
+    public Object[] getAllFields() {
+        return allFields;
     }
 }
