@@ -5,6 +5,7 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.Piece;
+import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
@@ -104,6 +105,17 @@ public class Move {
             if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
             movingPiece.setCurrentTile(previousTile);
             // TODO: set hasMoved field for piece on first move as false after unmaking move
+        }
+
+        // deleting last move made from historyMoves
+        movingPiece.getHistoryMoves().remove(movingPiece.getHistoryMoves().lastElement());
+        board.getGameHistoryMoves().remove(board.getGameHistoryMoves().lastElement());
+
+        // if it was their first move, return their hasMoved field to false
+        if (movingPiece.getHistoryMoves().size() == 0) {
+            if (movingPiece instanceof PawnPiece) ((PawnPiece) movingPiece).setHasMoved(false);
+            else if (movingPiece instanceof RookPiece) ((RookPiece) movingPiece).setHasMoved(false);
+            else if (movingPiece instanceof KingPiece) ((KingPiece) movingPiece).setHasMoved(false);
         }
 
         board.setCurrentPlayer(board.getCurrentPlayer());
