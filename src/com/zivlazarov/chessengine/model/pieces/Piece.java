@@ -4,6 +4,7 @@ package com.zivlazarov.chessengine.model.pieces;
 
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import javafx.beans.property.ObjectProperty;
@@ -12,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javax.swing.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public interface Piece extends Cloneable, Serializable {
@@ -19,10 +21,11 @@ public interface Piece extends Cloneable, Serializable {
     String name = "";
     boolean isAlive = true;
     boolean isInDanger = false;
-    final ArrayList<Tile> tilesToMoveTo = new ArrayList<>();
+    final ArrayList<Tile> possibleMoves = new ArrayList<>();
     PieceColor pieceColor = PieceColor.WHITE;
     final ArrayList<Piece> piecesUnderThreat = new ArrayList<>();
     final Stack<Pair<Tile, Tile>> historyMoves = new Stack<>();
+    final List<Move> moves = new ArrayList<>();
 //    ImageView imageIcon = null;
 
     String getName();
@@ -38,6 +41,8 @@ public interface Piece extends Cloneable, Serializable {
     String getImageName();
 
     Tile getLastTile();
+
+    List<Move> getMoves();
 
     boolean canMove();
 
@@ -78,6 +83,18 @@ public interface Piece extends Cloneable, Serializable {
 //    void setOnClickListener();
 
     void refresh();
+
+    default void reset() {
+        if (possibleMoves.size() != 0) {
+            possibleMoves.clear();
+        }
+        if (piecesUnderThreat.size() != 0) {
+            piecesUnderThreat.clear();
+        }
+        if (moves.size() != 0) {
+            moves.clear();
+        }
+    }
 
     int getValue();
 

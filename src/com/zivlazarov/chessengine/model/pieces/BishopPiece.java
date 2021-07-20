@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
@@ -382,5 +383,10 @@ public class BishopPiece implements Piece, Cloneable {
     @Override
     public void setPlayer(Player player)  {
         this.player = player;
+    }
+
+    @Override
+    public List<Move> getMoves() {
+        return moves;
     }
 }

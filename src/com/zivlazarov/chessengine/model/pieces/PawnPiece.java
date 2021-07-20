@@ -10,10 +10,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
@@ -484,5 +481,10 @@ public class PawnPiece implements Piece, Cloneable {
     @Override
     public void setPlayer(Player player)  {
         this.player = player;
+    }
+
+    @Override
+    public List<Move> getMoves() {
+        return moves;
     }
 }

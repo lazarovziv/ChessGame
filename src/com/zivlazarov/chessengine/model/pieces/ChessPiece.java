@@ -3,16 +3,14 @@ package com.zivlazarov.chessengine.model.pieces;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import javafx.beans.property.ObjectProperty;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 public class ChessPiece implements Piece {
 
@@ -816,5 +814,10 @@ public class ChessPiece implements Piece {
     @Override
     public Object[] getAllFields() {
         return allFields;
+    }
+
+    @Override
+    public List<Move> getMoves() {
+        return null;
     }
 }
