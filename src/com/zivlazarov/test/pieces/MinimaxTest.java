@@ -23,19 +23,21 @@ public class MinimaxTest {
         player.setOpponentPlayer(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
+
         board.setCurrentPlayer(player);
 
         board.initBoard();
 
         board.checkBoard(board.getCurrentPlayer());
 
-        minimax = new Minimax(player);
+        minimax = new Minimax();
     }
 
     @Test
     public void testSearch() {
-        board.printBoard();
-        int value = minimax.search(board, 10, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+//        board.printBoard();
+//        System.out.println(board.evaluateBoard());
+        int value = minimax.search(board, 3, Integer.MIN_VALUE, Integer.MAX_VALUE);
         System.out.println(value);
     }
 }
