@@ -6,13 +6,11 @@ import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.Piece;
-import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class Minimax {
-
 
     public int search(Board board, int depth, int alpha, int beta) {
         if (depth == 0 || board.getGameSituation() == GameSituation.BLACK_CHECKMATED

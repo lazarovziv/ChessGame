@@ -9,9 +9,6 @@ import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
-import java.util.ArrayList;
-import java.util.Objects;
-
 public class Move {
 
     private final Board board;
@@ -57,6 +54,7 @@ public class Move {
         movingPiece.setLastTile(currentTile);
         movingPiece.setCurrentTile(targetTile);
 
+        // adding the move to piece's and game log
         movingPiece.getHistoryMoves().push(targetTile);
         board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
 
@@ -110,6 +108,7 @@ public class Move {
         // deleting last move made from historyMoves
         movingPiece.getHistoryMoves().remove(movingPiece.getHistoryMoves().lastElement());
         board.getGameHistoryMoves().remove(board.getGameHistoryMoves().lastElement());
+        player.getLastMove().remove(movingPiece);
 
         // if it was their first move, return their hasMoved field to false
         if (movingPiece.getHistoryMoves().size() == 0) {

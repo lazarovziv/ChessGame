@@ -231,13 +231,9 @@ public class Board implements MyObservable, Serializable {
             return;
         }
 
-        actualLegalMoves.forEach(System.out::println);
-        System.out.println("-----");
-
         player.getLegalMoves().clear();
         player.getAlivePieces().forEach(piece -> piece.getPossibleMoves().clear());
         player.getMoves().clear();
-//        player.getAlivePieces().forEach(Piece::reset);
         player.getMoves().addAll(actualLegalMoves);
 
         for (Move move : player.getMoves()) {
@@ -248,8 +244,6 @@ public class Board implements MyObservable, Serializable {
         }
 
         setCurrentPlayer(player);
-        player.getMoves().forEach(System.out::println);
-//        player.updateLegalMoves();
     }
 
     public void generateLegalMovesWhenInCheck(Player currentPlayer) {
