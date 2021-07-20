@@ -185,9 +185,9 @@ public class BoardFrame {
                                         return;
                                     }
                                     playerPiece = sourceTile.getPiece();
-                                    System.out.println("Possible Moves: ");
+//                                    System.out.println("Possible Moves: ");
                                     for (Tile possibleMove : playerPiece.getPossibleMoves()) {
-                                        System.out.println(possibleMove);
+//                                        System.out.println(possibleMove);
                                         markedTiles.add(possibleMove);
                                         // drawing a circle in the possible move tile
                                         drawPossibleMoves = true;
@@ -217,7 +217,7 @@ public class BoardFrame {
                                             .targetTile(destinationTile)
                                             .build();
 
-                                    move.makeMove();
+                                    move.makeMove(true);
 
                                     System.out.println(board.getGameSituation());
 
@@ -234,7 +234,7 @@ public class BoardFrame {
                                             JOptionPane.QUESTION_MESSAGE, null, new String[] {"Yes", "No"}, "Yes");
 
                                     if (result == JOptionPane.YES_OPTION) {
-                                        move.unmakeMove();
+                                        move.unmakeMove(true);
                                         board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
                                     }
 
