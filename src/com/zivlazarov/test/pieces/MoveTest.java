@@ -5,6 +5,7 @@ import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.player.Player;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -60,5 +61,17 @@ public class MoveTest {
         move.unmakeMove(true);
         board.printBoard();
         System.out.println(opponentPawnPiece.getPlayer().getPlayerColor());
+    }
+
+    @Test
+    public void testMoveEquals() {
+        Move move = new Move.Builder()
+                .board(board)
+                .player(player)
+                .movingPiece(pawnPiece)
+                .targetTile(board.getBoard()[2][2])
+                .build();
+
+        Assertions.assertTrue(move.equals(player.getMoves().get(0)));
     }
 }

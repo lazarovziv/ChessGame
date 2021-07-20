@@ -9,6 +9,7 @@ import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Move {
 
@@ -25,8 +26,9 @@ public class Move {
     }
 
     public boolean makeMove(boolean checkBoard) {
-        if (!movingPiece.getPossibleMoves().contains(targetTile)) return false;
-        if (!player.getLegalMoves().contains(targetTile)) return false;
+        if (player.getMoves().stream().noneMatch(move -> move.equals(this))) return false;
+//        if (!movingPiece.getPossibleMoves().contains(targetTile)) return false;
+//        if (!player.getLegalMoves().contains(targetTile)) return false;
 //        if (!player.getMoves().contains(this)) return false;
 
         player.getLastMove().clear();
@@ -74,30 +76,37 @@ public class Move {
     }
 
     public void unmakeMove(boolean checkBoard) {
-        Piece piece = new ArrayList<>(player.getLastMove().keySet()).get(0);
-        Tile previousTile = player.getLastMove().get(piece).getFirst();
-        Tile currentTile = player.getLastMove().get(piece).getSecond();
+        Tile previousTile = movingPiece.getLastTile();
+        Tile currentTile = movingPiece.getCurrentTile();
 
         Piece capturedPiece;
 
         // getting last captured piece
-        if (piece.getCapturedPieces().size() != 0) {
-            capturedPiece = piece.getLastPieceEaten();
+        if (movingPiece.getCapturedPieces().size() != 0) {
+            capturedPiece = movingPiece.getLastPieceEaten();
 
             // if captured piece's last tile is the last move's previous tile, return the captured piece to the game
             // and place captured piece in that tile while clearing the current piece from there
             if (currentTile.equals(capturedPiece.getLastTile())) {
+                // adding the captured piece to the game
                 player.getOpponentPlayer().addPieceToAlive(capturedPiece);
-                piece.getCapturedPieces().remove(piece.getCapturedPieces().size() - 1);
+                // removing the captured piece from capturing piece's capturedPieces list
+                movingPiece.getCapturedPieces().remove(movingPiece.getCapturedPieces().size() - 1);
+                // clearing capturing piece from it's tile
                 player.clearTileFromPiece(currentTile);
+                // setting captured piece's tile
                 capturedPiece.setCurrentTile(currentTile);
+                // setting capturing piece to it's previous tile
+                movingPiece.setCurrentTile(previousTile);
             }
+        } else {
+            // if last tile is not empty then clear it and set piece to it's previous tile
+            if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
+            movingPiece.setCurrentTile(previousTile);
+            // TODO: set hasMoved field for piece on first move as false after unmaking move
         }
-        // if last tile is not empty then clear it and set piece to it's previous tile
-        if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
-        piece.setCurrentTile(previousTile);
 
-        board.setCurrentPlayer(player);
+        board.setCurrentPlayer(board.getCurrentPlayer());
 
         if (checkBoard)
             board.checkBoard(board.getCurrentPlayer());
@@ -117,6 +126,12 @@ public class Move {
     
     public String toString() {
       return movingPiece.getName() + ": " + movingPiece.getCurrentTile() + " -> " + targetTile;
+    }
+
+    public boolean equals(Move move) {
+        return move.player.getPlayerColor() == player.getPlayerColor() &&
+                move.movingPiece.getCurrentTile().equals(movingPiece.getCurrentTile()) &&
+                move.targetTile.equals(targetTile);
     }
 
     public static class Builder {
