@@ -216,21 +216,40 @@ public class Board implements MyObservable, Serializable {
         List<Move> actualLegalMoves = new ArrayList<>();
 
         for (Move move : new ArrayList<>(player.getMoves())) {
-            move.makeMove(false);
-            updateObservers();
+            boolean successfulMove = move.makeMove(false);
+            if (!successfulMove) continue;
+            else updateObservers();
+
             if (!player.isInCheck()) actualLegalMoves.add(move);
 
             move.unmakeMove(false);
             updateObservers();
         }
 
-        if (actualLegalMoves.size() == 0) gameSituation = checkmateSituations.get(player.getPlayerColor());
+        if (actualLegalMoves.size() == 0) {
+            gameSituation = checkmateSituations.get(player.getPlayerColor());
+            return;
+        }
+
+        actualLegalMoves.forEach(System.out::println);
+        System.out.println("-----");
 
         player.getLegalMoves().clear();
         player.getAlivePieces().forEach(piece -> piece.getPossibleMoves().clear());
         player.getMoves().clear();
+//        player.getAlivePieces().forEach(Piece::reset);
         player.getMoves().addAll(actualLegalMoves);
 
+        for (Move move : player.getMoves()) {
+            Piece piece = move.getMovingPiece();
+            Tile tile = move.getTargetTile();
+
+            piece.getPossibleMoves().add(tile);
+        }
+
+        setCurrentPlayer(player);
+        player.getMoves().forEach(System.out::println);
+//        player.updateLegalMoves();
     }
 
     public void generateLegalMovesWhenInCheck(Player currentPlayer) {

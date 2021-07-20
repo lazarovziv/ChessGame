@@ -229,24 +229,14 @@ public class BoardFrame {
                                                     playerPiece.getLastTile()
                                                     + " -> " + playerPiece.getCurrentTile());
 
-                                    int result = JOptionPane.showOptionDialog(boardPanel, "Undo move? ",
-                                            null, JOptionPane.YES_NO_OPTION,
-                                            JOptionPane.QUESTION_MESSAGE, null, new String[] {"Yes", "No"}, "Yes");
-
-                                    if (result == JOptionPane.YES_OPTION) {
-                                        move.unmakeMove(true);
-                                        board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
-                                    }
-
-//                                    Alert alert = new Alert(Alert.AlertType.NONE,
-//                                            "Would you like to undo move? ",
-//                                            ButtonType.YES,
-//                                            ButtonType.NO);
+//                                    int result = JOptionPane.showOptionDialog(boardPanel, "Undo move? ",
+//                                            null, JOptionPane.YES_NO_OPTION,
+//                                            JOptionPane.QUESTION_MESSAGE, null, new String[] {"Yes", "No"}, "Yes");
 //
-//                                    alert.showAndWait();
-//
-//                                    if (alert.getResult() == ButtonType.YES) move.unmakeMove();
-//                                    else if (alert.getResult() == ButtonType.OK);
+//                                    if (result == JOptionPane.YES_OPTION) {
+//                                        move.unmakeMove(true);
+//                                        board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
+//                                    }
                                 }
 
                                 sourceTile = null;
