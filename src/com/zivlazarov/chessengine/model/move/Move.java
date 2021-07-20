@@ -24,7 +24,7 @@ public class Move {
         this.targetTile = targetTile;
     }
 
-    public boolean makeMove() {
+    public boolean makeMove(boolean checkBoard) {
         if (!movingPiece.getPossibleMoves().contains(targetTile)) return false;
         if (!player.getLegalMoves().contains(targetTile)) return false;
 //        if (!player.getMoves().contains(this)) return false;
@@ -67,12 +67,13 @@ public class Move {
 
         board.setCurrentPlayer(player.getOpponentPlayer());
 
-        board.checkBoard(board.getCurrentPlayer());
+        if (checkBoard)
+            board.checkBoard(board.getCurrentPlayer());
 
         return true;
     }
 
-    public void unmakeMove() {
+    public void unmakeMove(boolean checkBoard) {
         Piece piece = new ArrayList<>(player.getLastMove().keySet()).get(0);
         Tile previousTile = player.getLastMove().get(piece).getFirst();
         Tile currentTile = player.getLastMove().get(piece).getSecond();
@@ -98,8 +99,8 @@ public class Move {
 
         board.setCurrentPlayer(player);
 
-        board.checkBoard(player);
-//        board.checkBoard(player);
+        if (checkBoard)
+            board.checkBoard(board.getCurrentPlayer());
     }
 
     public Player getPlayer() {

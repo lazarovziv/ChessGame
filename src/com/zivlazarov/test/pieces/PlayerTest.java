@@ -92,9 +92,9 @@ public class PlayerTest {
     public void testUnmakeMove() {
         Move move = player.getMoves().get(0);
         System.out.println(move);
-        move.makeMove();
+        move.makeMove(true);
         board.printBoard();
-        move.unmakeMove();
+        move.unmakeMove(true);
         board.printBoard();
     }
 }

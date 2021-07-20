@@ -105,7 +105,7 @@ public class PawnPieceTest {
                 .targetTile(board.getBoard()[7][3])
                 .build();
 
-        move.makeMove();
+        move.makeMove(true);
         board.printBoard();
     }
 
@@ -122,7 +122,7 @@ public class PawnPieceTest {
                 .targetTile(board.getBoard()[7][3])
                 .build();
 
-        move.makeMove();
+        move.makeMove(true);
 
 //        player.addPieceToDead(pawn);
 //

@@ -41,7 +41,7 @@ public class MoveTest {
                 .build();
 
         board.printBoard();
-        move.makeMove();
+        move.makeMove(true);
         board.printBoard();
     }
 
@@ -55,9 +55,9 @@ public class MoveTest {
                 .build();
 
         board.printBoard();
-        move.makeMove();
+        move.makeMove(true);
         board.printBoard();
-        move.unmakeMove();
+        move.unmakeMove(true);
         board.printBoard();
         System.out.println(opponentPawnPiece.getPlayer().getPlayerColor());
     }

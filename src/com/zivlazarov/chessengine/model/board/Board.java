@@ -1,5 +1,6 @@
 package com.zivlazarov.chessengine.model.board;
 
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Memento;
@@ -200,7 +201,7 @@ public class Board implements MyObservable, Serializable {
         if (currentPlayer.isInCheck()) {
             // reset all legal moves before proceeding to generation of legal moves in check situation
             gameSituation = checkSituations.get(currentPlayer.getPlayerColor());
-            generateLegalMovesWhenInCheck(currentPlayer);
+            generateMovesWhenInCheck(currentPlayer);
             return;
         } else {
             if (gameSituation == GameSituation.NORMAL) {
@@ -209,6 +210,27 @@ public class Board implements MyObservable, Serializable {
         }
         gameSituation = GameSituation.NORMAL;
         
+    }
+
+    public void generateMovesWhenInCheck(Player player) {
+        List<Move> actualLegalMoves = new ArrayList<>();
+
+        for (Move move : new ArrayList<>(player.getMoves())) {
+            move.makeMove(false);
+            updateObservers();
+            if (!player.isInCheck()) actualLegalMoves.add(move);
+
+            move.unmakeMove(false);
+            updateObservers();
+        }
+
+        if (actualLegalMoves.size() == 0) gameSituation = checkmateSituations.get(player.getPlayerColor());
+
+        player.getLegalMoves().clear();
+        player.getAlivePieces().forEach(piece -> piece.getPossibleMoves().clear());
+        player.getMoves().clear();
+        player.getMoves().addAll(actualLegalMoves);
+
     }
 
     public void generateLegalMovesWhenInCheck(Player currentPlayer) {
@@ -473,7 +495,8 @@ public class Board implements MyObservable, Serializable {
 
         int perspective = currentPlayer.getPlayerColor() == PieceColor.WHITE ? 1 : -1;
 
-        return perspective * (whitePlayer.getPlayerScore() - blackPlayer.getPlayerScore());
+        return currentPlayer.getPlayerScore();
+//        return perspective * (currentPlayer.getPlayerScore() - currentPlayer.getOpponentPlayer().getPlayerScore());
     }
 
     public BoardNode getCurrentNode() {

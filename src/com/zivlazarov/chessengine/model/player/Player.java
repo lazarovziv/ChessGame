@@ -58,34 +58,11 @@ public class Player implements MyObserver, Serializable {
     }
 
     public void refreshPieces() {
-        legalMoves.clear();
-        moves.clear();
+        if (legalMoves.size() != 0) legalMoves.clear();
+        if (moves.size() != 0) moves.clear();
+
         for (Piece piece : alivePieces) {
             piece.refresh();
-            for (Tile tile : piece.getPossibleMoves()) {
-                Move move = new Move.Builder()
-                        .board(board)
-                        .player(this)
-                        .movingPiece(piece)
-                        .targetTile(tile)
-                        .build();
-                moves.add(move);
-//                legalMoves.add(tile);
-            }
-            legalMoves.addAll(piece.getPossibleMoves());
-        }
-//        addAllPossibleNodes();
-    }
-
-    private void addAllPossibleNodes() {
-        for (Piece piece : alivePieces) {
-            if (!piece.canMove()) continue;
-            for (Tile tile : piece.getPossibleMoves()) {
-                if (movePiece(piece, tile)) {
-                    board.getCurrentNode().addChildNode(new BoardNode(board, this));
-                    board.unmakeLastMove(piece);
-                }
-            }
         }
     }
 
@@ -118,7 +95,7 @@ public class Player implements MyObserver, Serializable {
         if (piece instanceof PawnPiece) {
             isSpecialMove = handleEnPassantMove(piece, targetTile);
             ((PawnPiece) piece).setHasMoved(true);
-//            handlePawnPromotion(piece);
+            piece = handlePawnPromotion(piece, targetTile);
         }
         if (piece instanceof KingPiece) {
             isSpecialMove = handleKingSideCastling(piece, targetTile);
@@ -132,8 +109,8 @@ public class Player implements MyObserver, Serializable {
         }
 
         // placing piece in target tile
+        piece.setLastTile(pieceTile);
         piece.setCurrentTile(targetTile);
-        piece.setLastTile(targetTile);
 
         // pushing move to log
         piece.getHistoryMoves().push(targetTile);
@@ -148,6 +125,9 @@ public class Player implements MyObserver, Serializable {
         opponentPlayer.resetPlayerScore();
         opponentPlayer.evaluatePlayerScore();
 
+//        board.setCurrentPlayer(opponentPlayer);
+//
+//        board.checkBoard(board.getCurrentPlayer());
 //        board.setCurrentPlayer(opponentPlayer);
 //        board.checkBoard(board.getCurrentPlayer());
         // set board's current node the node the player made
@@ -172,7 +152,8 @@ public class Player implements MyObserver, Serializable {
             // if eaten piece's last tile is the last move's previous tile, return the eaten piece to the game
             // and place eaten piece in that tile while clearing the current piece from there
             if (currentTile.equals(capturedPiece.getLastTile())) {
-                addPieceToAlive(capturedPiece);
+                opponentPlayer.addPieceToAlive(capturedPiece);
+                piece.getCapturedPieces().remove(piece.getCapturedPieces().size() - 1);
                 clearTileFromPiece(currentTile);
                 capturedPiece.setCurrentTile(currentTile);
             }
@@ -180,6 +161,10 @@ public class Player implements MyObserver, Serializable {
         // if last tile is not empty then clear it and set piece to it's previous tile
         if (!currentTile.isEmpty()) clearTileFromPiece(currentTile);
         piece.setCurrentTile(previousTile);
+
+        board.setCurrentPlayer(this);
+
+        board.checkBoard(board.getCurrentPlayer());
     }
 
     public Piece handlePawnPromotion(Piece piece, Tile tile) {
@@ -368,7 +353,7 @@ public class Player implements MyObserver, Serializable {
         for (Piece piece : alivePieces) {
             playerScore += playerDirection * 100 * piece.getValue();
             for (Piece threatenedPiece : piece.getPiecesUnderThreat()) {
-                playerScore += playerDirection * 25 * threatenedPiece.getValue();
+                playerScore += playerDirection * 12 * threatenedPiece.getValue();
             }
         }
     }
