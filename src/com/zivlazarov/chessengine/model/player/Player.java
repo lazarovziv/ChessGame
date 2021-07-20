@@ -268,6 +268,7 @@ public class Player implements MyObserver, Serializable {
             deadPieces.add(piece);
             alivePieces.remove(piece);
             clearTileFromPiece(piece.getCurrentTile());
+            piece.setLastTile(piece.getCurrentTile());
             piece.setCurrentTile(null);
             piece.setIsAlive(false);
         }
@@ -377,6 +378,7 @@ public class Player implements MyObserver, Serializable {
     public void updateLegalMoves() {
         for (Piece piece : alivePieces) {
             legalMoves.addAll(piece.getPossibleMoves());
+            moves.addAll(piece.getMoves());
         }
     }
 
