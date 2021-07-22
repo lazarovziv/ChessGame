@@ -46,6 +46,8 @@ public class Board implements MyObservable, Serializable {
 
     private final Stack<Pair<Piece, Tile>> gameHistoryMoves;
 
+    private final Stack<Move> matchPlays;
+
     private boolean changedState;
 
     private final Stack<Board> states;
@@ -56,6 +58,8 @@ public class Board implements MyObservable, Serializable {
         observers = new ArrayList<>();
 
         gameHistoryMoves = new Stack<>();
+
+        matchPlays = new Stack<>();
 
         states = new Stack<>();
 
@@ -119,8 +123,8 @@ public class Board implements MyObservable, Serializable {
         Piece whiteQueen = new QueenPiece(whitePlayer, instance, PieceColor.WHITE, board[0][3]);
         Piece blackQueen = new QueenPiece(blackPlayer, instance, PieceColor.BLACK, board[7][3]);
 
-        Piece whiteKing = new KingPiece(whitePlayer, instance, PieceColor.WHITE, board[0][4]);
-        Piece blackKing = new KingPiece(blackPlayer, instance, PieceColor.BLACK, board[7][4]);
+        Piece whiteKing = new KingPiece(whitePlayer, instance, PieceColor.WHITE, board[0][4], false);
+        Piece blackKing = new KingPiece(blackPlayer, instance, PieceColor.BLACK, board[7][4], false);
 
         Piece whitePawn0 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][0], 0);
         Piece whitePawn1 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][1], 1);
@@ -205,8 +209,12 @@ public class Board implements MyObservable, Serializable {
             return;
         } else {
             if (gameSituation == GameSituation.NORMAL) {
+                if (currentPlayer.getMoves().size() == 0) {
+                    gameSituation = GameSituation.STALEMATE;
+                    System.out.println("Stalemate! ");
+                }
                 return;
-            } // TODO: add stalemate and draw situations here
+            }
         }
         gameSituation = GameSituation.NORMAL;
         
@@ -216,16 +224,23 @@ public class Board implements MyObservable, Serializable {
         List<Move> actualLegalMoves = new ArrayList<>();
 
         for (Move move : new ArrayList<>(player.getMoves())) {
+            // setting checkBoard argument to false to prevent a StackOverflow error
             boolean successfulMove = move.makeMove(false);
+            // if the move wasn't successful, try the next move
             if (!successfulMove) continue;
+            // if it did, make all pieces generate moves according to current board state
             else updateObservers();
 
+            // if the move prevented the check, it is legal
             if (!player.isInCheck()) actualLegalMoves.add(move);
 
+            // setting checkBoard argument to false to prevent a StackOverflow error
+            // unmake the move and make all pieces generate moves
             move.unmakeMove(false);
             updateObservers();
         }
 
+        // if no legal move exists in this current board's state, it is checkmate
         if (actualLegalMoves.size() == 0) {
             gameSituation = checkmateSituations.get(player.getPlayerColor());
             return;
@@ -472,6 +487,10 @@ public class Board implements MyObservable, Serializable {
         System.out.println();
     }
 
+    public void pushMoveToMatchPlays(Move move) {
+        matchPlays.push(move);
+    }
+
     public Tile[][] getBoard() {
         return board;
     }
@@ -526,6 +545,17 @@ public class Board implements MyObservable, Serializable {
 
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
+    }
+
+    public Stack<Move> getMatchPlays() {
+        return matchPlays;
+    }
+
+    public String getLastMoveToString() {
+        if (matchPlays.lastElement() != null) {
+            return matchPlays.lastElement().getPlayer() + " played " + matchPlays.lastElement();
+        }
+        return "No plays played.";
     }
 
     @Override

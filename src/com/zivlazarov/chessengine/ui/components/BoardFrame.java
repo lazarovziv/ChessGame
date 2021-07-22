@@ -49,6 +49,9 @@ public class BoardFrame {
         whitePlayer = new Player(board, PieceColor.WHITE);
         blackPlayer = new Player(board, PieceColor.BLACK);
 
+        whitePlayer.setName("Ziv");
+        blackPlayer.setName("Guy");
+
         whitePlayer.setAI(false);
         blackPlayer.setAI(true);
 
@@ -225,9 +228,11 @@ public class BoardFrame {
 
                                     System.out.println();
 
-                                    System.out.println(board.getGameHistoryMoves().peek().getFirst().getName() + ": " +
-                                            board.getGameHistoryMoves().peek().getFirst().getLastTile() + " -> " +
-                                            board.getGameHistoryMoves().peek().getSecond());
+                                    System.out.println(board.getLastMoveToString());
+
+//                                    System.out.println(board.getGameHistoryMoves().peek().getFirst().getName() + ": " +
+//                                            board.getGameHistoryMoves().peek().getFirst().getLastTile() + " -> " +
+//                                            board.getGameHistoryMoves().peek().getSecond());
 //                                    System.out.println(
 //                                            playerPiece.getName() + ": " +
 //                                                    playerPiece.getLastTile()
