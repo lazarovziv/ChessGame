@@ -30,7 +30,7 @@ public class PawnPieceTest {
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
         opponent.setOpponentPlayer(player);
-        KingPiece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[7][4]);
+        KingPiece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[7][4], false);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[3][0], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][1], 0);

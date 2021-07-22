@@ -34,7 +34,7 @@ public class RookPiece implements Piece, Cloneable {
     private final int pieceCounter;
     private boolean isAlive = true;
     private boolean isInDanger = false;
-    private boolean hasMoved;
+    private boolean hasMoved = false;
     private Tile currentTile;
     private PieceColor pieceColor;
     private String imageName;
@@ -60,8 +60,6 @@ public class RookPiece implements Piece, Cloneable {
         historyMoves = new Stack<>();
         capturedPieces = new Stack<>();
         moves = new ArrayList<>();
-
-        hasMoved = false;
 
         currentTile = initTile;
         lastTile = currentTile;

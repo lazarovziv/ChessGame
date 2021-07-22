@@ -32,6 +32,7 @@ public class BoardTest {
         player.setOpponentPlayer(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
+        board.setCurrentPlayer(opponent);
 //        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], false, 0);
 //        rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], true, 1);
 //        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][4]);
@@ -39,9 +40,9 @@ public class BoardTest {
 //        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[3][4], 0);
 //        opponentPawnPiece1 = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[5][0], 1);
 //        opponentBishopPiece = new BishopPiece(opponent, board, PieceColor.BLACK, board.getBoard()[4][0], 0);
-        board.initBoard();
-        board.setCurrentPlayer(player);
-        board.checkBoard(board.getCurrentPlayer());
+//        board.initBoard();
+//        board.setCurrentPlayer(player);
+//        board.checkBoard(board.getCurrentPlayer());
     }
 
     @Test
@@ -112,7 +113,15 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsSameBoard() {
-
+    public void testStalemate() {
+        Piece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[7][7], true);
+        Piece opponentKingPiece = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[6][4], true);
+        Piece opponentQueenPiece = new QueenPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[5][6]);
+        board.printBoard();
+        board.checkBoard(board.getCurrentPlayer());
+        opponentKingPiece.getMoves().get(3).makeMove(true);
+        board.printBoard();
+        System.out.println(board.getGameSituation());
+        player.getMoves().forEach(System.out::println);
     }
 }

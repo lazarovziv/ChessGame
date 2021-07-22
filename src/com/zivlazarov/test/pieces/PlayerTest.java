@@ -30,7 +30,7 @@ public class PlayerTest {
         opponent.setOpponentPlayer(player);
         pawnPiece = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[5][3], 0);
         bishopPiece = new BishopPiece(player, board, player.getPlayerColor(), board.getBoard()[1][0], 0);
-        opponentKingPiece = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][4]);
+        opponentKingPiece = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][4], false);
         opponentPawnPiece = new PawnPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[6][2], 0);
         board.checkBoard(player);
     }
@@ -46,7 +46,7 @@ public class PlayerTest {
 
     @Test
     public void testSaveAndLoadState() {
-        KingPiece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[1][4]);
+        KingPiece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[1][4], false);
         System.out.println("Player pieces: ");
         for (Piece piece : player.getAlivePieces()) {
             System.out.println(piece.getName() + " - " + piece.getCurrentTile());

@@ -38,12 +38,17 @@ public class Move {
 
         if (movingPiece instanceof PawnPiece) {
             isSpecialMove = player.handleEnPassantMove(movingPiece, targetTile);
-            ((PawnPiece) movingPiece).setHasMoved(true);
+            if (checkBoard)
+                ((PawnPiece) movingPiece).setHasMoved(true);
             movingPiece = player.handlePawnPromotion(movingPiece, targetTile);
         } else if (movingPiece instanceof KingPiece) {
             isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
             if (!isSpecialMove) isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
-            ((KingPiece) movingPiece).setHasMoved(true);
+            if (checkBoard)
+                ((KingPiece) movingPiece).setHasMoved(true);
+        } else if (movingPiece instanceof RookPiece) {
+            if (checkBoard)
+                ((RookPiece) movingPiece).setHasMoved(true);
         }
 
         if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != player.getPlayerColor()) {
@@ -57,6 +62,7 @@ public class Move {
         // adding the move to piece's and game log
         movingPiece.getHistoryMoves().push(targetTile);
         board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
+        board.pushMoveToMatchPlays(this);
 
         player.getLastMove().put(movingPiece, new Pair<>(currentTile, targetTile));
 
@@ -98,24 +104,25 @@ public class Move {
                 // setting capturing piece to it's previous tile
                 movingPiece.setCurrentTile(previousTile);
             }
+            // no capturing involved in last move
         } else {
             // if last tile is not empty then clear it and set piece to it's previous tile
             if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
             movingPiece.setCurrentTile(previousTile);
-            // TODO: set hasMoved field for piece on first move as false after unmaking move
         }
 
-        // deleting last move made from historyMoves
-        movingPiece.getHistoryMoves().remove(movingPiece.getHistoryMoves().lastElement());
-        board.getGameHistoryMoves().remove(board.getGameHistoryMoves().lastElement());
-        player.getLastMove().remove(movingPiece);
-
-        // if it was their first move, return their hasMoved field to false
-        if (movingPiece.getHistoryMoves().size() == 0) {
+        // if it was their first move, revert their hasMoved field to false
+        if (movingPiece.getHistoryMoves().size() == 1) {
             if (movingPiece instanceof PawnPiece) ((PawnPiece) movingPiece).setHasMoved(false);
             else if (movingPiece instanceof RookPiece) ((RookPiece) movingPiece).setHasMoved(false);
             else if (movingPiece instanceof KingPiece) ((KingPiece) movingPiece).setHasMoved(false);
         }
+
+        // deleting last move made from logs
+        movingPiece.getHistoryMoves().remove(movingPiece.getHistoryMoves().lastElement());
+        board.getGameHistoryMoves().remove(board.getGameHistoryMoves().lastElement());
+        player.getLastMove().remove(movingPiece);
+        board.getMatchPlays().remove(board.getMatchPlays().size() - 1);
 
         board.setCurrentPlayer(board.getCurrentPlayer());
 
@@ -136,7 +143,7 @@ public class Move {
     }
     
     public String toString() {
-      return movingPiece.getName() + ": " + movingPiece.getCurrentTile() + " -> " + targetTile;
+      return movingPiece.getName() + ": " + movingPiece.getLastTile() + " -> " + targetTile;
     }
 
     public boolean equals(Move move) {

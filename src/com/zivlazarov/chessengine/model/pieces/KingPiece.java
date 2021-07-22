@@ -39,14 +39,14 @@ public class KingPiece implements Piece, Cloneable {
     private String imageName;
     private Icon imageIcon;
 
-    private final Tile kingSideCastleTile;
-    private final Tile queenSideCastleTile;
+    private Tile kingSideCastleTile;
+    private Tile queenSideCastleTile;
 
     private final int value = 0;
 
     private final Object[] allFields;
 
-    public KingPiece(Player player, Board board, PieceColor pc, Tile initTile) {
+    public KingPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean test) {
         this.player = player;
         this.board = board;
 
@@ -72,8 +72,12 @@ public class KingPiece implements Piece, Cloneable {
             imageName = "whiteKing.png";
         }
 
-        kingSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
-        queenSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
+        kingSideCastleTile = null;
+        queenSideCastleTile = null;
+
+        if (!test)
+            kingSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
+            queenSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
 
         player.addPieceToAlive(this);
 

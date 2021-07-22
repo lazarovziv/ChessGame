@@ -35,8 +35,8 @@ public class KingPieceTest {
         opponent.setOpponentPlayer(player);
         player.setOpponentPlayer(opponent);
 //        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[3][4], 0);
-        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3]);
-        opponentKingPiece = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][4]);
+        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3], false);
+        opponentKingPiece = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][4], false);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][3], 0);
         opponentKnightPiece = new KnightPiece(opponent, board, PieceColor.BLACK, board.getBoard()[4][1], 0);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][1], 0);
@@ -45,7 +45,7 @@ public class KingPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
-        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4]);
+        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], false);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
         board.checkBoard(player);
         List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
@@ -69,7 +69,7 @@ public class KingPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
-        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4]);
+        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], false);
 //        pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
 //        opponentPawnPiece.moveToTile(board.getBoard()[opponentPawnPiece.getCurrentTile().getRow() - 1][opponentPawnPiece.getCurrentTile().getCol()]);
