@@ -2,7 +2,9 @@ package com.zivlazarov.chessengine.ui.components;
 
 import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.Piece;
+import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.player.Player;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -121,6 +124,29 @@ public class BoardFrame {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
 
+//        playRandomly();
+    }
+
+    public void playRandomly() {
+        while (board.getGameSituation() != GameSituation.BLACK_CHECKMATED ||
+                board.getGameSituation() != GameSituation.WHITE_CHECKMATED ||
+        board.getGameSituation() != GameSituation.STALEMATE) {
+            try {
+                Thread.sleep(10);
+
+                Collections.shuffle(board.getCurrentPlayer().getMoves());
+
+                Move move = board.getCurrentPlayer().getMoves().get(0);
+                System.out.println(board.getCurrentPlayer());
+                move.makeMove(true);
+                System.out.println(board.getGameSituation());
+                if (board.getGameSituation() == GameSituation.STALEMATE) break;
+
+                SwingUtilities.invokeLater(boardPanel::drawBoard);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static class BoardPanel extends JPanel {
@@ -221,6 +247,7 @@ public class BoardFrame {
                                         return;
                                     }
                                     playerPiece = sourceTile.getPiece();
+                                    if (playerPiece instanceof RookPiece) System.out.println(playerPiece.hasMoved());
 //                                    System.out.println("Possible Moves: ");
                                     for (Tile possibleMove : playerPiece.getPossibleMoves()) {
 //                                        System.out.println(possibleMove);
