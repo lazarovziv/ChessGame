@@ -92,6 +92,21 @@ public class Board implements MyObservable, Serializable {
         return instance;
     }
 
+    public void resetBoard() {
+        if (instance != null) {
+            synchronized (Board.class) {
+                if (instance != null) {
+//                    for (Tile[] tiles : board) {
+//                        for (Tile tile : tiles) {
+//                            tile.setPiece(null);
+//                        }
+//                    }
+                    instance = null;
+                }
+            }
+        }
+    }
+
     public static Board getSimulatedInstance() {
         if (simulatedInstance == null) {
             synchronized (Board.class) {
@@ -212,8 +227,8 @@ public class Board implements MyObservable, Serializable {
                 if (currentPlayer.getMoves().size() == 0) {
                     gameSituation = GameSituation.STALEMATE;
                     System.out.println("Stalemate! ");
+                    return;
                 }
-                return;
             }
         }
         gameSituation = GameSituation.NORMAL;

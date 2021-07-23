@@ -53,7 +53,7 @@ public class BoardFrame {
         blackPlayer.setName("Guy");
 
         whitePlayer.setAI(false);
-        blackPlayer.setAI(true);
+        blackPlayer.setAI(false);
 
         whitePlayer.setOpponentPlayer(blackPlayer);
 //        blackPlayer.setOpponentPlayer(whitePlayer);
@@ -78,9 +78,42 @@ public class BoardFrame {
 
 //        board.getCurrentPlayer().minimax(board, 6, Integer.MIN_VALUE, Integer.MAX_VALUE);
         gameFrame = new JFrame("Chess");
+        gameFrame.setUndecorated(true);
         gameFrame.setLayout(new BorderLayout());
-        gameFrame.setSize(600, 600);
         boardPanel = new BoardPanel(board);
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Options");
+
+        JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem.addActionListener((event) -> System.exit(1));
+        JMenuItem restartGameItem = new JMenuItem("Restart");
+        restartGameItem.addActionListener((event) -> {
+            gameFrame.dispose();
+            board.resetBoard();
+            new BoardFrame();
+        });
+
+        JMenuItem saveGameItem = new JMenuItem("Save Game");
+        saveGameItem.addActionListener((event) -> {
+
+        });
+
+        JMenuItem loadGameItem = new JMenuItem("Load Game");
+        loadGameItem.addActionListener((event) -> {
+
+        });
+
+        menu.add(saveGameItem);
+        menu.add(loadGameItem);
+        menu.add(restartGameItem);
+        menu.add(exitMenuItem);
+
+        menuBar.add(menu);
+
+        gameFrame.setJMenuBar(menuBar);
+
+        gameFrame.setSize(600, 600);
         gameFrame.add(boardPanel, BorderLayout.CENTER);
         gameFrame.setVisible(true);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
