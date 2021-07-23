@@ -226,7 +226,6 @@ public class Board implements MyObservable, Serializable {
             if (gameSituation == GameSituation.NORMAL) {
                 if (currentPlayer.getMoves().size() == 0) {
                     gameSituation = GameSituation.STALEMATE;
-                    System.out.println("Stalemate! ");
                     return;
                 }
             }
@@ -668,5 +667,11 @@ public class Board implements MyObservable, Serializable {
             }
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        printBoard();
+        return "\n";
     }
 }

@@ -1,7 +1,6 @@
 package com.zivlazarov.chessengine.model.player;
 
 import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.BoardNode;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.move.Move;

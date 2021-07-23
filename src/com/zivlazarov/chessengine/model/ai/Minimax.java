@@ -6,11 +6,56 @@ import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.Piece;
+import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class Minimax {
+
+    private final Board board;
+
+    public Minimax(Board board) {
+        this.board = board;
+    }
+
+    public Move execute(int depth, boolean isMaximizing) {
+        if (depth == 0) return null;
+
+        Move bestMove = null;
+        int score = board.evaluateBoard();
+
+        Player currentPlayer = board.getCurrentPlayer();
+
+        // white player is maximizing, black minimizing
+        if (isMaximizing) {
+            for (Move move : new ArrayList<>(currentPlayer.getMoves())) {
+                board.printBoard();
+                move.makeMove(true);
+                int currentScore = board.evaluateBoard();
+                if (currentScore >= score) {
+                    score = currentScore;
+                    bestMove = move;
+                }
+                execute(depth - 1, false);
+                move.unmakeMove(true);
+            }
+        } else {
+            for (Move move : new ArrayList<>(currentPlayer.getMoves())) {
+                board.printBoard();
+                move.makeMove(true);
+                int currentScore = board.evaluateBoard();
+                execute(depth - 1, true);
+                if (currentScore <= score) {
+                    score = currentScore;
+                    bestMove = move;
+                }
+                move.unmakeMove(true);
+            }
+        }
+
+        return bestMove;
+    }
 
     public int search(Board board, int depth, int alpha, int beta) {
         if (depth == 0 || board.getGameSituation() == GameSituation.BLACK_CHECKMATED

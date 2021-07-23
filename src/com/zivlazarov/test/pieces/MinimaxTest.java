@@ -3,6 +3,7 @@ package com.zivlazarov.test.pieces;
 import com.zivlazarov.chessengine.model.ai.Minimax;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ public class MinimaxTest {
 
         board.checkBoard(board.getCurrentPlayer());
 
-        minimax = new Minimax();
+        minimax = new Minimax(board);
     }
 
     @Test
@@ -39,5 +40,11 @@ public class MinimaxTest {
 //        System.out.println(board.evaluateBoard());
         int value = minimax.search(board, 3, Integer.MIN_VALUE, Integer.MAX_VALUE);
         System.out.println(value);
+    }
+
+    @Test
+    public void testExecute() {
+        Move bestMove = minimax.execute(3, board.getCurrentPlayer().getPlayerColor() == PieceColor.WHITE);
+        System.out.println(bestMove);
     }
 }

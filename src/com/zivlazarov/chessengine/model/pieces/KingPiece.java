@@ -33,7 +33,7 @@ public class KingPiece implements Piece, Cloneable {
     private String name;
     private boolean isAlive = true;
     private boolean isInDanger = false;
-    private boolean hasMoved;
+    private boolean hasMoved = false;
     private Tile currentTile;
     private PieceColor pieceColor;
     private String imageName;
@@ -57,8 +57,6 @@ public class KingPiece implements Piece, Cloneable {
         historyMoves = new Stack<>();
         capturedPieces = new Stack<>();
         moves = new ArrayList<>();
-
-        hasMoved = false;
 
         currentTile = initTile;
         lastTile = currentTile;

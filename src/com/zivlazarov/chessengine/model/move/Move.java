@@ -87,7 +87,7 @@ public class Move {
         Piece capturedPiece;
 
         // getting last captured piece
-        if (movingPiece.getCapturedPieces().size() != 0) {
+        if (movingPiece.getCapturedPieces().size() > 0) {
             capturedPiece = movingPiece.getLastPieceEaten();
 
             // if captured piece's last tile is the last move's previous tile, return the captured piece to the game
@@ -119,10 +119,13 @@ public class Move {
         }
 
         // deleting last move made from logs
-        movingPiece.getHistoryMoves().remove(movingPiece.getHistoryMoves().lastElement());
-        board.getGameHistoryMoves().remove(board.getGameHistoryMoves().lastElement());
+        if (movingPiece.getHistoryMoves().size() > 0)
+            movingPiece.getHistoryMoves().remove(movingPiece.getHistoryMoves().lastElement());
+        if (board.getGameHistoryMoves().size() > 0)
+            board.getGameHistoryMoves().remove(board.getGameHistoryMoves().lastElement());
         player.getLastMove().remove(movingPiece);
-        board.getMatchPlays().remove(board.getMatchPlays().size() - 1);
+        if (board.getMatchPlays().size() > 0)
+            board.getMatchPlays().remove(board.getMatchPlays().size() - 1);
 
         board.setCurrentPlayer(board.getCurrentPlayer());
 
