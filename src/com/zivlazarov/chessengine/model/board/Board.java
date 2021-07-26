@@ -232,18 +232,26 @@ public class Board implements MyObservable, Serializable {
                 Map<Piece, List<Tile>> directionsOfDanger = calculatePotentialDangerForKing(currentPlayer);
 
                 for (Piece opponentPiece : directionsOfDanger.keySet()) {
-                    if (opponentPiece != null)
-                    for (Tile tile : directionsOfDanger.get(opponentPiece)) {
-                        if (!tile.isEmpty()) {
-                            if (tile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
-                                Piece playerPiece = tile.getPiece();
+                    if (opponentPiece != null) {
+                        // in each direction of threat, count how many pieces are in between king and threatening piece
+                        List<Piece> playerPiecesInTheWay = new ArrayList<>();
+                        for (Tile tile : directionsOfDanger.get(opponentPiece)) {
+                            if (!tile.isEmpty()) {
+                                if (tile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
+                                    Piece playerPiece = tile.getPiece();
 
-                                System.out.println(playerPiece.getName());
-                                currentPlayer.getMoves().removeIf(move -> move.getMovingPiece().equals(playerPiece));
-                                playerPiece.getPossibleMoves().removeIf(t -> !t.equals(opponentPiece.getCurrentTile()));
-                                playerPiece.getMoves().removeIf(move -> !move.getTargetTile().equals(opponentPiece.getCurrentTile()));
-                                currentPlayer.getMoves().addAll(playerPiece.getMoves());
+                                    playerPiecesInTheWay.add(playerPiece);
+                                }
                             }
+                        }
+                        // if there's only one player's piece in the way between king and opponent threatening piece, limit it's moves, else not
+                        if (playerPiecesInTheWay.size() == 1) {
+                            Piece playerPiece = playerPiecesInTheWay.get(0);
+
+                            currentPlayer.getMoves().removeIf(move -> move.getMovingPiece().equals(playerPiece));
+                            playerPiece.getPossibleMoves().removeIf(t -> !t.equals(opponentPiece.getCurrentTile()));
+                            playerPiece.getMoves().removeIf(move -> !move.getTargetTile().equals(opponentPiece.getCurrentTile()));
+                            currentPlayer.getMoves().addAll(playerPiece.getMoves());
                         }
                     }
                 }

@@ -124,7 +124,7 @@ public class BoardFrame {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
 
-        playRandomly(500);
+//        playRandomly(500);
     }
 
     public void playRandomly(long milliseconds) {
