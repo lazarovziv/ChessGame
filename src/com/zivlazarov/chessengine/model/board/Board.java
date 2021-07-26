@@ -35,14 +35,16 @@ public class Board implements MyObservable, Serializable {
     public static final String ANSI_WHITE = "\u001B[37m";
     private final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
     private final Map<PieceColor, GameSituation> checkmateSituations = new HashMap<>();
-    private Tile[][] board;
+    private final Tile[][] board;
 
     private Player whitePlayer;
     private Player blackPlayer;
     private Player currentPlayer;
 
+    private Map<Player, KingPiece> kingsMap;
+
     private GameSituation gameSituation;
-    private List<MyObserver> observers;
+    private final List<MyObserver> observers;
 
     private final Stack<Pair<Piece, Tile>> gameHistoryMoves;
 
@@ -62,6 +64,8 @@ public class Board implements MyObservable, Serializable {
         matchPlays = new Stack<>();
 
         states = new Stack<>();
+
+        kingsMap = new HashMap<>();
 
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
@@ -708,6 +712,10 @@ public class Board implements MyObservable, Serializable {
             return matchPlays.lastElement().getPlayer() + " played " + matchPlays.lastElement();
         }
         return "No plays played.";
+    }
+
+    public Map<Player, KingPiece> getKingsMap() {
+        return kingsMap;
     }
 
     @Override

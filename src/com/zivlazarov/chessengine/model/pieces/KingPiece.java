@@ -87,6 +87,8 @@ public class KingPiece implements Piece, Cloneable {
                 historyMoves, lastTile, capturedPieces,
                 name, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
+
+        board.getKingsMap().put(player, this);
     }
 
     @Override

@@ -284,10 +284,11 @@ public class Player implements MyObserver, Serializable {
     }
 
     public KingPiece getKing() {
-        for (Piece piece : alivePieces) {
-            if (piece instanceof KingPiece) return (KingPiece) piece;
-        }
-        return null;
+        return board.getKingsMap().get(this);
+//        for (Piece piece : alivePieces) {
+//            if (piece instanceof KingPiece) return (KingPiece) piece;
+//        }
+//        return null;
     }
 
     public PieceColor getPlayerColor() {

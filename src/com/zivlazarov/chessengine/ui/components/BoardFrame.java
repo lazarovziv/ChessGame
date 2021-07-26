@@ -124,20 +124,21 @@ public class BoardFrame {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
 
-//        playRandomly();
+        playRandomly(500);
     }
 
-    public void playRandomly() {
+    public void playRandomly(long milliseconds) {
         while (board.getGameSituation() != GameSituation.BLACK_CHECKMATED ||
                 board.getGameSituation() != GameSituation.WHITE_CHECKMATED ||
         board.getGameSituation() != GameSituation.STALEMATE) {
             try {
-                Thread.sleep(10);
+                Thread.sleep(milliseconds);
 
                 Collections.shuffle(board.getCurrentPlayer().getMoves());
 
                 Move move = board.getCurrentPlayer().getMoves().get(0);
                 System.out.println(board.getCurrentPlayer());
+                System.out.println(move.getMovingPiece().getCurrentTile());
                 move.makeMove(true);
                 System.out.println(board.getGameSituation());
                 if (board.getGameSituation() == GameSituation.STALEMATE) break;
