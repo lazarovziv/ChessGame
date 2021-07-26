@@ -1,7 +1,6 @@
 package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
@@ -10,6 +9,9 @@ import com.zivlazarov.chessengine.model.utils.Memento;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 public class BoardTest {
 
@@ -123,5 +125,26 @@ public class BoardTest {
         board.printBoard();
         System.out.println(board.getGameSituation());
         player.getMoves().forEach(System.out::println);
+    }
+
+    @Test
+    public void testCalculatePotentialDangerForKing() {
+        Piece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[3][3], true);
+        Piece pawnPiece = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[3][4], 0);
+        Piece pawnPiece1 = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[4][2], 1);
+        Piece opponentQueenPiece = new QueenPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[3][7]);
+        Piece opponentBishopPiece = new BishopPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[5][1], 0);
+        board.checkBoard(player);
+        board.printBoard();
+
+//        board.canKingBeInDanger(player);
+//        if (board.canKingBeInDanger(player)) System.out.println("TRUE");
+
+        Map<Piece, List<Tile>> map = board.calculatePotentialDangerForKing(player);
+        for (Piece piece : map.keySet()) {
+            System.out.println(piece.getName() + ": ");
+            map.get(piece).forEach(System.out::println);
+        }
+//        player.getMoves().forEach(System.out::println);
     }
 }

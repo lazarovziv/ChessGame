@@ -224,6 +224,26 @@ public class Board implements MyObservable, Serializable {
             return;
         } else {
             if (gameSituation == GameSituation.NORMAL) {
+//                generateMovesToPreventCheckInNormalGameSituation(currentPlayer);
+                Map<Piece, List<Tile>> directionsOfDanger = calculatePotentialDangerForKing(currentPlayer);
+
+                for (Piece opponentPiece : directionsOfDanger.keySet()) {
+                    if (opponentPiece != null)
+                    for (Tile tile : directionsOfDanger.get(opponentPiece)) {
+                        if (!tile.isEmpty()) {
+                            if (tile.getPiece().getPieceColor() == currentPlayer.getPlayerColor()) {
+                                Piece playerPiece = tile.getPiece();
+
+                                System.out.println(playerPiece.getName());
+                                currentPlayer.getMoves().removeIf(move -> move.getMovingPiece().equals(playerPiece));
+                                playerPiece.getPossibleMoves().removeIf(t -> !t.equals(opponentPiece.getCurrentTile()));
+                                playerPiece.getMoves().removeIf(move -> !move.getTargetTile().equals(opponentPiece.getCurrentTile()));
+                                currentPlayer.getMoves().addAll(playerPiece.getMoves());
+                            }
+                        }
+                    }
+                }
+
                 if (currentPlayer.getMoves().size() == 0) {
                     gameSituation = GameSituation.STALEMATE;
                     return;
@@ -232,6 +252,94 @@ public class Board implements MyObservable, Serializable {
         }
         gameSituation = GameSituation.NORMAL;
         
+    }
+
+    public Map<Piece, List<Tile>> calculatePotentialDangerForKing(Player player) {
+        // setting potential threatening piece as key of threatened row/column/diagonal
+        Map<Piece, List<Tile>> allDirections = new HashMap<>();
+
+        int[][] diagonalDirections = {
+                {1, 1},
+                {1, -1},
+                {-1, -1},
+                {-1, 1}
+        };
+
+        // horizontal and vertical directions
+        int[][] hwDirections = {
+                {1, 0},
+                {-1, 0},
+                {0, 1},
+                {0, -1}
+        };
+
+        Tile kingTile = player.getKing().getCurrentTile();
+        int kingTileRow = kingTile.getRow();
+        int kingTileCol = kingTile.getCol();
+
+        // looping through the row and column of the king
+        for (int[] directions : hwDirections) {
+            int row = directions[0];
+            int col = directions[1];
+
+            if (kingTileRow + row > board.length - 1 || kingTileRow + row < 0 ||
+            kingTileCol + col > board.length - 1 || kingTileCol + col < 0) continue;
+
+            List<Tile> currentTiles = new ArrayList<>();
+
+            for (int i = 1; i < board.length; i++) {
+                if (kingTileRow + row*i > board.length - 1 || kingTileRow + row*i < 0 ||
+                kingTileCol + col*i > board.length - 1 || kingTileCol + col*i < 0) continue;
+
+                Tile currentTile =  board[kingTileRow + row*i][kingTileCol + col*i];
+                currentTiles.add(currentTile);
+
+                if (!currentTile.isEmpty()) {
+                    if (currentTile.getPiece().getPieceColor() != player.getPlayerColor()) {
+                        Piece opponentPiece = currentTile.getPiece();
+                        if (opponentPiece instanceof QueenPiece || opponentPiece instanceof RookPiece) {
+                            // if opponent contains queen or rook, all tiles in this row/column with player's pieces in between king and
+                            // queen/rook shouldn't be able to move so the next tiles can't affect, so break
+                            allDirections.put(opponentPiece, currentTiles);
+                            break;
+                        }
+                    } else continue;
+                }
+                if (i == board.length - 1) allDirections.put(null, currentTiles);
+            }
+        }
+
+        // loop through king's diagonals
+        for (int[] diagonalDirection : diagonalDirections) {
+            int row = diagonalDirection[0];
+            int col = diagonalDirection[1];
+
+            if (kingTileRow + row > board.length - 1 || kingTileRow + row < 0 ||
+                    kingTileCol + col > board.length - 1 || kingTileCol + col < 0) continue;
+
+            List<Tile> currentTiles = new ArrayList<>();
+
+            for (int i = 1; i < board.length; i++) {
+                if (kingTileRow + row*i > board.length - 1 || kingTileRow + row*i < 0 ||
+                kingTileCol + col*i > board.length - 1 || kingTileCol + col*i < 0) continue;
+
+                Tile currentTile =  board[kingTileRow + row*i][kingTileCol + col*i];
+                currentTiles.add(currentTile);
+
+                if (!currentTile.isEmpty()) {
+                    if (currentTile.getPiece().getPieceColor() != player.getPlayerColor()) {
+                        Piece opponentPiece = currentTile.getPiece();
+                        if (opponentPiece instanceof QueenPiece || opponentPiece instanceof BishopPiece) {
+                            allDirections.put(opponentPiece, currentTiles);
+                            break;
+                        }
+                    } else continue;
+                }
+                if (i == board.length - 1) allDirections.put(null, currentTiles);
+            }
+        }
+
+        return allDirections;
     }
 
     public void generateMovesWhenInCheck(Player player) {
@@ -258,6 +366,36 @@ public class Board implements MyObservable, Serializable {
         if (actualLegalMoves.size() == 0) {
             gameSituation = checkmateSituations.get(player.getPlayerColor());
             return;
+        }
+
+//        player.getLegalMoves().clear();
+        player.getAlivePieces().forEach(piece -> piece.getPossibleMoves().clear());
+        player.getMoves().clear();
+        player.getMoves().addAll(actualLegalMoves);
+
+        for (Move move : player.getMoves()) {
+            Piece piece = move.getMovingPiece();
+            Tile tile = move.getTargetTile();
+
+            piece.getPossibleMoves().add(tile);
+        }
+
+        setCurrentPlayer(player);
+    }
+
+    public void generateMovesToPreventCheckInNormalGameSituation(Player player) {
+        List<Move> actualLegalMoves = new ArrayList<>();
+
+        for (Move move : new ArrayList<>(player.getMoves())) {
+            boolean successfulMove = move.makeMove(false);
+
+            if (!successfulMove) continue;
+            else updateObservers();
+
+            if (!player.isInCheck()) actualLegalMoves.add(move);
+
+            move.unmakeMove(false);
+            updateObservers();
         }
 
         player.getLegalMoves().clear();
