@@ -66,10 +66,6 @@ public interface Piece extends Cloneable, Serializable {
     Icon getImageIcon();
     void setImageIcon(Icon imageView);
 
-    void moveToTile(Tile tile);
-
-    void unmakeLastMove();
-
     Piece getLastPieceEaten();
 
     Stack<Piece> getCapturedPieces();

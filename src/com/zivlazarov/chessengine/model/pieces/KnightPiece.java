@@ -248,51 +248,6 @@ public class KnightPiece implements Piece, Cloneable {
     }
 
     @Override
-    public void moveToTile(Tile tile) {
-        if (!player.getLegalMoves().contains(tile)) return;
-        if (possibleMoves.contains(tile)) {
-            // clear current tile
-            currentTile.setPiece(null);
-            // check if tile has opponent's piece and if so, mark as not alive
-            if (!tile.isEmpty()) {
-                capturedPieces.push(tile.getPiece());
-                tile.getPiece().setIsAlive(false);
-                player.getOpponentPlayer().addPieceToDead(tile.getPiece());
-                tile.setPiece(null);
-            }
-            historyMoves.push(tile);
-            // change to selected tile
-            currentTile = tile;
-            // set the piece at selected tile
-            currentTile.setPiece(this);
-            possibleMoves.clear();
-            // add the pair of tiles to history of moves
-            generateMoves();
-            // call refresh() here ??
-        }
-    }
-
-    @Override
-    public void unmakeLastMove() {
-        if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop();
-
-        if (capturedPieces.size() > 0) {
-            if (capturedPieces.peek().getHistoryMoves().peek().equals(currentTile)) {
-                Piece piece = capturedPieces.pop();
-                currentTile.setPiece(piece);
-                piece.setIsAlive(true);
-                player.getOpponentPlayer().addPieceToAlive(piece);
-            }
-        } else currentTile.setPiece(null);
-
-        currentTile = previousTile;
-        currentTile.setPiece(this);
-        possibleMoves.clear();
-        generateMoves();
-    }
-
-    @Override
     public boolean isTileAvailable(Tile tile) {
         if (tile.isEmpty()) {
             return true;

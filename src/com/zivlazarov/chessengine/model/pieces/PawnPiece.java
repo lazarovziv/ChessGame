@@ -311,86 +311,11 @@ public class PawnPiece implements Piece, Cloneable {
     }
 
     @Override
-    public void moveToTile(Tile tile) {
-        if (!player.getLegalMoves().contains(tile)) return;
-        if (possibleMoves.contains(tile)) {
-            // clear current tile
-            currentTile.setPiece(null);
-            if (enPassantTile != null) {
-                if (tile.equals(enPassantTile)) {
-                    historyMoves.push(enPassantTile);
-                    currentTile = tile;
-                    currentTile.setPiece(this);
-                    possibleMoves.clear();
-                    capturedPieces.push(
-                            board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].getPiece());
-                    player.getOpponentPlayer().addPieceToDead(
-                            board.getBoard()[enPassantTile.getRow() - player.getPlayerDirection()][enPassantTile.getCol()].getPiece());
-                    generateMoves();
-                    return;
-                }
-            }
-
-            // check if tile has opponent's piece and if so, mark as not alive
-            if (!tile.isEmpty()) {
-                capturedPieces.push(tile.getPiece());
-                tile.getPiece().setIsAlive(false);
-                player.getOpponentPlayer().addPieceToDead(tile.getPiece());
-                tile.setPiece(null);
-            }
-            historyMoves.push(tile);
-            // change to selected tile
-            currentTile = tile;
-            // set the piece at selected tile
-            currentTile.setPiece(this);
-            possibleMoves.clear();
-            // add target tile to history of moves
-
-            if (!hasMoved) hasMoved = true;
-            generateMoves();
-        }
-    }
-
-    @Override
-    public void unmakeLastMove() {
-        if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop();
-
-        if (capturedPieces.size() > 0) {
-            if (capturedPieces.peek().getHistoryMoves().peek().equals(currentTile)) {
-                Piece piece = capturedPieces.pop();
-                currentTile.setPiece(piece);
-                piece.setIsAlive(true);
-                player.getOpponentPlayer().addPieceToAlive(piece);
-            }
-        } else currentTile.setPiece(null);
-
-        currentTile = previousTile;
-        currentTile.setPiece(this);
-        possibleMoves.clear();
-        generateMoves();
-    }
-
-    @Override
     public boolean isTileAvailable(Tile tile) {
         if (tile.isEmpty()) {
             return true;
         } else return tile.getPiece().getPieceColor() != pieceColor;
     }
-
-//    @Override
-//    public void setOnClickListener() {
-////        if (!isAlive) return;
-//        if (imageIcon == null) return;
-//        imageIcon.setOnMouseClicked(mouseEvent -> {
-//            if (tilesToMoveTo.size() == 0) return;
-//            for (Tile tile : tilesToMoveTo) {
-//                tile.setTileImageView(createImageView("redTile"));
-//                System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
-//            }
-//        });
-//    }
-
 
     public Tile getEnPassantTile() {
         return enPassantTile;
