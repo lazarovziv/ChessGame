@@ -110,5 +110,18 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$USER_HOME$/Downloads/hibernatejar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/Downloads/hibernatejar" />
+        </SOURCES>
+        <jarDirectory url="file://$USER_HOME$/Downloads/hibernatejar" recursive="false" />
+        <jarDirectory url="file://$USER_HOME$/Downloads/hibernatejar" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
   </component>
 </module>

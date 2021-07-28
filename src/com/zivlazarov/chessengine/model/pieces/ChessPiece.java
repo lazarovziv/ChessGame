@@ -748,30 +748,6 @@ public class ChessPiece implements Piece {
     }
 
     @Override
-    public void moveToTile(Tile tile) {
-    }
-
-    @Override
-    public void unmakeLastMove() {
-        if (historyMoves.size() == 0) return;
-        Tile previousTile = historyMoves.pop();
-
-        if (capturedPieces.size() > 0) {
-            if (capturedPieces.peek().getHistoryMoves().peek().equals(currentTile)) {
-                Piece piece = capturedPieces.pop();
-                currentTile.setPiece(piece);
-                piece.setIsAlive(true);
-                player.getOpponentPlayer().addPieceToAlive(piece);
-            }
-        } else currentTile.setPiece(null);
-
-        currentTile = previousTile;
-        currentTile.setPiece(this);
-        possibleMoves.clear();
-        generateMoves();
-    }
-
-    @Override
     public Piece getLastPieceEaten() {
         if (capturedPieces.size() == 0) return null;
         return capturedPieces.peek();
