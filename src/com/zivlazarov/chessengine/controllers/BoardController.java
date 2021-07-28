@@ -33,8 +33,8 @@ public class BoardController {
         board.printBoardUpsideDown(tileChosen);
     }
 
-    public void checkBoard(Player currentPlayer) {
-        board.checkBoard(currentPlayer);
+    public void checkBoard() {
+        board.checkBoard();
     }
 
     public void setBoard(Board board) {

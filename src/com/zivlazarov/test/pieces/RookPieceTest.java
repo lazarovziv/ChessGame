@@ -30,7 +30,7 @@ public class RookPieceTest {
         rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], false, 0);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[0][3], 0);
-        board.checkBoard(player);
+        board.checkBoard();
     }
 
     @Test
@@ -50,9 +50,9 @@ public class RookPieceTest {
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
         List<Tile> tilesGenerated = rookPiece.getPossibleMoves();
 
-        pawnPiece.moveToTile(board.getBoard()[3][0]);
+//        pawnPiece.moveToTile(board.getBoard()[3][0]);
         opponentPawnPiece.getCurrentTile().setPiece(null);
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesTrue = new ArrayList<>();
         tilesTrue.add(board.getBoard()[0][1]);
@@ -75,7 +75,7 @@ public class RookPieceTest {
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = rookPiece.getPossibleMoves();
 

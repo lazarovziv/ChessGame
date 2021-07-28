@@ -29,7 +29,7 @@ public class MoveTest {
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][2], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][3], 0);
 
-        board.checkBoard(player);
+        board.checkBoard();
     }
 
     @Test

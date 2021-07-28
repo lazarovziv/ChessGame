@@ -51,7 +51,7 @@ public class CommandLineGame {
         board.initBoard();
 
         board.setCurrentPlayer(whitePlayer);
-        board.checkBoard(board.getCurrentPlayer());
+        board.checkBoard();
 
         boardController = new BoardController(board);
 
@@ -100,7 +100,7 @@ public class CommandLineGame {
             } else board.printBoard();
 
             // checking the board to see what situation the current player is in
-            boardController.checkBoard(currentPlayer);
+            boardController.checkBoard();
 
             // showing current board situation and exiting program if it's checkmate
             if (board.getGameSituation() != GameSituation.NORMAL) {

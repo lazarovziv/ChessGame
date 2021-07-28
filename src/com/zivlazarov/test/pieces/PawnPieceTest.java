@@ -34,7 +34,7 @@ public class PawnPieceTest {
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
         knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[3][0], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][1], 0);
-        board.checkBoard(player);
+        board.checkBoard();
     }
 
     @Test
@@ -51,7 +51,7 @@ public class PawnPieceTest {
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
         knightPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = pawnPiece.getPossibleMoves();
         board.printBoard();
@@ -73,21 +73,21 @@ public class PawnPieceTest {
 //        KingPiece whiteKing = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0]);
 //        KingPiece blackKing = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7]);
 
-        board.checkBoard(player);
+        board.checkBoard();
         PlayerController controller = new PlayerController();
         controller.setPlayer(player);
         controller.setOpponentPlayer(opponent);
         controller.addPieceToAlive(pawn);
         controller.movePiece(pawn, board.getBoard()[3][3]);
-        board.checkBoard(player);
+        board.checkBoard();
         board.printBoard();
         controller.setPlayer(opponent);
         controller.addPieceToAlive(opponentPawn);
         controller.movePiece(opponentPawn, board.getBoard()[4][3]);
-        board.checkBoard(player);
+        board.checkBoard();
         board.printBoard();
         controller.setPlayer(player);
-        board.checkBoard(player);
+        board.checkBoard();
 
         pawn.getPossibleMoves().forEach(tile -> System.out.print(tile + ","));
     }
@@ -96,7 +96,7 @@ public class PawnPieceTest {
     public void testPromotion() {
         ChessPiece pawn = new ChessPiece(player, board, PieceType.PAWN, PieceColor.WHITE, board.getBoard()[6][3]);
         board.printBoard();
-        board.checkBoard(player);
+        board.checkBoard();
 
         Move move = new Move.Builder()
                 .board(board)
@@ -113,7 +113,7 @@ public class PawnPieceTest {
     public void testPawnPromotion() {
         Piece pawn = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[6][3], 6);
         board.printBoard();
-        board.checkBoard(player);
+        board.checkBoard();
 
         Move move = new Move.Builder()
                 .board(board)

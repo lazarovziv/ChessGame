@@ -32,7 +32,7 @@ public class PlayerTest {
         bishopPiece = new BishopPiece(player, board, player.getPlayerColor(), board.getBoard()[1][0], 0);
         opponentKingPiece = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][4], false);
         opponentPawnPiece = new PawnPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[6][2], 0);
-        board.checkBoard(player);
+        board.checkBoard();
     }
 
     @Test
@@ -60,7 +60,7 @@ public class PlayerTest {
 
         player.movePiece(pawnPiece, board.getBoard()[1][3]);
 
-        board.checkBoard(player);
+        board.checkBoard();
 
         Player loadedPlayer = player.loadState();
         Player loadedOpponent = player.getOpponentPlayer().loadState();
@@ -80,7 +80,7 @@ public class PlayerTest {
         board.printBoard();
         pawnPiece.getPossibleMoves().forEach(System.out::println);
         if (player.movePiece(pawnPiece, board.getBoard()[6][2])) {
-            board.checkBoard(player);
+            board.checkBoard();
             board.printBoard();
             player.undoLastMove();
             board.printBoard();

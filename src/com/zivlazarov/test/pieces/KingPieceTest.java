@@ -1,10 +1,8 @@
 package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.controllers.PlayerController;
-import com.zivlazarov.chessengine.model.pieces.KingPiece;
-import com.zivlazarov.chessengine.model.pieces.KnightPiece;
-import com.zivlazarov.chessengine.model.pieces.PawnPiece;
-import com.zivlazarov.chessengine.model.pieces.RookPiece;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.player.Player;
@@ -35,9 +33,9 @@ public class KingPieceTest {
         opponent.setOpponentPlayer(player);
         player.setOpponentPlayer(opponent);
 //        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[3][4], 0);
-        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3], false);
+//        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3], false);
         opponentKingPiece = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][4], false);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][3], 0);
+//        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][3], 0);
         opponentKnightPiece = new KnightPiece(opponent, board, PieceColor.BLACK, board.getBoard()[4][1], 0);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][1], 0);
 //        board.checkBoard();
@@ -47,7 +45,7 @@ public class KingPieceTest {
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
         kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], false);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
-        board.checkBoard(player);
+        board.checkBoard();
         List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
         board.printBoard();
 
@@ -73,7 +71,7 @@ public class KingPieceTest {
 //        pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
 //        opponentPawnPiece.moveToTile(board.getBoard()[opponentPawnPiece.getCurrentTile().getRow() - 1][opponentPawnPiece.getCurrentTile().getCol()]);
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
         board.printBoard();
@@ -104,7 +102,7 @@ public class KingPieceTest {
         RookPiece rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], false, 1);
         RookPiece blackRook0 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][0], true, 0);
         RookPiece blackRook1 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7], false, 1);
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
         board.printBoard();
@@ -116,7 +114,7 @@ public class KingPieceTest {
 
         PlayerController controller = new PlayerController();
         controller.setPlayer(player);
-        board.checkBoard(player);
+        board.checkBoard();
         board.printBoard();
 
     }
@@ -124,28 +122,40 @@ public class KingPieceTest {
     @Test
     public void testUnmakeMove() {
         board.printBoard();
-        board.checkBoard(player);
-        kingPiece.moveToTile(board.getBoard()[1][3]);
+        board.checkBoard();
+//        kingPiece.moveToTile(board.getBoard()[1][3]);
         board.printBoard();
-        kingPiece.unmakeLastMove();
+//        kingPiece.unmakeLastMove();
         board.printBoard();
-        board.checkBoard(player);
+        board.checkBoard();
         for (Tile tile : kingPiece.getPossibleMoves()) System.out.println(tile);
     }
 
     @Test
     public void testCheckSituation() {
         board.removePieceFromBoard(opponentPawnPiece);
-        board.checkBoard(opponent);
+        board.checkBoard();
         board.printBoard();
 
-        opponentKnightPiece.moveToTile(board.getBoard()[2][2]);
-        board.checkBoard(player);
+//        opponentKnightPiece.moveToTile(board.getBoard()[2][2]);
+        board.checkBoard();
         if (player.isInCheck()) System.out.println("Check! ");
         board.printBoard();
-        pawnPiece.moveToTile(board.getBoard()[2][1]);
-        board.checkBoard(opponent);
+//        pawnPiece.moveToTile(board.getBoard()[2][1]);
+        board.checkBoard();
         board.printBoard();
     }
 
+    @Test
+    public void testMoveToPotentialCapturingTileByPawn() {
+        Piece opponentRook = new RookPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][3], false, 7);
+        Piece opponentPawn1 = new PawnPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[1][3], 6);
+        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3], true);
+        board.printBoard();
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+        board.setCurrentPlayer(player);
+        board.checkBoard();
+        for (Move move : player.getMoves()) System.out.println(move);
+    }
 }

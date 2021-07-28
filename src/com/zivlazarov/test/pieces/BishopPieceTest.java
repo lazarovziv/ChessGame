@@ -30,7 +30,7 @@ public class BishopPieceTest {
         bishopPiece = new BishopPiece(player, board, PieceColor.WHITE, board.getBoard()[0][2], 0);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][3], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][1], 0);
-        board.checkBoard(player);
+        board.checkBoard();
     }
 
     @Test
@@ -49,9 +49,9 @@ public class BishopPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
-        pawnPiece.moveToTile(board.getBoard()[2][3]);
+//        pawnPiece.moveToTile(board.getBoard()[2][3]);
         opponentPawnPiece.getCurrentTile().setPiece(null);
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = bishopPiece.getPossibleMoves();
         for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
@@ -72,7 +72,7 @@ public class BishopPieceTest {
     @Test
     public void testIfPieceMovedToTile() {
         Tile tile = board.getBoard()[2][0];
-        bishopPiece.moveToTile(tile);
+//        bishopPiece.moveToTile(tile);
 
         Assertions.assertEquals(tile, bishopPiece.getCurrentTile());
     }
@@ -81,8 +81,8 @@ public class BishopPieceTest {
     public void testWhichTilesAreBeingGenerated() {
         opponentPawnPiece.getCurrentTile().setPiece(null);
         pawnPiece.getCurrentTile().setPiece(null);
-        bishopPiece.moveToTile(board.getBoard()[3][5]);
-        board.checkBoard(player);
+//        bishopPiece.moveToTile(board.getBoard()[3][5]);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = bishopPiece.getPossibleMoves();
         for (Tile tile : tilesGenerated) System.out.println("[" + tile.getRow() + ", " + tile.getCol() + "]");
@@ -96,7 +96,7 @@ public class BishopPieceTest {
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 
-        board.checkBoard(player);
+        board.checkBoard();
 
         List<Tile> tilesGenerated = bishopPiece.getPossibleMoves();
 

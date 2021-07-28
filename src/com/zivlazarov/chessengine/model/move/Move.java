@@ -75,7 +75,7 @@ public class Move {
         board.setCurrentPlayer(player.getOpponentPlayer());
 
         if (checkBoard)
-            board.checkBoard(board.getCurrentPlayer());
+            board.checkBoard();
 
         return true;
     }
@@ -130,7 +130,7 @@ public class Move {
         board.setCurrentPlayer(board.getCurrentPlayer());
 
         if (checkBoard)
-            board.checkBoard(board.getCurrentPlayer());
+            board.checkBoard();
     }
 
     public Player getPlayer() {

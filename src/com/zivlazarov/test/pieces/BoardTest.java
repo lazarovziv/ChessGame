@@ -61,7 +61,7 @@ public class BoardTest {
     @Test
     public void testLegalMovesInitialization() {
         board.printBoard();
-        board.checkBoard(player);
+        board.checkBoard();
         System.out.println(board.getGameSituation());
     }
 
@@ -69,9 +69,9 @@ public class BoardTest {
     public void testUnmakeLastMove() {
         System.out.println(rookPiece1.getCurrentTile());
         board.printBoard();
-        rookPiece1.moveToTile(board.getBoard()[0][0]);
+//        rookPiece1.moveToTile(board.getBoard()[0][0]);
         board.printBoard();
-        board.checkBoard(player);
+        board.checkBoard();
         board.unmakeLastMove(rookPiece1);
         board.printBoard();
     }
@@ -83,7 +83,7 @@ public class BoardTest {
         else System.out.println("Normal");
         player.movePiece(kingPiece, board.getBoard()[0][3]);
         board.printBoard();
-        board.checkBoard(opponent);
+        board.checkBoard();
         if (player.isInCheck()) System.out.println("Check!");
         else System.out.println("Normal");
     }
@@ -120,7 +120,7 @@ public class BoardTest {
         Piece opponentKingPiece = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[6][4], true);
         Piece opponentQueenPiece = new QueenPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[5][6]);
         board.printBoard();
-        board.checkBoard(board.getCurrentPlayer());
+        board.checkBoard();
         opponentKingPiece.getMoves().get(3).makeMove(true);
         board.printBoard();
         System.out.println(board.getGameSituation());
@@ -134,7 +134,7 @@ public class BoardTest {
         Piece pawnPiece1 = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[4][2], 1);
         Piece opponentQueenPiece = new QueenPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[3][7]);
         Piece opponentBishopPiece = new BishopPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[5][1], 0);
-        board.checkBoard(player);
+        board.checkBoard();
         board.printBoard();
 
 //        board.canKingBeInDanger(player);

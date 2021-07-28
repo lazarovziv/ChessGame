@@ -29,7 +29,7 @@ public class MinimaxTest {
 
         board.initBoard();
 
-        board.checkBoard(board.getCurrentPlayer());
+        board.checkBoard();
 
         minimax = new Minimax(board);
     }
