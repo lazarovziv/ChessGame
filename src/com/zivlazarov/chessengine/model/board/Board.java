@@ -11,12 +11,9 @@ import com.zivlazarov.chessengine.model.utils.Pair;
 import java.io.*;
 import java.util.*;
 
-// make as Singleton (?)
 public class Board implements MyObservable, Serializable {
 
     private static volatile Board instance;
-
-    private static volatile Board simulatedInstance;
 
     private BoardNode node;
     private BoardNode currentNode;
@@ -111,15 +108,6 @@ public class Board implements MyObservable, Serializable {
         }
     }
 
-    public static Board getSimulatedInstance() {
-        if (simulatedInstance == null) {
-            synchronized (Board.class) {
-                if (simulatedInstance == null) simulatedInstance = new Board();
-            }
-        }
-        return simulatedInstance;
-    }
-
     public void initBoard() {
         Piece whiteRookKingSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][7], true, 0);
         Piece whiteRookQueenSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][0], false, 1);
@@ -142,9 +130,6 @@ public class Board implements MyObservable, Serializable {
         Piece whiteQueen = new QueenPiece(whitePlayer, instance, PieceColor.WHITE, board[0][3]);
         Piece blackQueen = new QueenPiece(blackPlayer, instance, PieceColor.BLACK, board[7][3]);
 
-        Piece whiteKing = new KingPiece(whitePlayer, instance, PieceColor.WHITE, board[0][4], false);
-        Piece blackKing = new KingPiece(blackPlayer, instance, PieceColor.BLACK, board[7][4], false);
-
         Piece whitePawn0 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][0], 0);
         Piece whitePawn1 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][1], 1);
         Piece whitePawn2 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][2], 2);
@@ -162,6 +147,9 @@ public class Board implements MyObservable, Serializable {
         Piece blackPawn5 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][5], 5);
         Piece blackPawn6 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][6], 6);
         Piece blackPawn7 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][7], 7);
+
+        Piece whiteKing = new KingPiece(whitePlayer, instance, PieceColor.WHITE, board[0][4], false);
+        Piece blackKing = new KingPiece(blackPlayer, instance, PieceColor.BLACK, board[7][4], false);
 
         node = new BoardNode(instance, whitePlayer);
         currentNode = node;
@@ -212,14 +200,15 @@ public class Board implements MyObservable, Serializable {
 
     }
 
-    public void checkBoard(Player currentPlayer) {
+    public void checkBoard() {
         // resetting tiles threatened state before every board check
         resetThreatsOnTiles();
         // update all observers
-        updateObservers();
+        currentPlayer.getOpponentPlayer().update();
+        currentPlayer.update();
         // for each player's legal move's target piece, that piece is in danger of being eaten
-        markEndangeredPiecesFromPlayer(currentPlayer);
-        markEndangeredPiecesFromPlayer(currentPlayer.getOpponentPlayer());
+//        markEndangeredPiecesFromPlayer(currentPlayer);
+//        markEndangeredPiecesFromPlayer(currentPlayer.getOpponentPlayer());
 
         if (currentPlayer.isInCheck()) {
             // reset all legal moves before proceeding to generation of legal moves in check situation
@@ -241,6 +230,11 @@ public class Board implements MyObservable, Serializable {
                                     Piece playerPiece = tile.getPiece();
 
                                     playerPiecesInTheWay.add(playerPiece);
+                                } else {
+                                    currentPlayer.getKing().getMoves().removeIf(move -> move.getTargetTile().equals(tile));
+                                    currentPlayer.getKing().getPossibleMoves().removeIf(t -> t.equals(tile));
+                                    currentPlayer.getMoves().removeIf(move -> move.getMovingPiece().equals(currentPlayer.getKing())
+                                    && move.getTargetTile().equals(tile));
                                 }
                             }
                         }
@@ -263,7 +257,6 @@ public class Board implements MyObservable, Serializable {
             }
         }
         gameSituation = GameSituation.NORMAL;
-        
     }
 
     public Map<Piece, List<Tile>> calculatePotentialDangerForKing(Player player) {
@@ -395,98 +388,6 @@ public class Board implements MyObservable, Serializable {
         setCurrentPlayer(player);
     }
 
-    public void generateMovesToPreventCheckInNormalGameSituation(Player player) {
-        List<Move> actualLegalMoves = new ArrayList<>();
-
-        for (Move move : new ArrayList<>(player.getMoves())) {
-            boolean successfulMove = move.makeMove(false);
-
-            if (!successfulMove) continue;
-            else updateObservers();
-
-            if (!player.isInCheck()) actualLegalMoves.add(move);
-
-            move.unmakeMove(false);
-            updateObservers();
-        }
-
-        player.getLegalMoves().clear();
-        player.getAlivePieces().forEach(piece -> piece.getPossibleMoves().clear());
-        player.getMoves().clear();
-        player.getMoves().addAll(actualLegalMoves);
-
-        for (Move move : player.getMoves()) {
-            Piece piece = move.getMovingPiece();
-            Tile tile = move.getTargetTile();
-
-            piece.getPossibleMoves().add(tile);
-        }
-
-        setCurrentPlayer(player);
-    }
-
-    public void generateLegalMovesWhenInCheck(Player currentPlayer) {
-        Map<Piece, List<Tile>> actualLegalMoves = new HashMap<>();
-
-        ArrayList<Piece> alivePiecesList = new ArrayList<>(currentPlayer.getAlivePieces());
-        for (Piece piece : alivePiecesList) {
-            if (!piece.canMove()) continue;
-            List<Tile> potentialLegalMovesForPiece = new ArrayList<>();
-            synchronized (piece) {
-                for (Tile tile : new ArrayList<>(piece.getPossibleMoves())) {
-                    boolean successfulMove = currentPlayer.movePiece(piece, tile);
-
-                    if (!successfulMove) continue;
-                    else updateObservers();
-
-                    // if the move broke the check, it's legal
-                    if (!currentPlayer.isInCheck()) {
-                        potentialLegalMovesForPiece.add(tile);
-                    }
-
-                    // unmaking last move
-                    currentPlayer.undoLastMove();
-                    updateObservers();
-//                    updateObserver(currentPlayer.getOpponentPlayer());
-                }
-            }
-            // adding for looped piece it's potential legal moves after checking
-            actualLegalMoves.put(piece, potentialLegalMovesForPiece);
-        }
-
-        // start counting for no potential legal moves for every piece
-        int emptyListsCounter = 0;
-
-        // iterating on every piece
-        for (Piece piece : actualLegalMoves.keySet()) {
-            // if it doesn't have any potential moves, increment variable and continue to next piece
-            if (actualLegalMoves.get(piece).size() == 0) {
-                emptyListsCounter++;
-                continue;
-            }
-
-            // if all pieces don't have potential legal moves, then it's checkmate, and stop the method
-            if (emptyListsCounter == actualLegalMoves.keySet().size()) {
-                gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
-                System.exit(1);
-                return;
-            }
-        }
-//        if (actualLegalMoves.size() == 0) {
-//            gameSituation = checkmateSituations.get(currentPlayer.getPlayerColor());
-//            return;
-//        }
-        // for every piece's "normal" legal move, clear it
-        currentPlayer.getLegalMoves().clear();
-        // adding each possible move for piece
-        for (Piece piece : actualLegalMoves.keySet()) {
-            piece.getPossibleMoves().clear();
-            piece.getPossibleMoves().addAll(actualLegalMoves.get(piece));
-        }
-        // add all piece's "check" legal moves to player's legal moves list
-        currentPlayer.updateLegalMoves();
-    }
-
     public void unmakeLastMove(Piece piece) {
         if (gameHistoryMoves.size() == 0) return;
         if (!gameHistoryMoves.lastElement().getFirst().equals(piece)) return;
@@ -520,7 +421,8 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void markEndangeredPiecesFromPlayer(Player player) {
-        for (Tile tile : player.getLegalMoves()) {
+        for (Move move : player.getMoves()) {
+            Tile tile = move.getTargetTile();
             tile.setThreatenedByColor(player.getPlayerColor(), true);
         }
     }
@@ -708,6 +610,8 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void setCurrentPlayer(Player currentPlayer) {
+        currentPlayer.setIsCurrentPlayer(true);
+        currentPlayer.getOpponentPlayer().setIsCurrentPlayer(false);
         this.currentPlayer = currentPlayer;
     }
 

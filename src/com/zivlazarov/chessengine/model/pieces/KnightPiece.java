@@ -130,6 +130,7 @@ public class KnightPiece implements Piece, Cloneable {
                 }
             }
         }
+        possibleMoves.forEach(tile -> tile.setThreatenedByColor(pieceColor, true));
         player.getLegalMoves().addAll(possibleMoves);
         player.getMoves().addAll(moves);
     }
