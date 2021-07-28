@@ -1,8 +1,9 @@
 package com.zivlazarov.chessengine.ui.components;
 
+import com.zivlazarov.chessengine.db.GameDatabase;
+import com.zivlazarov.chessengine.db.PlayerDao;
 import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.move.Move;
-import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.player.Player;
@@ -11,21 +12,15 @@ import javafx.scene.control.ButtonType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.xml.transform.TransformerException;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
@@ -47,39 +42,13 @@ public class BoardFrame {
     private static Piece playerPiece;
 
     public BoardFrame() {
+        GameDatabase database = GameDatabase.getInstance();
+        PlayerDao playerDao = database.playerDao();
+
         board = Board.getInstance();
 
-        whitePlayer = new Player(board, PieceColor.WHITE);
-        blackPlayer = new Player(board, PieceColor.BLACK);
+        initGame(false);
 
-        whitePlayer.setName("Ziv");
-        blackPlayer.setName("Guy");
-
-        whitePlayer.setAI(false);
-        blackPlayer.setAI(false);
-
-        whitePlayer.setOpponentPlayer(blackPlayer);
-//        blackPlayer.setOpponentPlayer(whitePlayer);
-
-        checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
-        checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
-
-        checkmateSituations.put(PieceColor.WHITE, GameSituation.WHITE_CHECKMATED);
-        checkmateSituations.put(PieceColor.BLACK, GameSituation.BLACK_CHECKMATED);
-
-        board.setWhitePlayer(whitePlayer);
-        board.setBlackPlayer(blackPlayer);
-
-        board.initBoard();
-
-//        CommandLineGame.initPieces(whitePlayer, blackPlayer);
-//        board.checkBoard(whitePlayer);
-
-        board.setCurrentPlayer(whitePlayer);
-
-        board.checkBoard(board.getCurrentPlayer());
-
-//        board.getCurrentPlayer().minimax(board, 6, Integer.MIN_VALUE, Integer.MAX_VALUE);
         gameFrame = new JFrame("Chess");
         gameFrame.setUndecorated(true);
         gameFrame.setLayout(new BorderLayout());
@@ -92,19 +61,20 @@ public class BoardFrame {
         exitMenuItem.addActionListener((event) -> System.exit(1));
         JMenuItem restartGameItem = new JMenuItem("Restart");
         restartGameItem.addActionListener((event) -> {
-            gameFrame.dispose();
-            board.resetBoard();
-            new BoardFrame();
+            restartGame();
         });
 
         JMenuItem saveGameItem = new JMenuItem("Save Game");
         saveGameItem.addActionListener((event) -> {
-
+//            playerDao.insertPlayer(whitePlayer);
+//            playerDao.insertPlayer(blackPlayer);
         });
 
         JMenuItem loadGameItem = new JMenuItem("Load Game");
         loadGameItem.addActionListener((event) -> {
-
+//            whitePlayer = playerDao.fetchPlayer(whitePlayer.getId());
+//            blackPlayer = playerDao.fetchPlayer(blackPlayer.getId());
+//            initGame(true);
         });
 
         menu.add(saveGameItem);
@@ -124,24 +94,83 @@ public class BoardFrame {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
 
-//        playRandomly(500);
+        playRandomly(1200);
+    }
+
+    public static void initGame(boolean loadGame) {
+        if (!loadGame) {
+            whitePlayer = new Player(board, PieceColor.WHITE);
+            blackPlayer = new Player(board, PieceColor.BLACK);
+
+            whitePlayer.setName("Ziv");
+            blackPlayer.setName("Guy");
+
+            whitePlayer.setAI(false);
+            blackPlayer.setAI(false);
+
+            whitePlayer.setOpponentPlayer(blackPlayer);
+        }
+
+        checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
+        checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
+
+        checkmateSituations.put(PieceColor.WHITE, GameSituation.WHITE_CHECKMATED);
+        checkmateSituations.put(PieceColor.BLACK, GameSituation.BLACK_CHECKMATED);
+
+        board.setWhitePlayer(whitePlayer);
+        board.setBlackPlayer(blackPlayer);
+
+        board.initBoard();
+
+        if (!loadGame) {
+            board.setCurrentPlayer(whitePlayer);
+        } else {
+            if (whitePlayer.isCurrentPlayer()) board.setCurrentPlayer(whitePlayer);
+            else board.setCurrentPlayer(blackPlayer);
+        }
+
+        board.checkBoard();
     }
 
     public void playRandomly(long milliseconds) {
         while (board.getGameSituation() != GameSituation.BLACK_CHECKMATED ||
                 board.getGameSituation() != GameSituation.WHITE_CHECKMATED ||
-        board.getGameSituation() != GameSituation.STALEMATE) {
+                board.getGameSituation() != GameSituation.STALEMATE) {
             try {
                 Thread.sleep(milliseconds);
 
                 Collections.shuffle(board.getCurrentPlayer().getMoves());
 
-                Move move = board.getCurrentPlayer().getMoves().get(0);
+                int number = new Random().nextInt(board.getCurrentPlayer().getMoves().size());
+
+                Move move = board.getCurrentPlayer().getMoves().get(number);
                 System.out.println(board.getCurrentPlayer());
-                System.out.println(move.getMovingPiece().getCurrentTile());
+                System.out.println(move.getMovingPiece().getCurrentTile() + " -> " + move.getTargetTile());
                 move.makeMove(true);
+                board.printBoard();
                 System.out.println(board.getGameSituation());
-                if (board.getGameSituation() == GameSituation.STALEMATE) break;
+                if (board.getGameSituation() == GameSituation.STALEMATE || board.getGameSituation() == GameSituation.BLACK_CHECKMATED ||
+                board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
+                    if (board.getGameSituation() == GameSituation.BLACK_CHECKMATED ||
+                            board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
+                        ImageIcon icon = null;
+                        try {
+                            BufferedImage image = ImageIO.read(new File(TilePanel.currentPath + "/src/" + whitePlayer.getKing().getImageName()));
+                            icon = new ImageIcon(image);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        String[] options = { "No", "Yes" };
+                        int answer = JOptionPane.showOptionDialog(gameFrame, "Checkmate! Restart game? ", "End Game",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, icon, options, options[1]);
+                        if (answer == 1) {
+                            gameFrame.dispose();
+                            board.resetBoard();
+                            new BoardFrame();
+                        } else System.exit(1);
+                    }
+                    break;
+                };
 
                 SwingUtilities.invokeLater(boardPanel::drawBoard);
             } catch (InterruptedException e) {
@@ -150,7 +179,13 @@ public class BoardFrame {
         }
     }
 
-    private static class BoardPanel extends JPanel {
+    private void restartGame() {
+        gameFrame.dispose();
+        board.resetBoard();
+        new BoardFrame();
+    }
+
+    private class BoardPanel extends JPanel {
 
         final ArrayList<TilePanel> tilePanels;
         final Map<Tile, TilePanel> tilePanelMap;
@@ -185,6 +220,29 @@ public class BoardFrame {
             }
             validate();
             repaint();
+
+            showDialogWhenCheckmate();
+        }
+
+        public void showDialogWhenCheckmate() {
+            if (board.getGameSituation() == GameSituation.BLACK_CHECKMATED ||
+                    board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
+                ImageIcon icon = null;
+                try {
+                    BufferedImage image = ImageIO.read(new File(TilePanel.currentPath + "/src/" + whitePlayer.getKing().getImageName()));
+                    icon = new ImageIcon(image);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String[] options = { "No", "Yes" };
+                int answer = JOptionPane.showOptionDialog(gameFrame, "Checkmate! Restart game? ", "End Game",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, icon, options, options[1]);
+                if (answer == 1) {
+                    gameFrame.dispose();
+                    board.resetBoard();
+                    new BoardFrame();
+                } else System.exit(1);
+            }
         }
 
         public void displayAlertDialogWhenCheckmate() {
@@ -203,7 +261,7 @@ public class BoardFrame {
         }
     }
 
-    private static class TilePanel extends JPanel {
+    private class TilePanel extends JPanel {
 
         private final Tile tile;
 
@@ -284,29 +342,6 @@ public class BoardFrame {
                                     move.makeMove(true);
 
                                     System.out.println(board.getGameSituation());
-
-                                    System.out.println("Board evaluation: " + board.evaluateBoard());
-
-                                    System.out.println();
-
-                                    System.out.println(board.getLastMoveToString());
-
-//                                    System.out.println(board.getGameHistoryMoves().peek().getFirst().getName() + ": " +
-//                                            board.getGameHistoryMoves().peek().getFirst().getLastTile() + " -> " +
-//                                            board.getGameHistoryMoves().peek().getSecond());
-//                                    System.out.println(
-//                                            playerPiece.getName() + ": " +
-//                                                    playerPiece.getLastTile()
-//                                                    + " -> " + playerPiece.getCurrentTile());
-
-//                                    int result = JOptionPane.showOptionDialog(boardPanel, "Undo move? ",
-//                                            null, JOptionPane.YES_NO_OPTION,
-//                                            JOptionPane.QUESTION_MESSAGE, null, new String[] {"Yes", "No"}, "Yes");
-//
-//                                    if (result == JOptionPane.YES_OPTION) {
-//                                        move.unmakeMove(true);
-//                                        board.setCurrentPlayer(board.getCurrentPlayer().getOpponentPlayer());
-//                                    }
                                 }
 
                                 sourceTile = null;
@@ -316,6 +351,7 @@ public class BoardFrame {
                                 for (Tile markedTile : markedTiles) {
                                     boardPanel.tilePanelMap.get(markedTile).setBackground(tileColorMap.get(markedTile.getTileColor()));
                                 }
+
                                 SwingUtilities.invokeLater(boardPanel::drawBoard);
                             }
                         }
