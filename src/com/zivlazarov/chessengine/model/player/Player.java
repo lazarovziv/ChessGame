@@ -10,15 +10,24 @@ import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Entity
+@Table(name = "players")
 public class Player implements MyObserver, Serializable {
+
+    @Id
+    private UUID id;
 
     private Player opponentPlayer;
 
     private boolean isAI;
+    private boolean isCurrentPlayer;
 
     private final Board board;
 
@@ -39,6 +48,8 @@ public class Player implements MyObserver, Serializable {
     private int playerScore = 0;
 
     public Player(Board b, PieceColor pc) {
+        id = UUID.randomUUID();
+
         board = b;
         playerColor = pc;
         alivePieces = new ArrayList<Piece>();
@@ -163,7 +174,7 @@ public class Player implements MyObserver, Serializable {
 
         board.setCurrentPlayer(this);
 
-        board.checkBoard(board.getCurrentPlayer());
+        board.checkBoard();
     }
 
     public Piece handlePawnPromotion(Piece piece, Tile tile) {
@@ -316,13 +327,14 @@ public class Player implements MyObserver, Serializable {
         if (opponentPlayer.getOpponentPlayer() == null) {
             opponentPlayer.setOpponentPlayer(this);
         }
-//        if (opponentPlayer.getOpponentPlayer() != null) {
-//            opponentPlayer.setOpponentPlayer(this);
-//        }
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public boolean equals(Player other) {
@@ -435,5 +447,13 @@ public class Player implements MyObserver, Serializable {
     @Override
     public void setObservable(MyObservable observable) {
         this.observable = observable;
+    }
+
+    public boolean isCurrentPlayer() {
+        return isCurrentPlayer;
+    }
+
+    public void setIsCurrentPlayer(boolean isCurrentPlayer) {
+        this.isCurrentPlayer = isCurrentPlayer;
     }
 }
