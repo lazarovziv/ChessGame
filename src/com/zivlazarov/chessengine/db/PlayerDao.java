@@ -9,21 +9,32 @@ import org.hibernate.cfg.Configuration;
 
 import java.util.UUID;
 
-public class PlayerDao {
+public class PlayerDao implements Dao {
 
     private static SessionFactory sessionFactory;
     private static Session session;
 
     public PlayerDao() {
-//        sessionFactory = new Configuration().configure().buildSessionFactory();
+        createConnection();
     }
 
-    private void openSession() {
+    @Override
+    public void createConnection() {
+        sessionFactory = new Configuration().configure().buildSessionFactory();
+    }
+
+    @Override
+    public void connect() {
         session = sessionFactory.openSession();
     }
 
+    @Override
+    public void close() {
+        session.close();
+    }
+
     public Player findByID(UUID id) {
-        openSession();
+        connect();
         Transaction transaction = null;
         Player player = null;
 
@@ -44,7 +55,7 @@ public class PlayerDao {
     }
 
     public void insert(Player player) {
-        openSession();
+        connect();
         Transaction transaction = null;
 
         try {
@@ -63,7 +74,7 @@ public class PlayerDao {
     }
 
     public void update(UUID id) {
-        openSession();
+        connect();
         Transaction transaction = null;
 
         try {
@@ -83,7 +94,7 @@ public class PlayerDao {
     }
 
     public void delete(UUID id) {
-        openSession();
+        connect();
         Transaction transaction = null;
 
         try {
