@@ -150,9 +150,14 @@ public class RookPiece implements Piece, Cloneable {
                     piecesUnderThreat.add(targetTile.getPiece());
                     break;
                 }
-                if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) break;
+                if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) {
+                    // setting it as threatened in the case of the piece on the tile will be captured
+                    targetTile.setThreatenedByColor(pieceColor, true);
+                    break;
+                }
             }
         }
+        possibleMoves.forEach(tile -> tile.setThreatenedByColor(pieceColor, true));
         player.getLegalMoves().addAll(possibleMoves);
         player.getMoves().addAll(moves);
     }

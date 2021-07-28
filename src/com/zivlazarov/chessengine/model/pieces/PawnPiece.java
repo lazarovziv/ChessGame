@@ -151,6 +151,8 @@ public class PawnPiece implements Piece, Cloneable {
                 possibleMoves.add(board.getBoard()[x+direction][y+d]);
                 piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
             }
+            // setting potential capturing tiles as threats
+            board.getBoard()[x+direction][y+d].setThreatenedByColor(pieceColor, true);
             // insert en passant
             if (canEnPassant(d)) {
                 Move move = new Move.Builder()
