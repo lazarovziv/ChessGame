@@ -6,14 +6,11 @@ import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-//import javafx.scene.image.ImageView;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
-//import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
 public class KingPiece implements Piece, Cloneable {
 
@@ -129,18 +126,19 @@ public class KingPiece implements Piece, Cloneable {
             int c = direction[1];
             if (x+r > board.getBoard().length - 1 || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
             Tile targetTile = board.getBoard()[x+r][y+c];
+            if (!targetTile.isThreatenedByColor(player.getOpponentPlayer().getPlayerColor()))
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
-                if (!isThreatenedAtTile(targetTile)) {
-                    Move move = new Move.Builder()
-                            .board(board)
-                            .player(player)
-                            .movingPiece(this)
-                            .targetTile(targetTile)
-                            .build();
-                    moves.add(move);
-                    possibleMoves.add(targetTile);
-                    if (!targetTile.isEmpty()) {
-                        if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(player)
+                        .movingPiece(this)
+                        .targetTile(targetTile)
+                        .build();
+                moves.add(move);
+                possibleMoves.add(targetTile);
+                if (!targetTile.isEmpty()) {
+                    if (targetTile.getPiece().getPieceColor() != pieceColor) {
+                        piecesUnderThreat.add(targetTile.getPiece());
                     }
                 }
             }
@@ -179,6 +177,7 @@ public class KingPiece implements Piece, Cloneable {
                 }
             }
         }
+        possibleMoves.forEach(tile -> tile.setThreatenedByColor(pieceColor, true));
         player.getLegalMoves().addAll(possibleMoves);
         player.getMoves().addAll(moves);
     }
