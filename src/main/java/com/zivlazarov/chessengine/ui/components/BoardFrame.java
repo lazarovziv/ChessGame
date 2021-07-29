@@ -1,6 +1,5 @@
 package com.zivlazarov.chessengine.ui.components;
 
-import com.zivlazarov.chessengine.db.GameDatabase;
 import com.zivlazarov.chessengine.db.PlayerDao;
 import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.move.Move;
@@ -42,12 +41,11 @@ public class BoardFrame {
     private static Piece playerPiece;
 
     public BoardFrame() {
-        GameDatabase database = GameDatabase.getInstance();
-        PlayerDao playerDao = database.playerDao();
-
         board = Board.getInstance();
 
         initGame(false);
+
+        PlayerDao playerDao = new PlayerDao();
 
         gameFrame = new JFrame("Chess");
         gameFrame.setUndecorated(true);
@@ -66,15 +64,15 @@ public class BoardFrame {
 
         JMenuItem saveGameItem = new JMenuItem("Save Game");
         saveGameItem.addActionListener((event) -> {
-//            playerDao.insertPlayer(whitePlayer);
-//            playerDao.insertPlayer(blackPlayer);
+            playerDao.insertPlayer(whitePlayer);
+            playerDao.insertPlayer(blackPlayer);
         });
 
         JMenuItem loadGameItem = new JMenuItem("Load Game");
         loadGameItem.addActionListener((event) -> {
-//            whitePlayer = playerDao.fetchPlayer(whitePlayer.getId());
-//            blackPlayer = playerDao.fetchPlayer(blackPlayer.getId());
-//            initGame(true);
+            whitePlayer = playerDao.findPlayerByID(whitePlayer.getId());
+            blackPlayer = playerDao.findPlayerByID(blackPlayer.getId());
+            initGame(true);
         });
 
         menu.add(saveGameItem);
@@ -94,7 +92,7 @@ public class BoardFrame {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
 
-        playRandomly(1200);
+//        playRandomly(1200);
     }
 
     public static void initGame(boolean loadGame) {
@@ -221,15 +219,16 @@ public class BoardFrame {
             validate();
             repaint();
 
-            showDialogWhenCheckmate();
+            showDialogInSituation();
         }
 
-        public void showDialogWhenCheckmate() {
+        public void showDialogInSituation() {
             if (board.getGameSituation() == GameSituation.BLACK_CHECKMATED ||
                     board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
                 ImageIcon icon = null;
                 try {
-                    BufferedImage image = ImageIO.read(new File(TilePanel.currentPath + "/src/" + whitePlayer.getKing().getImageName()));
+                    BufferedImage image = ImageIO.read(new File(TilePanel.currentPath + "/src/"
+                            + board.getCurrentPlayer().getKing().getImageName()));
                     icon = new ImageIcon(image);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -242,6 +241,10 @@ public class BoardFrame {
                     board.resetBoard();
                     new BoardFrame();
                 } else System.exit(1);
+            } else if (board.getGameSituation() == GameSituation.BLACK_IN_CHECK ||
+                    board.getGameSituation() == GameSituation.WHITE_IN_CHECK) {
+
+                JOptionPane.showMessageDialog(gameFrame, "Check!", "Chess", JOptionPane.PLAIN_MESSAGE);
             }
         }
 
@@ -340,8 +343,6 @@ public class BoardFrame {
                                             .build();
 
                                     move.makeMove(true);
-
-                                    System.out.println(board.getGameSituation());
                                 }
 
                                 sourceTile = null;
@@ -493,7 +494,7 @@ public class BoardFrame {
         private ImageIcon createImageIcon(Piece piece) {
             if (piece != null) {
                 try {
-                    BufferedImage image = ImageIO.read(new File(currentPath + "/src/" + piece.getImageName()));
+                    BufferedImage image = ImageIO.read(new File(currentPath + "/src/main/java/" + piece.getImageName()));
                     return new ImageIcon(image);
                 } catch (IOException e) {
                     e.printStackTrace();

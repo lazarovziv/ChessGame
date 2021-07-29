@@ -8,7 +8,6 @@ import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import javafx.beans.property.ObjectProperty;
-import javafx.scene.image.ImageView;
 
 import javax.swing.*;
 import java.io.Serializable;
@@ -26,6 +25,8 @@ public interface Piece extends Cloneable, Serializable {
     final ArrayList<Piece> piecesUnderThreat = new ArrayList<>();
     final Stack<Pair<Tile, Tile>> historyMoves = new Stack<>();
     final List<Move> moves = new ArrayList<>();
+    int value = 0;
+    int pieceCounter = 0;
 //    ImageView imageIcon = null;
 
     String getName();

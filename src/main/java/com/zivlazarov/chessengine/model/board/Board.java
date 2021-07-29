@@ -38,7 +38,7 @@ public class Board implements MyObservable, Serializable {
     private Player blackPlayer;
     private Player currentPlayer;
 
-    private Map<Player, KingPiece> kingsMap;
+    private final Map<Player, KingPiece> kingsMap;
 
     private GameSituation gameSituation;
     private final List<MyObserver> observers;

@@ -10,46 +10,56 @@ import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "players")
+@Table(name = "player")
 public class Player implements MyObserver, Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 2L;
+
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true)
+    private int id;
 
-    private Player opponentPlayer;
-
+    @Column(name = "is_AI")
     private boolean isAI;
+
+    @Column(name = "is_current_player")
     private boolean isCurrentPlayer;
+
+    @Column(name = "player_color")
+    private final PieceColor playerColor;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "player_direction")
+    private final int playerDirection;
+
+    @Column(name = "player_score")
+    private int playerScore = 0;
 
     private final Board board;
 
+    private Player opponentPlayer;
+
     private MyObservable observable;
 
-    private final PieceColor playerColor;
-    private String name;
     private final List<Piece> alivePieces;
     private final List<Piece> deadPieces;
     private final List<Tile> legalMoves;
-
-    private final int playerDirection;
 
     private final List<Move> moves;
 
     private Map<Piece, Pair<Tile, Tile>> lastMove;
 
-    private int playerScore = 0;
-
     public Player(Board b, PieceColor pc) {
-        id = UUID.randomUUID();
-
         board = b;
         playerColor = pc;
         alivePieces = new ArrayList<Piece>();
@@ -333,7 +343,7 @@ public class Player implements MyObserver, Serializable {
         this.name = name;
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
@@ -394,6 +404,14 @@ public class Player implements MyObserver, Serializable {
         }
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setPlayerScore(int playerScore) {
+        this.playerScore = playerScore;
+    }
+
     public boolean isInCheck() {
         for (Piece piece : opponentPlayer.getAlivePieces()) {
             if (piece.getPiecesUnderThreat().contains(getKing())) {
@@ -401,7 +419,6 @@ public class Player implements MyObserver, Serializable {
             }
         }
         return false;
-//        return getKing().getIsInDanger();
     }
 
     public void saveState() {
