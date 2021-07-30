@@ -11,6 +11,8 @@ import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Iterator;
+
 public class PlayerTest {
 
     private static Board board;
@@ -90,7 +92,8 @@ public class PlayerTest {
 
     @Test
     public void testUnmakeMove() {
-        Move move = player.getMoves().get(0);
+        Iterator iterator = player.getMoves().iterator();
+        Move move = (Move) iterator.next();
         System.out.println(move);
         move.makeMove(true);
         board.printBoard();

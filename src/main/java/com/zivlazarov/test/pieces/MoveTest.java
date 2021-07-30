@@ -3,11 +3,15 @@ package com.zivlazarov.test.pieces;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.util.Iterator;
 
 public class MoveTest {
 
@@ -26,6 +30,9 @@ public class MoveTest {
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
 
+        board.setCurrentPlayer(player);
+        Piece king = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[5][5], true);
+        Piece oKing = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][7], true);
         pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][2], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][3], 0);
 
@@ -68,10 +75,12 @@ public class MoveTest {
         Move move = new Move.Builder()
                 .board(board)
                 .player(player)
-                .movingPiece(pawnPiece)
-                .targetTile(board.getBoard()[2][2])
+                .movingPiece(player.getKing())
+                .targetTile(board.getBoard()[6][4])
                 .build();
 
-        Assertions.assertTrue(move.equals(player.getMoves().get(0)));
+        Iterator<Move> iterator = player.getMoves().iterator();
+
+        Assertions.assertTrue(move.equals(iterator.next()));
     }
 }

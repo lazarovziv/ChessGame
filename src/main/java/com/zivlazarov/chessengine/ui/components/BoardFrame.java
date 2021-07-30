@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
@@ -64,15 +65,15 @@ public class BoardFrame {
 
         JMenuItem saveGameItem = new JMenuItem("Save Game");
         saveGameItem.addActionListener((event) -> {
-            playerDao.insertPlayer(whitePlayer);
-            playerDao.insertPlayer(blackPlayer);
+//            playerDao.insertPlayer(whitePlayer);
+//            playerDao.insertPlayer(blackPlayer);
         });
 
         JMenuItem loadGameItem = new JMenuItem("Load Game");
         loadGameItem.addActionListener((event) -> {
-            whitePlayer = playerDao.findPlayerByID(whitePlayer.getId());
-            blackPlayer = playerDao.findPlayerByID(blackPlayer.getId());
-            initGame(true);
+//            whitePlayer = playerDao.findPlayerByID(whitePlayer.getId());
+//            blackPlayer = playerDao.findPlayerByID(blackPlayer.getId());
+//            initGame(true);
         });
 
         menu.add(saveGameItem);
@@ -137,11 +138,13 @@ public class BoardFrame {
             try {
                 Thread.sleep(milliseconds);
 
-                Collections.shuffle(board.getCurrentPlayer().getMoves());
+                Collections.shuffle((List<?>) board.getCurrentPlayer().getMoves());
 
                 int number = new Random().nextInt(board.getCurrentPlayer().getMoves().size());
 
-                Move move = board.getCurrentPlayer().getMoves().get(number);
+                Iterator<Move> iterator = board.getCurrentPlayer().getMoves().iterator();
+                Move move = iterator.next();
+//                Move move = board.getCurrentPlayer().getMoves().get(number);
                 System.out.println(board.getCurrentPlayer());
                 System.out.println(move.getMovingPiece().getCurrentTile() + " -> " + move.getTargetTile());
                 move.makeMove(true);

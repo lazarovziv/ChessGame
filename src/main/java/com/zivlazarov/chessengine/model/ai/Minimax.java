@@ -10,6 +10,7 @@ import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class Minimax {
 
@@ -66,7 +67,7 @@ public class Minimax {
         if (board.getCurrentPlayer().getPlayerColor() == PieceColor.WHITE) {
             value = Integer.MIN_VALUE;
 
-            Collections.shuffle(board.getCurrentPlayer().getMoves());
+            Collections.shuffle((List<?>) board.getCurrentPlayer().getMoves());
 
             for (Move move : new ArrayList<>(board.getCurrentPlayer().getMoves())) {
                 System.out.println(board.getCurrentPlayer().getPlayerColor() + ": ");
@@ -86,7 +87,7 @@ public class Minimax {
 //            player = player.getOpponentPlayer();
             value = Integer.MAX_VALUE;
 
-            Collections.shuffle(board.getCurrentPlayer().getMoves());
+            Collections.shuffle((List<?>) board.getCurrentPlayer().getMoves());
 
             for (Move move : new ArrayList<>(board.getCurrentPlayer().getMoves())) {
                 System.out.println(board.getCurrentPlayer().getPlayerColor() + ": ");

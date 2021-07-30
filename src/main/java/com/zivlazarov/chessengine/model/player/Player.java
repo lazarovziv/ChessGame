@@ -23,7 +23,7 @@ public class Player implements MyObserver, Serializable {
     private static final long serialVersionUID = 2L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     @Column(name = "id", unique = true)
     private int id;
 
@@ -33,41 +33,68 @@ public class Player implements MyObserver, Serializable {
     @Column(name = "is_current_player")
     private boolean isCurrentPlayer;
 
-    @Column(name = "player_color")
-    private final PieceColor playerColor;
-
     @Column(name = "name")
     private String name;
 
     @Column(name = "player_direction")
-    private final int playerDirection;
+    private int playerDirection;
 
     @Column(name = "player_score")
     private int playerScore = 0;
 
-    private final Board board;
+    @Column(name = "player_color")
+    private PieceColor playerColor;
+
+    @OneToMany
+    @JoinTable(name = "player_piece_alive",
+            joinColumns = {@JoinColumn(name = "player_id", referencedColumnName = "id")},
+    inverseJoinColumns = {@JoinColumn(name = "piece_id", referencedColumnName = "id")})
+    private final List<Piece> alivePieces;
+
+    @OneToMany
+    @JoinTable(name = "player_piece_dead",
+            joinColumns = {@JoinColumn(name = "player_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "piece_id", referencedColumnName = "id")})
+    private final List<Piece> deadPieces;
+
+    @OneToMany
+    @JoinTable(name = "player_move",
+    joinColumns = {
+            @JoinColumn(name = "player_id", referencedColumnName = "id"),
+            @JoinColumn(name = "moving_piece_id", referencedColumnName = "id"),
+            @JoinColumn(name = "target_tile_id", referencedColumnName = "id")
+    },
+    inverseJoinColumns = {@JoinColumn(name = "")})
+    private final Set<Move> moves;
+
+    private final List<Tile> legalMoves;
+
+    private final Map<Piece, Pair<Tile, Tile>> lastMove;
+
+    private Board board;
 
     private Player opponentPlayer;
 
     private MyObservable observable;
 
-    private final List<Piece> alivePieces;
-    private final List<Piece> deadPieces;
-    private final List<Tile> legalMoves;
+    public Player() {
+        alivePieces = new ArrayList<>();
+        deadPieces = new ArrayList<>();
+        legalMoves = new ArrayList<>();
+        lastMove = new HashMap<>();
 
-    private final List<Move> moves;
-
-    private Map<Piece, Pair<Tile, Tile>> lastMove;
+        moves = new HashSet<>();
+    }
 
     public Player(Board b, PieceColor pc) {
         board = b;
         playerColor = pc;
-        alivePieces = new ArrayList<Piece>();
-        deadPieces = new ArrayList<Piece>();
+        alivePieces = new ArrayList<>();
+        deadPieces = new ArrayList<>();
         legalMoves = new ArrayList<>();
         lastMove = new HashMap<>();
 
-        moves = new ArrayList<>();
+        moves = new HashSet<>();
 
         // setting player direction, white goes up the board, black goes down (specifically to pawn pieces and for checking pawn promotion)
         if (playerColor == PieceColor.WHITE) {
@@ -306,10 +333,6 @@ public class Player implements MyObserver, Serializable {
 
     public KingPiece getKing() {
         return board.getKingsMap().get(this);
-//        for (Piece piece : alivePieces) {
-//            if (piece instanceof KingPiece) return (KingPiece) piece;
-//        }
-//        return null;
     }
 
     public PieceColor getPlayerColor() {
@@ -351,7 +374,7 @@ public class Player implements MyObserver, Serializable {
         return playerColor == other.getPlayerColor();
     }
 
-    public List<Move> getMoves() {
+    public Set<Move> getMoves() {
         return moves;
     }
 
@@ -410,6 +433,10 @@ public class Player implements MyObserver, Serializable {
 
     public void setPlayerScore(int playerScore) {
         this.playerScore = playerScore;
+    }
+
+    public void setPlayerDirection(int playerDirection) {
+        this.playerDirection = playerDirection;
     }
 
     public boolean isInCheck() {
