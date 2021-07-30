@@ -8,6 +8,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 //import javafx.scene.image.ImageView;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,6 +163,16 @@ public class RookPiece implements Piece, Cloneable {
         possibleMoves.forEach(tile -> tile.setThreatenedByColor(pieceColor, true));
         player.getLegalMoves().addAll(possibleMoves);
         player.getMoves().addAll(moves);
+    }
+
+    @Override
+    public int getId() {
+        return 0;
+    }
+
+    @Override
+    public void setId(int id) {
+
     }
 
     @Override

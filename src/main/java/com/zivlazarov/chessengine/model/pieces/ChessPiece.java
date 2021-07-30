@@ -512,6 +512,16 @@ public class ChessPiece implements Piece {
     }
 
     @Override
+    public int getId() {
+        return 0;
+    }
+
+    @Override
+    public void setId(int id) {
+
+    }
+
+    @Override
     public Player getPlayer() {
         return player;
     }

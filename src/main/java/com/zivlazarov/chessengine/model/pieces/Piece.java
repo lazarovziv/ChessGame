@@ -9,6 +9,9 @@ import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import javafx.beans.property.ObjectProperty;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.swing.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,6 +19,11 @@ import java.util.List;
 import java.util.Stack;
 
 public interface Piece extends Cloneable, Serializable {
+
+    @Id
+    @GeneratedValue
+    @Column(name = "id", unique = true)
+    int id = 0;
 
     String name = "";
     boolean isAlive = true;
@@ -28,6 +36,9 @@ public interface Piece extends Cloneable, Serializable {
     int value = 0;
     int pieceCounter = 0;
 //    ImageView imageIcon = null;
+
+    int getId();
+    void setId(int id);
 
     String getName();
     boolean isAlive();

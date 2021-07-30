@@ -198,6 +198,16 @@ public class PawnPiece implements Piece, Cloneable {
     }
 
     @Override
+    public int getId() {
+        return 0;
+    }
+
+    @Override
+    public void setId(int id) {
+
+    }
+
+    @Override
     public String getName() {
         return name;
     }
