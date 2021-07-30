@@ -1,11 +1,16 @@
 package com.zivlazarov.chessengine.db;
 
 import com.zivlazarov.chessengine.model.player.Player;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import javax.persistence.*;
 import java.io.File;
+import java.sql.*;
 import java.util.List;
+
+import static com.zivlazarov.chessengine.db.DatabaseUtils.*;
 
 public class PlayerDao implements Dao {
 
@@ -83,7 +88,7 @@ public class PlayerDao implements Dao {
         } finally {
             manager.close();
         }
-    } */
+    }
 
     public void insertPlayer(Player player) {
         Session session = DatabaseUtils.createSessionFactory().openSession();
@@ -106,5 +111,54 @@ public class PlayerDao implements Dao {
         session.getTransaction().commit();
 
         return player;
+    } */
+
+//    public void insertPlayer(Player player) {
+//        Connection connection = null;
+//        Statement statement = null;
+//
+//        try {
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+//            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+//            statement = connection.createStatement();
+//
+//            String query = "INSERT INTO player(id, is_AI, is_current_player, name, player_direction, player_score, player_color) " +
+//                    "VALUES (" + player.getId() + ", " +
+//                    player.isAI() + ", " +
+//                    player.isCurrentPlayer() + ", " +
+//                    player.getName() + ", " +
+//                    player.getPlayerDirection() + ", " +
+//                    player.getPlayerScore() + ", " +
+//                    player.getPlayerColor() + ");";
+//
+//            statement.executeUpdate(query);
+//
+//            System.out.println("Insertion complete.");
+//
+//        } catch (SQLException | ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    public int insertPlayer(Player player) {
+        Session session = DatabaseUtils.createSessionFactory().openSession();
+        Transaction transaction = null;
+
+        int playerID = 0;
+
+        try {
+            transaction = session.beginTransaction();
+            playerID = (int) session.save(player);
+
+            transaction.commit();
+        } catch (HibernateException e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        // returning the id to be able to fetch it later on
+        return playerID;
     }
 }
