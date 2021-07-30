@@ -15,7 +15,7 @@ public class DatabaseController {
         playerDao.insertPlayer(player);
     }
 
-    public Player findPlayerByID(int id) {
-        return playerDao.findPlayerByID(id);
-    }
+//    public Player findPlayerByID(int id) {
+//        return playerDao.findPlayerByID(id);
+//    }
 }
