@@ -5,24 +5,43 @@ package com.zivlazarov.chessengine.model.board;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import javafx.scene.image.ImageView;
 
+import javax.persistence.*;
 import javax.swing.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "tile")
 public class Tile implements Serializable {
 
+	@Id
+	@GeneratedValue
+	@Column(name = "id", unique = true)
+	private int id;
+
+	@Column(name="tile_row", nullable = false)
 	private int row;
+	@Column(name="tile_col", nullable = false)
 	private int col;
-	private Piece piece;
+	@Column(name = "tile_color", nullable = false)
+	private TileColor tileColor;
+	@Column(name = "is_empty")
 	private boolean isEmpty;
-	private final TileColor tileColor;
-	private boolean isThreatenedByWhite;
+	@Column(name = "is_threatened_by_black")
 	private boolean isThreatenedByBlack;
+	@Column(name = "is_threatened_by_white")
+	private boolean isThreatenedByWhite;
+
+	@Column(name = "piece_id")
+	@OneToOne
+	private Piece piece;
 	private ImageView tileImageView;
 	private ImageView pieceImageView;
 	private JLabel label;
 	private JButton button;
 
-	private final char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+	private static final char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+
+	public Tile() {}
 
 	public Tile(int row, int col, TileColor tc) {
 		this.row = row;
@@ -41,6 +60,14 @@ public class Tile implements Serializable {
 		isEmpty = piece == null; // if piece is initialized (as NOT null) tile is not empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public int getRow() {
@@ -144,7 +171,6 @@ public class Tile implements Serializable {
 	public void setLabel(JLabel label) {
 		this.label = label;
 	}
-
 
 	public JButton getButton() {
 		return button;

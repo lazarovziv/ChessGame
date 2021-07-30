@@ -9,12 +9,28 @@ import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "move")
 public class Move {
 
-    private final Board board;
-    private final Player player;
+    @Id
+    @GeneratedValue
+    @Column(name = "id", unique = true)
+    private int id;
+
+    @Column(name = "player_id")
+    @ManyToOne
+    private Player player;
+    @Column(name = "moving_piece_id")
     private Piece movingPiece;
-    private final Tile targetTile;
+    @Column(name = "target_tile_id")
+    private Tile targetTile;
+
+    private Board board;
+
+    public Move() {}
 
     private Move(Board board, Player player, Piece movingPiece, Tile targetTile) {
         this.board = board;
@@ -131,6 +147,14 @@ public class Move {
 
         if (checkBoard)
             board.checkBoard();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Player getPlayer() {
