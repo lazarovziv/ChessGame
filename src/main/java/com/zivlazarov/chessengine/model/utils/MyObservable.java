@@ -1,6 +1,8 @@
 package com.zivlazarov.chessengine.model.utils;
 
-public interface MyObservable {
+import java.io.Serializable;
+
+public interface MyObservable extends Serializable {
 
     void updateObservers();
     void updateObserver(MyObserver observer);

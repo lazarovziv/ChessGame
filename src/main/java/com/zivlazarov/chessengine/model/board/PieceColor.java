@@ -1,6 +1,8 @@
 package com.zivlazarov.chessengine.model.board;
 
-public enum PieceColor {
+import java.io.Serializable;
+
+public enum PieceColor implements Serializable {
 
     BLACK, WHITE
 }

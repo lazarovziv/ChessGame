@@ -30,6 +30,12 @@
 <!--        <mapping resource = "Employee.hbm.xml"/>-->
         <mapping class="com.zivlazarov.chessengine.model.player.Player" />
         <mapping class="com.zivlazarov.chessengine.model.pieces.Piece" />
+        <mapping class="com.zivlazarov.chessengine.model.pieces.BishopPiece" />
+        <mapping class="com.zivlazarov.chessengine.model.pieces.KingPiece" />
+        <mapping class="com.zivlazarov.chessengine.model.pieces.KnightPiece" />
+        <mapping class="com.zivlazarov.chessengine.model.pieces.PawnPiece" />
+        <mapping class="com.zivlazarov.chessengine.model.pieces.QueenPiece" />
+        <mapping class="com.zivlazarov.chessengine.model.pieces.RookPiece" />
         <mapping class="com.zivlazarov.chessengine.model.move.Move" />
         <mapping class="com.zivlazarov.chessengine.model.board.Tile" />
 

@@ -10,25 +10,23 @@ import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
 import javax.persistence.*;
+import java.io.Serial;
+import java.io.Serializable;
 
-@Entity
-@Table(name = "move")
-public class Move {
+public class Move implements Serializable {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id", unique = true)
+    @Serial
+    private static final long serialVersionUID = 3L;
+
     private int id;
 
-    @Column(name = "player_id")
-    @ManyToOne
     private Player player;
-    @Column(name = "moving_piece_id")
+
     private Piece movingPiece;
-    @Column(name = "target_tile_id")
+
     private Tile targetTile;
 
-    private Board board;
+    private transient Board board;
 
     public Move() {}
 

@@ -8,6 +8,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 //import javafx.scene.image.ImageView;
 
+import javax.persistence.*;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +24,18 @@ public class QueenPiece implements Piece, Cloneable {
 
     private PieceType pieceType;
 
-    private final ArrayList<Move> moves;
-    private final ArrayList<Tile> possibleMoves;
-    private final ArrayList<Piece> piecesUnderThreat;
+    private int id;
+
+    private final List<Move> moves;
+    private final List<Tile> possibleMoves;
+    private final List<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
     private Stack<Piece> capturedPieces;
     private final Board board;
+
     private String name;
+
     private boolean isAlive = true;
     private boolean isInDanger = false;
     private Tile currentTile;
@@ -152,12 +157,12 @@ public class QueenPiece implements Piece, Cloneable {
 
     @Override
     public int getId() {
-        return 0;
+        return id;
     }
 
     @Override
     public void setId(int id) {
-
+        this.id = id;
     }
 
     @Override
@@ -176,7 +181,7 @@ public class QueenPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Tile> getPossibleMoves() {
+    public List<Tile> getPossibleMoves() {
         return possibleMoves;
     }
 
@@ -231,7 +236,7 @@ public class QueenPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Piece> getPiecesUnderThreat() {
+    public List<Piece> getPiecesUnderThreat() {
         return piecesUnderThreat;
     }
 

@@ -9,6 +9,7 @@ import com.zivlazarov.chessengine.model.utils.MyObservable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import javax.persistence.*;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +27,20 @@ public class BishopPiece implements Piece, Cloneable {
 
     private PieceType pieceType;
 
-    private final ArrayList<Move> moves;
-    private final ArrayList<Tile> possibleMoves;
-    private final ArrayList<Piece> piecesUnderThreat;
+    private int id;
+
+    private final List<Move> moves;
+    private final List<Tile> possibleMoves;
+    private final List<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
     private Stack<Piece> capturedPieces;
     private final Board board;
+
     private String name;
+
     private final int pieceCounter;
+
     private boolean isAlive = true;
     private boolean isInDanger = false;
     private Tile currentTile;
@@ -42,7 +48,7 @@ public class BishopPiece implements Piece, Cloneable {
     private String imageName;
     private Icon imageIcon;
 
-    private int value = 3;
+    private final int value = 3;
 
     private final Object[] allFields;
 
@@ -154,12 +160,12 @@ public class BishopPiece implements Piece, Cloneable {
 
     @Override
     public int getId() {
-        return 0;
+        return id;
     }
 
     @Override
     public void setId(int id) {
-
+        this.id = id;
     }
 
     @Override
@@ -178,7 +184,7 @@ public class BishopPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Tile> getPossibleMoves() {
+    public List<Tile> getPossibleMoves() {
         return possibleMoves;
     }
 
@@ -222,7 +228,7 @@ public class BishopPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Piece> getPiecesUnderThreat() {
+    public List<Piece> getPiecesUnderThreat() {
         return piecesUnderThreat;
     }
 

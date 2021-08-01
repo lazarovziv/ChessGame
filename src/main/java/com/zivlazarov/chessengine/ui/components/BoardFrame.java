@@ -65,8 +65,8 @@ public class BoardFrame {
 
         JMenuItem saveGameItem = new JMenuItem("Save Game");
         saveGameItem.addActionListener((event) -> {
-//            playerDao.insertPlayer(whitePlayer);
-//            playerDao.insertPlayer(blackPlayer);
+            playerDao.insertPlayer(whitePlayer);
+            playerDao.insertPlayer(blackPlayer);
         });
 
         JMenuItem loadGameItem = new JMenuItem("Load Game");

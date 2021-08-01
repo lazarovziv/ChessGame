@@ -9,10 +9,9 @@ import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 import javafx.beans.property.ObjectProperty;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.swing.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +19,12 @@ import java.util.Stack;
 
 public interface Piece extends Cloneable, Serializable {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id", unique = true)
+    @Serial
+    static final long serialVersionUID = 2L;
+
     int id = 0;
+
+    Player player = null;
 
     String name = "";
     boolean isAlive = true;
@@ -43,12 +44,12 @@ public interface Piece extends Cloneable, Serializable {
     String getName();
     boolean isAlive();
     boolean getIsInDanger();
-    ArrayList<Tile> getPossibleMoves();
+    List<Tile> getPossibleMoves();
     PieceColor getPieceColor();
     Tile getCurrentTile();
     Stack<Tile> getHistoryMoves();
     Tile getLastMove();
-    ArrayList<Piece> getPiecesUnderThreat();
+    List<Piece> getPiecesUnderThreat();
     Player getPlayer();
     String getImageName();
 

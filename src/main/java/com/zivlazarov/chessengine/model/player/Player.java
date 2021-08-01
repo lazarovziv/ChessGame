@@ -15,67 +15,40 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "player")
 public class Player implements MyObserver, Serializable {
 
     @Serial
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id", unique = true)
     private int id;
 
-    @Column(name = "is_AI")
     private boolean isAI;
 
-    @Column(name = "is_current_player")
     private boolean isCurrentPlayer;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "player_direction")
     private int playerDirection;
 
-    @Column(name = "player_score")
     private int playerScore = 0;
 
-    @Column(name = "player_color")
     private PieceColor playerColor;
 
-    @OneToMany
-    @JoinTable(name = "player_piece_alive",
-            joinColumns = {@JoinColumn(name = "player_id", referencedColumnName = "id")},
-    inverseJoinColumns = {@JoinColumn(name = "piece_id", referencedColumnName = "id")})
     private final List<Piece> alivePieces;
 
-    @OneToMany
-    @JoinTable(name = "player_piece_dead",
-            joinColumns = {@JoinColumn(name = "player_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "piece_id", referencedColumnName = "id")})
     private final List<Piece> deadPieces;
 
-    @OneToMany
-    @JoinTable(name = "player_move",
-    joinColumns = {
-            @JoinColumn(name = "player_id", referencedColumnName = "id"),
-            @JoinColumn(name = "moving_piece_id", referencedColumnName = "id"),
-            @JoinColumn(name = "target_tile_id", referencedColumnName = "id")
-    },
-    inverseJoinColumns = {@JoinColumn(name = "")})
     private final Set<Move> moves;
 
     private final List<Tile> legalMoves;
 
     private final Map<Piece, Pair<Tile, Tile>> lastMove;
 
-    private Board board;
+    private transient Board board;
 
-    private Player opponentPlayer;
+    private transient Player opponentPlayer;
 
-    private MyObservable observable;
+    private transient MyObservable observable;
 
     public Player() {
         alivePieces = new ArrayList<>();

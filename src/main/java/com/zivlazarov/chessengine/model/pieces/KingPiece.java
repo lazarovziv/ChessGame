@@ -7,6 +7,7 @@ import com.zivlazarov.chessengine.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import javax.persistence.*;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +21,18 @@ public class KingPiece implements Piece, Cloneable {
 
     private PieceType pieceType;
 
-    private final ArrayList<Move> moves;
-    private final ArrayList<Tile> possibleMoves;
-    private final ArrayList<Piece> piecesUnderThreat;
+    private int id;
+
+    private final List<Move> moves;
+    private final List<Tile> possibleMoves;
+    private final List<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
     private final Stack<Piece> capturedPieces;
     private final Board board;
+
     private String name;
+
     private boolean isAlive = true;
     private boolean isInDanger = false;
     private boolean hasMoved = false;
@@ -38,6 +43,7 @@ public class KingPiece implements Piece, Cloneable {
 
     private Tile kingSideCastleTile;
     private Tile queenSideCastleTile;
+
 
     private final int value = 0;
 
@@ -249,12 +255,12 @@ public class KingPiece implements Piece, Cloneable {
 
     @Override
     public int getId() {
-        return 0;
+        return id;
     }
 
     @Override
     public void setId(int id) {
-
+        this.id = id;
     }
 
     @Override
@@ -288,7 +294,7 @@ public class KingPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Tile> getPossibleMoves() {
+    public List<Tile> getPossibleMoves() {
         return possibleMoves;
     }
 
@@ -335,7 +341,7 @@ public class KingPiece implements Piece, Cloneable {
     }
 
     @Override
-    public ArrayList<Piece> getPiecesUnderThreat() {
+    public List<Piece> getPiecesUnderThreat() {
         return piecesUnderThreat;
     }
 

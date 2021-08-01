@@ -1,6 +1,8 @@
 package com.zivlazarov.chessengine.model.board;
 
-public enum TileColor {
+import java.io.Serializable;
+
+public enum TileColor implements Serializable {
 
 	BLACK, WHITE
 }

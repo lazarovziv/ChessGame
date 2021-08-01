@@ -7,37 +7,38 @@ import javafx.scene.image.ImageView;
 
 import javax.persistence.*;
 import javax.swing.*;
+import java.io.Serial;
 import java.io.Serializable;
 
-@Entity
-@Table(name = "tile")
 public class Tile implements Serializable {
 
-	@Id
-	@GeneratedValue
-	@Column(name = "id", unique = true)
+	@Serial
+	private static final long serialVersionUID = 4L;
+
 	private int id;
 
-	@Column(name="tile_row", nullable = false)
 	private int row;
-	@Column(name="tile_col", nullable = false)
+
 	private int col;
-	@Column(name = "tile_color", nullable = false)
+
 	private TileColor tileColor;
-	@Column(name = "is_empty")
+
 	private boolean isEmpty;
-	@Column(name = "is_threatened_by_black")
+
 	private boolean isThreatenedByBlack;
-	@Column(name = "is_threatened_by_white")
+
 	private boolean isThreatenedByWhite;
 
-	@Column(name = "piece_id")
-	@OneToOne
+
 	private Piece piece;
-	private ImageView tileImageView;
-	private ImageView pieceImageView;
-	private JLabel label;
-	private JButton button;
+
+	private transient ImageView tileImageView;
+
+	private transient ImageView pieceImageView;
+
+	private transient JLabel label;
+
+	private transient JButton button;
 
 	private static final char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 
