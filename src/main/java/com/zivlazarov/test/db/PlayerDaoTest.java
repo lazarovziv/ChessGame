@@ -20,19 +20,6 @@ public class PlayerDaoTest {
 
     @Test
     public void testInsertPlayer() {
-        Player player = new Player(board, PieceColor.WHITE);
-        player.setName("Ziv");
-        Player opponent = new Player(board, PieceColor.BLACK);
-        opponent.setName("Opponent");
 
-        player.setOpponentPlayer(opponent);
-
-        board.setWhitePlayer(player);
-        board.setBlackPlayer(opponent);
-        board.initBoard();
-
-        int id = playerDao.insertPlayer(player);
-
-        System.out.println(id);
     }
 }
