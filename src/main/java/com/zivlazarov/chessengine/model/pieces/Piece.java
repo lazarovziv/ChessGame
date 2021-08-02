@@ -13,10 +13,9 @@ import javax.persistence.*;
 import javax.swing.*;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
+//@MappedSuperclass
 public interface Piece extends Cloneable, Serializable {
 
     @Serial
@@ -24,6 +23,8 @@ public interface Piece extends Cloneable, Serializable {
 
     int id = 0;
 
+//    @ManyToOne
+//    @JoinColumn(name = "player_id")
     Player player = null;
 
     String name = "";
@@ -33,7 +34,8 @@ public interface Piece extends Cloneable, Serializable {
     PieceColor pieceColor = PieceColor.WHITE;
     final ArrayList<Piece> piecesUnderThreat = new ArrayList<>();
     final Stack<Pair<Tile, Tile>> historyMoves = new Stack<>();
-    final List<Move> moves = new ArrayList<>();
+//    @OneToMany(targetEntity = Move.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "movingPiece")
+    final Set<Move> moves = new HashSet<>();
     int value = 0;
     int pieceCounter = 0;
 //    ImageView imageIcon = null;
@@ -52,10 +54,11 @@ public interface Piece extends Cloneable, Serializable {
     List<Piece> getPiecesUnderThreat();
     Player getPlayer();
     String getImageName();
+    int getPieceCounter();
 
     Tile getLastTile();
 
-    List<Move> getMoves();
+    Set<Move> getMoves();
 
     boolean canMove();
 

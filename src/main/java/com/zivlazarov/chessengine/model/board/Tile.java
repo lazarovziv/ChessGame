@@ -51,6 +51,7 @@ public class Tile implements Serializable {
 		isEmpty = true; // if piece is not initialized tile is empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
+		id = this.row + this.col;
 	}
 
 	public Tile(int row, int col, TileColor tc, Piece p) {
@@ -61,6 +62,7 @@ public class Tile implements Serializable {
 		isEmpty = piece == null; // if piece is initialized (as NOT null) tile is not empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
+		id = this.row + this.col;
 	}
 
 	public int getId() {

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
@@ -65,8 +66,12 @@ public class BoardFrame {
 
         JMenuItem saveGameItem = new JMenuItem("Save Game");
         saveGameItem.addActionListener((event) -> {
-            playerDao.insertPlayer(whitePlayer);
-            playerDao.insertPlayer(blackPlayer);
+            try {
+                playerDao.insertPlayer(whitePlayer);
+                playerDao.insertPlayer(blackPlayer);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         });
 
         JMenuItem loadGameItem = new JMenuItem("Load Game");

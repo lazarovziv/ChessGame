@@ -121,7 +121,7 @@ public class BoardTest {
         Piece opponentQueenPiece = new QueenPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[5][6]);
         board.printBoard();
         board.checkBoard();
-        opponentKingPiece.getMoves().get(3).makeMove(true);
+//        opponentKingPiece.getMoves().get(3).makeMove(true);
         board.printBoard();
         System.out.println(board.getGameSituation());
         player.getMoves().forEach(System.out::println);

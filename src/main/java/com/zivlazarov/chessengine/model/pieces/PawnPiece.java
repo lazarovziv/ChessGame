@@ -17,21 +17,21 @@ import java.util.*;
 
 public class PawnPiece implements Piece, Cloneable {
 
+    private Player player;
+
     private ObjectProperty<Tile> currentTileProperty;
 
     private PieceType pieceType;
 
     private int id;
 
-    private final List<Move> moves;
+    private final Set<Move> moves;
     private final List<Tile> possibleMoves;
     private final List<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
     private Stack<Piece> capturedPieces;
     private final Board board;
-
-    private Player player;
 
     private String name;
 
@@ -62,7 +62,7 @@ public class PawnPiece implements Piece, Cloneable {
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
         capturedPieces = new Stack<>();
-        moves = new ArrayList<>();
+        moves = new HashSet<>();
 
         currentTile = initTile;
         lastTile = currentTile;
@@ -428,7 +428,7 @@ public class PawnPiece implements Piece, Cloneable {
     }
 
     @Override
-    public List<Move> getMoves() {
+    public Set<Move> getMoves() {
         return moves;
     }
 }

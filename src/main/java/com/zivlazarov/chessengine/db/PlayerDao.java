@@ -1,5 +1,6 @@
 package com.zivlazarov.chessengine.db;
 
+import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -9,156 +10,122 @@ import javax.persistence.*;
 import java.io.File;
 import java.sql.*;
 import java.util.List;
+import java.util.UUID;
 
 import static com.zivlazarov.chessengine.db.DatabaseUtils.*;
 
 public class PlayerDao implements Dao {
 
-    /*
-    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("chess");
+    public long insertPlayer(Player player) throws SQLException {
+        Connection connection = null;
+        Statement statement = null;
 
-    public void insertPlayer(Player player) {
-        EntityManager manager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = null;
-
-        try {
-            transaction = manager.getTransaction();
-            transaction.begin();
-
-            manager.persist(player);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-        } finally {
-            manager.close();
-        }
-    }
-
-    public Player findPlayerByID(int id) {
-        EntityManager manager = entityManagerFactory.createEntityManager();
-        // playerID is a parameterized query
-        String query = "SELECT p FROM player p WHERE p.id =:playerID";
-
-        TypedQuery<Player> typedQuery = manager.createQuery(query, Player.class);
-        typedQuery.setParameter("playerID", id);
-
-        Player player = null;
-        try {
-            player = typedQuery.getSingleResult();
-            System.out.println(player.getName());
-        } catch (NoResultException e) {
-            e.printStackTrace();
-        } finally {
-            manager.close();
-        }
-        return player;
-    }
-
-    public List<Player> findAllPlayers() {
-        EntityManager manager = entityManagerFactory.createEntityManager();
-        String query = "SELECT p FROM player p WHERE p.id IS NOT NULL";
-
-        TypedQuery<Player> typedQuery = manager.createQuery(query, Player.class);
-
-        List<Player> players = null;
+        long id = player.getId();
+        boolean isAI = player.isAI();
+        boolean isCurrentPlayer = player.isCurrentPlayer();
+        String name = player.getName();
+        int playerDirection = player.getPlayerDirection();
+        int playerScore = player.getPlayerScore();
+        PieceColor playerColor = player.getPlayerColor();
+        int color;
+        if (playerColor == PieceColor.WHITE) color = 0;
+        else color = 1;
 
         try {
-            players = typedQuery.getResultList();
-            players.forEach(System.out::println);
-        } catch (NoResultException e) {
-            e.printStackTrace();
-        } finally {
-            manager.close();
-        }
-        return players;
-    }
-
-    public void updatePlayer(Player player) {
-        EntityManager manager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = null;
-
-        try {
-            transaction = manager.getTransaction();
-            transaction.begin();
-
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-        } finally {
-            manager.close();
-        }
-    }
-
-    public void insertPlayer(Player player) {
-        Session session = DatabaseUtils.createSessionFactory().openSession();
-        session.beginTransaction();
-
-        player.saveState();
-        Player playerToSave = player.loadState();
-
-        session.save(playerToSave);
-
-        session.getTransaction().commit();
-    }
-
-    public Player findPlayerByID(int id) {
-        Session session = DatabaseUtils.createSessionFactory().openSession();
-        session.beginTransaction();
-
-        Player player = (Player) session.get(Player.class, id);
-
-        session.getTransaction().commit();
-
-        return player;
-    } */
-
-//    public void insertPlayer(Player player) {
-//        Connection connection = null;
-//        Statement statement = null;
-//
-//        try {
 //            Class.forName("com.mysql.cj.jdbc.Driver");
-//            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-//            statement = connection.createStatement();
-//
-//            String query = "INSERT INTO player(id, is_AI, is_current_player, name, player_direction, player_score, player_color) " +
-//                    "VALUES (" + player.getId() + ", " +
-//                    player.isAI() + ", " +
-//                    player.isCurrentPlayer() + ", " +
-//                    player.getName() + ", " +
-//                    player.getPlayerDirection() + ", " +
-//                    player.getPlayerScore() + ", " +
-//                    player.getPlayerColor() + ");";
-//
-//            statement.executeUpdate(query);
-//
-//            System.out.println("Insertion complete.");
-//
-//        } catch (SQLException | ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//    }
+            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            statement = connection.createStatement();
 
-    public int insertPlayer(Player player) {
-        Session session = DatabaseUtils.createSessionFactory().openSession();
-        Transaction transaction = null;
+            String query = "INSERT INTO Player(id, isAI, isCurrentPlayer, name, playerDirection, playerScore, playerColor) " +
+                    "VALUES (" + id + ", " +
+                    isAI + ", " +
+                    isCurrentPlayer + ", " +
+                    name + ", " +
+                    playerDirection + ", " +
+                    playerScore + ", " +
+                    color  + ");";
 
-        int playerID = 0;
+            statement.executeUpdate(query);
 
-        try {
-            transaction = session.beginTransaction();
-            playerID = (int) session.save(player);
+            System.out.println("Insertion complete.");
 
-            transaction.commit();
-        } catch (HibernateException e) {
-            if (transaction != null) transaction.rollback();
+        } catch (SQLException /*| ClassNotFoundException*/ e) {
             e.printStackTrace();
         } finally {
-            session.close();
+            if (statement != null)
+                statement.close();
+            if (connection != null)
+                connection.close();
         }
-
-        // returning the id to be able to fetch it later on
-        return playerID;
+        return id;
     }
+
+    public long deletePlayer(Player player) throws SQLException {
+        Connection connection = null;
+        Statement statement = null;
+
+        long id = player.getId();
+
+        try {
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            statement = connection.createStatement();
+
+            String query = "DELETE FROM Player WHERE id = " + player.getId();
+
+            statement.executeUpdate(query);
+
+            System.out.println("Deletion complete.");
+
+        } catch (SQLException /*| ClassNotFoundException*/ e) {
+            e.printStackTrace();
+        } finally {
+            if (statement != null)
+                statement.close();
+            if (connection != null)
+                connection.close();
+        }
+        return id;
+    }
+
+    public Player findPlayerByID(long id) throws SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        Player player = new Player();
+
+        try {
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+
+            String query = "SELECT * FROM Player WHERE id = " + id;
+
+            preparedStatement = connection.prepareStatement(query);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                player.setId(id);
+                player.setAI(resultSet.getBoolean(1));
+                player.setIsCurrentPlayer(resultSet.getBoolean(2));
+                player.setName(resultSet.getString(3));
+                player.setPlayerDirection(resultSet.getInt(4));
+                player.setPlayerScore(resultSet.getInt(5));
+                PieceColor playerColor = resultSet.getInt(6) == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+                player.setPlayerColor(playerColor);
+            }
+
+            System.out.println("Retrieve of player is complete.");
+
+        } catch (SQLException /*| ClassNotFoundException*/ e) {
+            e.printStackTrace();
+        } finally {
+            if (preparedStatement != null)
+                preparedStatement.close();
+            if (connection != null)
+                connection.close();
+        }
+        return player;
+    }
+
 }

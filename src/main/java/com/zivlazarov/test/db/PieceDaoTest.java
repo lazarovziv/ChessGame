@@ -1,25 +1,25 @@
 package com.zivlazarov.test.db;
 
-import com.zivlazarov.chessengine.db.PlayerDao;
+import com.zivlazarov.chessengine.db.PieceDao;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
-public class PlayerDaoTest {
+public class PieceDaoTest {
 
-    private static PlayerDao playerDao;
+    private static PieceDao pieceDao;
     private static Board board;
     private static Player player;
     private static Player opponent;
 
     @BeforeAll
     public static void setup() {
-        playerDao = new PlayerDao();
+        pieceDao = new PieceDao();
         board = Board.getInstance();
 
         player = new Player(board, PieceColor.WHITE);
@@ -37,32 +37,11 @@ public class PlayerDaoTest {
     }
 
     @Test
-    public void testInsertPlayer() {
-        long id = 0;
+    public void testInsertPiece() {
+        Piece piece = board.getKingsMap().get(player);
+        int id = 0;
         try {
-            id = playerDao.insertPlayer(player);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println(id);
-
-        Player player = null;
-
-        try {
-            player = playerDao.findPlayerByID(id);
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-        if (player != null)
-            System.out.println(player.getPlayerColor());
-    }
-
-
-    @Test
-    public void testDeletePlayer() {
-        long id = 0;
-        try {
-            id = playerDao.deletePlayer(player);
+            id = pieceDao.insertPiece(piece);
         } catch (SQLException e) {
             e.printStackTrace();
         }

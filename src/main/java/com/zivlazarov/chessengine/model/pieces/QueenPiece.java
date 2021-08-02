@@ -10,9 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import javax.persistence.*;
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 //import static com.zivlazarov.chessengine.ui.Game.createImageView;
 
@@ -26,7 +24,7 @@ public class QueenPiece implements Piece, Cloneable {
 
     private int id;
 
-    private final List<Move> moves;
+    private final Set<Move> moves;
     private final List<Tile> possibleMoves;
     private final List<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
@@ -57,7 +55,7 @@ public class QueenPiece implements Piece, Cloneable {
         piecesUnderThreat = new ArrayList<>();
         historyMoves = new Stack<>();
         capturedPieces = new Stack<>();
-        moves = new ArrayList<>();
+        moves = new HashSet<>();
 
         currentTile = initTile;
         lastTile = currentTile;
@@ -369,7 +367,12 @@ public class QueenPiece implements Piece, Cloneable {
     }
 
     @Override
-    public List<Move> getMoves() {
+    public Set<Move> getMoves() {
         return moves;
+    }
+
+    @Override
+    public int getPieceCounter() {
+        return -1;
     }
 }

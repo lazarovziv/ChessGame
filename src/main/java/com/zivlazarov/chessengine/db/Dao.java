@@ -1,6 +1,3 @@
 package com.zivlazarov.chessengine.db;
 
-public interface Dao {
-
-
-}
+public interface Dao {}

@@ -803,7 +803,7 @@ public class ChessPiece implements Piece {
     }
 
     @Override
-    public List<Move> getMoves() {
+    public Set<Move> getMoves() {
         return null;
     }
 }

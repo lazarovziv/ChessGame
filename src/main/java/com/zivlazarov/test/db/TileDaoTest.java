@@ -6,6 +6,8 @@ import com.zivlazarov.chessengine.model.board.Tile;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
+
 public class TileDaoTest {
 
     private static TileDao tileDao;
@@ -40,7 +42,24 @@ public class TileDaoTest {
     @Test
     public void testInsertTile() {
         Tile tile = board.getBoard()[4][7];
-        int id = tileDao.insertTile(tile);
+        int id = 0;
+        try {
+            id = tileDao.insertTile(tile);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println(id);
+    }
+
+    @Test
+    public void testDeleteTile() {
+        Tile tile = board.getBoard()[4][7];
+        int id = 0;
+        try {
+            id = tileDao.deleteTile(tile);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         System.out.println(id);
     }
 }

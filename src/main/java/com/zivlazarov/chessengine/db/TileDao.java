@@ -1,120 +1,77 @@
 package com.zivlazarov.chessengine.db;
 
+import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.board.TileColor;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import com.zivlazarov.chessengine.model.player.Player;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import static com.zivlazarov.chessengine.db.DatabaseUtils.*;
 
 public class TileDao {
 
-//    public void insertTile(Tile tile) {
-//        Connection connection = null;
-//        Statement statement = null;
-//
-//        try {
-//            Class.forName("com.mysql.cj.jdbc.Driver");
-//            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-//            statement = connection.createStatement();
-//
-//            String query = "INSERT INTO tile(tile_row, tile_col, tile_color, is_empty, is_threatened_by_black, is_threatened_by_white) " +
-//                    "VALUES (" + tile.getRow() + ", " +
-//                    tile.getCol() + ", " +
-//                    tile.getTileColor().toString() + ", " +
-//                    tile.isEmpty() + ", " +
-//                    tile.isThreatenedByBlack() + ", " +
-//                    tile.isThreatenedByWhite() + ");";
-//
-//            statement.executeUpdate(query);
-//
-//            System.out.println("Tile insertion completed.");
-//        } catch (SQLException | ClassNotFoundException exception) {
-//            exception.printStackTrace();
-//        }
-//    }
-//
-//    public Tile findTileByRowAndCol(int row, int col) {
-//        Tile tile = null;
-//
-//        Connection connection = null;
-//        Statement statement = null;
-//
-//        try {
-//            Class.forName("com.mysql.cj.jdbc.Driver");
-//            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-//            statement = connection.createStatement();
-//
-//            String query = "SELECT tile_row, tile_col, tile_color, is_empty, is_threatened_by_black, is_threatened_by_white FROM tile " +
-//                    "WHERE tile_row = " + row + " AND tile_col = " + col + ";";
-//
-//            ResultSet resultSet = statement.executeQuery(query);
-//
-//            int tileRow = resultSet.getInt("tile_row");
-//            int tileCol = resultSet.getInt("tile_col");
-//            String tileColorStr = resultSet.getString("tile_color");
-//            TileColor tileColor;
-//            if (tileColorStr.equals("WHITE")) tileColor = TileColor.WHITE;
-//            else tileColor = TileColor.BLACK;
-//
-//            boolean threatenedByBlack = resultSet.getBoolean("is_threatened_by_black");
-//            boolean threatenedByWhite = resultSet.getBoolean("is_threatened_by_white");
-////            boolean isEmpty = resultSet.getBoolean("is_empty");
-//
-//            tile = new Tile(tileRow, tileCol, tileColor);
-//
-//            tile.setThreatenedByBlack(threatenedByBlack);
-//            tile.setThreatenedByWhite(threatenedByWhite);
-//
-//            System.out.println("Tile insertion completed.");
-//        } catch (SQLException | ClassNotFoundException exception) {
-//            exception.printStackTrace();
-//        }
-//
-//        return tile;
-//    }
-//
-//    public void deleteTile(Tile tile) {
-//        Connection connection;
-//        Statement statement;
-//
-//        try {
-//            Class.forName("com.mysql.cj.jdbc.Driver");
-//            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-//            statement = connection.createStatement();
-//
-//            String query = "DELETE FROM tile WHERE tile_row = " + tile.getRow() + " AND tile_col = " + tile.getCol() + ";";
-//
-//            statement.executeUpdate(query);
-//
-//            System.out.println("Tile deletion completed.");
-//        } catch (SQLException | ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public int insertTile(Tile tile) throws SQLException {
+        Connection connection = null;
+        Statement statement = null;
 
-    public int insertTile(Tile tile) {
-        Session session = DatabaseUtils.createSessionFactory().openSession();
-        Transaction transaction = null;
-
-        int tileID = 0;
+        int id = tile.getId();
+        int row = tile.getRow();
+        int col = tile.getCol();
+        boolean isEmpty = tile.isEmpty();
+        boolean isThreatenedByWhite = tile.isThreatenedByWhite();
+        boolean isThreatenedByBlack = tile.isThreatenedByBlack();
+        int pieceID = tile.getPiece() == null ? 0 : tile.getPiece().getId();
+        TileColor tileColor = tile.getTileColor();
+        int color = tileColor == TileColor.WHITE ? 1 : 0;
 
         try {
-            transaction = session.beginTransaction();
-            tileID = (int) session.save(tile);
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            statement = connection.createStatement();
 
-            transaction.commit();
-        } catch (HibernateException e) {
-            if (transaction != null) transaction.rollback();
+            String query = "INSERT INTO Tile (id, tile_row, tile_col, isEmpty, isThreatenedByWhite, isThreatenedByBlack, piece_id, tileColor) " +
+                    "VALUES (" + id + ", " +
+                    row + ", " +
+                    col + ", " +
+                    isEmpty + ", " +
+                    isThreatenedByWhite + ", " +
+                    isThreatenedByBlack + ", " +
+                    pieceID + ", " +
+                    color + ");";
+
+            statement.executeUpdate(query);
+
+            System.out.println("Insertion complete.");
+
+        } catch (SQLException /*| ClassNotFoundException*/ e) {
             e.printStackTrace();
         } finally {
-            session.close();
+            if (statement != null)
+                statement.close();
+            if (connection != null)
+                connection.close();
+        }
+        return id;
+    }
+
+    public int deleteTile(Tile tile) throws SQLException {
+
+        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement statement = connection.createStatement()) {
+
+            String query = "DELETE FROM Tile WHERE id = " + tile.getId();
+
+            statement.executeUpdate(query);
+
+            System.out.println("Deletion completed.");
+        } catch (SQLException /*| ClassNotFoundException*/ e) {
+            e.printStackTrace();
         }
 
-        // returning the id to be able to fetch it later on
-        return tileID;
+        return tile.getId();
     }
 }

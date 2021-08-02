@@ -13,15 +13,20 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 
+//@Entity
 public class Move implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 3L;
 
+//    @Id
+//    @GeneratedValue
     private int id;
 
     private Player player;
 
+//    @ManyToOne
+//    @JoinColumn(name = "moving_piece_id")
     private Piece movingPiece;
 
     private Tile targetTile;

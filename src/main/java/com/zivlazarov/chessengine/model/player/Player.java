@@ -20,7 +20,7 @@ public class Player implements MyObserver, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private int id;
+    private long id;
 
     private boolean isAI;
 
@@ -34,20 +34,28 @@ public class Player implements MyObserver, Serializable {
 
     private PieceColor playerColor;
 
+//    @OneToMany(targetEntity = Piece.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
     private final List<Piece> alivePieces;
 
+//    @OneToMany(targetEntity = Piece.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
     private final List<Piece> deadPieces;
 
+    @Transient
     private final Set<Move> moves;
 
+    @Transient
     private final List<Tile> legalMoves;
 
+    @Transient
     private final Map<Piece, Pair<Tile, Tile>> lastMove;
 
+    @Transient
     private transient Board board;
 
+    @EmbeddedId
     private transient Player opponentPlayer;
 
+    @Transient
     private transient MyObservable observable;
 
     public Player() {
@@ -75,6 +83,7 @@ public class Player implements MyObserver, Serializable {
         } else playerDirection = -1;
 
         board.addObserver(this);
+        id = (long) (Math.random() * Long.MAX_VALUE);
     }
 
     public void refreshPieces() {
@@ -335,11 +344,15 @@ public class Player implements MyObserver, Serializable {
         }
     }
 
+    public void setPlayerColor(PieceColor playerColor) {
+        this.playerColor = playerColor;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -400,8 +413,8 @@ public class Player implements MyObserver, Serializable {
         }
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(long value) {
+        id = value;
     }
 
     public void setPlayerScore(int playerScore) {

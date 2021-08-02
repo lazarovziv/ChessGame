@@ -19,15 +19,19 @@
         </property>
 
         <property name = "hibernate.connection.username">
-            zivlazarov
+            root
         </property>
 
         <property name = "hibernate.connection.password">
-            zivlazarov
+            ZivLazarov12
         </property>
 
+        <!-- Echo the SQL to stdout -->
+        <property name="show_sql">true</property>
+        <!-- Set the current session context -->
+        <property name="current_session_context_class">thread</property>
+
         <!-- List of XML mapping files -->
-<!--        <mapping resource = "Employee.hbm.xml"/>-->
         <mapping class="com.zivlazarov.chessengine.model.player.Player" />
         <mapping class="com.zivlazarov.chessengine.model.pieces.Piece" />
         <mapping class="com.zivlazarov.chessengine.model.pieces.BishopPiece" />
