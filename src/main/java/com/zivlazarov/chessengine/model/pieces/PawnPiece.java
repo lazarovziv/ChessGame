@@ -87,6 +87,8 @@ public class PawnPiece implements Piece, Cloneable {
                 historyMoves, lastTile, capturedPieces,
                 name, pieceCounter, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
+
+        id = value * player.getPlayerDirection() * new Random().nextInt();
     }
 
     @Override

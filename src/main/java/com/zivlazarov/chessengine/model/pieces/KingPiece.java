@@ -89,6 +89,8 @@ public class KingPiece implements Piece, Cloneable {
                 name, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
 
+        id = 10 * player.getPlayerDirection() * new Random().nextInt();
+
         board.getKingsMap().put(player, this);
     }
 

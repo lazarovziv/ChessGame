@@ -39,12 +39,11 @@ public class PieceDaoTest {
     @Test
     public void testInsertPiece() {
         Piece piece = board.getKingsMap().get(player);
-        int id = 0;
         try {
-            id = pieceDao.insertPiece(piece);
+            int id = pieceDao.insertPiece(piece);
+            System.out.println(id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println(id);
     }
 }

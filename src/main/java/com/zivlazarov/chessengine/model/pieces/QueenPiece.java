@@ -78,6 +78,8 @@ public class QueenPiece implements Piece, Cloneable {
                 historyMoves, lastTile, capturedPieces,
                 name, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
+
+        id = value * player.getPlayerDirection() * new Random().nextInt();
     }
 
     @Override
@@ -373,6 +375,6 @@ public class QueenPiece implements Piece, Cloneable {
 
     @Override
     public int getPieceCounter() {
-        return -1;
+        return -2;
     }
 }

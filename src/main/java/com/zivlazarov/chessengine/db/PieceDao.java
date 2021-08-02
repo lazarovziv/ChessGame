@@ -1,9 +1,7 @@
 package com.zivlazarov.chessengine.db;
 
 import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.Piece;
-import com.zivlazarov.chessengine.model.pieces.QueenPiece;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,8 +18,7 @@ public class PieceDao implements Dao {
 
         int id = piece.getId();
         long playerID = piece.getPlayer().getId();
-        String name = piece.getName();
-        int pieceCounter = (piece instanceof KingPiece || piece instanceof QueenPiece) ? piece.getPieceCounter() : -1;
+        int pieceCounter = piece.getPieceCounter();
         boolean isAlive = piece.isAlive();
         int tileID = piece.getCurrentTile().getId();
         PieceColor pieceColor = piece.getPieceColor();
@@ -31,10 +28,10 @@ public class PieceDao implements Dao {
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
             statement = connection.createStatement();
 
-            String query = "INSERT INTO Piece (id, player_id, name, pieceCounter, isAlive, tile_id, pieceColor) " +
+            String query = "INSERT INTO Piece(id, player_id, pieceCounter, isAlive, tile_id, pieceColor) " +
                     "VALUES (" + id + ", " +
                     playerID + ", " +
-                    name + ", " +
+//                    name + ", " +
                     pieceCounter + ", " +
                     isAlive + ", " +
                     tileID + ", " +
