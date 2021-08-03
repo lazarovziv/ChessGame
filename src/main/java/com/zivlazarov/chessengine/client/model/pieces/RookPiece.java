@@ -1,20 +1,19 @@
-package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.move.Move;
-import com.zivlazarov.chessengine.model.player.Player;
+package com.zivlazarov.chessengine.client.model.pieces;
+import com.zivlazarov.chessengine.client.model.board.Board;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.board.Tile;
+import com.zivlazarov.chessengine.client.model.move.Move;
+import com.zivlazarov.chessengine.client.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 //import javafx.scene.image.ImageView;
 
-import javax.persistence.*;
 import javax.swing.*;
 import java.util.*;
 
-//import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.client.ui.Game.createImageView;
 
-public class KnightPiece implements Piece, Cloneable {
+public class RookPiece implements Piece, Cloneable {
 
     private Player player;
 
@@ -29,29 +28,36 @@ public class KnightPiece implements Piece, Cloneable {
     private final List<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
-    private Stack<Piece> capturedPieces;
+    private final Stack<Piece> capturedPieces;
     private final Board board;
 
     private String name;
 
-    private int pieceCounter;
+    private final int pieceCounter;
 
     private boolean isAlive = true;
     private boolean isInDanger = false;
+    private boolean hasMoved = false;
     private Tile currentTile;
     private PieceColor pieceColor;
     private String imageName;
+
+    private Tile kingSideCastlingTile = null;
+    private Tile queenSideCastlingTile = null;
+    private final boolean isKingSide;
+    private final boolean isQueenSide;
     private Icon imageIcon;
 
-    private int value = 3;
+
+    private int value = 5;
 
     private final Object[] allFields;
 
-    public KnightPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
+    public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean isKingSide, int pieceCounter) {
         this.player = player;
         this.board = board;
 
-//        name = 'N';
+//        name = 'R';
         pieceColor = pc;
         possibleMoves = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
@@ -63,14 +69,22 @@ public class KnightPiece implements Piece, Cloneable {
         lastTile = currentTile;
 
         this.pieceCounter = pieceCounter;
+        this.isKingSide = isKingSide;
+        this.isQueenSide = !isKingSide;
+
         if (pieceColor == PieceColor.BLACK) {
-            name = "bN";
-            imageName = "blackKnight.png";
+            name = "bR";
+            imageName = "blackRook.png";
         }
         if (pieceColor == PieceColor.WHITE) {
-            name = "wN";
-            imageName = "whiteKnight.png";
+            name = "wR";
+            imageName = "whiteRook.png";
         }
+
+        if (isKingSide) {
+            kingSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
+        } else queenSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 3];
+
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
@@ -82,7 +96,9 @@ public class KnightPiece implements Piece, Cloneable {
                 name, pieceCounter, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
 
-        id = value * player.getPlayerDirection() * new Random().nextInt();
+        pieceType = PieceType.QUEEN;
+
+        id = 100 * value * player.getPlayerDirection() + player.getId() + pieceCounter;
     }
 
     @Override
@@ -102,15 +118,11 @@ public class KnightPiece implements Piece, Cloneable {
     @Override
     public void generateMoves() {
         if (!isAlive) return;
-        int[][] directions ={
-                {1, 2},
-                {1, -2},
-                {-1, 2},
-                {-1, -2},
-                {2, 1},
-                {2, -1},
-                {-2, 1},
-                {-2 ,-1}
+        int[][] directions = {
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1}
         };
 
         int x = currentTile.getRow();
@@ -121,18 +133,35 @@ public class KnightPiece implements Piece, Cloneable {
             int c = direction[1];
 
             if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
-            Tile targetTile = board.getBoard()[x+r][y+c];
-            if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
-                Move move = new Move.Builder()
-                        .board(board)
-                        .player(player)
-                        .movingPiece(this)
-                        .targetTile(targetTile)
-                        .build();
-                moves.add(move);
-                possibleMoves.add(targetTile);
-                if (!targetTile.isEmpty()) {
-                    if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
+
+            for (int i = 1; i < board.getBoard().length; i++) {
+                if (x + i*r > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
+                Tile targetTile = board.getBoard()[x+r*i][y+c*i];
+                if (targetTile.isEmpty()) {
+                    Move move = new Move.Builder()
+                            .board(board)
+                            .player(player)
+                            .movingPiece(this)
+                            .targetTile(targetTile)
+                            .build();
+                    moves.add(move);
+                    possibleMoves.add(targetTile);
+                } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
+                    Move move = new Move.Builder()
+                            .board(board)
+                            .player(player)
+                            .movingPiece(this)
+                            .targetTile(targetTile)
+                            .build();
+                    moves.add(move);
+                    possibleMoves.add(targetTile);
+                    piecesUnderThreat.add(targetTile.getPiece());
+                    break;
+                }
+                if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) {
+                    // setting it as threatened in the case of the piece on the tile will be captured
+                    targetTile.setThreatenedByColor(pieceColor, true);
+                    break;
                 }
             }
         }
@@ -166,11 +195,6 @@ public class KnightPiece implements Piece, Cloneable {
         return !isAlive;
     }
 
-//    @Override
-//    public ImageView getImageIcon() {
-//        return imageIcon;
-//    }
-
     @Override
     public void setIsAlive(boolean isAlive) {
         this.isAlive = isAlive;
@@ -180,6 +204,11 @@ public class KnightPiece implements Piece, Cloneable {
     public boolean getIsInDanger() {
         return isInDanger;
     }
+
+//    @Override
+//    public ImageView getImageIcon() {
+//        return imageIcon;
+//    }
 
     @Override
     public void setIsInDanger(boolean isInDanger) {
@@ -201,29 +230,9 @@ public class KnightPiece implements Piece, Cloneable {
         this.pieceColor = pieceColor;
     }
 
-//    @Override
-//    public void setImageIcon(ImageView imageIcon) {
-//        this.imageIcon = imageIcon;
-//    }
-
-    @Override
-    public Tile getCurrentTile() {
-        return currentTile;
-    }
-
-    public int getPieceCounter() {
-        return pieceCounter;
-    }
-
     @Override
     public Stack<Tile> getHistoryMoves() {
         return historyMoves;
-    }
-
-    @Override
-    public Tile getLastMove() {
-        if (historyMoves.size() == 0) return null;
-        return historyMoves.peek();
     }
 
     @Override
@@ -242,6 +251,27 @@ public class KnightPiece implements Piece, Cloneable {
         currentTile.setPiece(this);
     }
 
+    public Tile getKingSideCastlingTile() {
+        return kingSideCastlingTile;
+    }
+
+    public Tile getQueenSideCastlingTile() {
+        return queenSideCastlingTile;
+    }
+
+    public void setHasMoved(boolean moved) {
+        hasMoved = moved;
+    }
+
+    @Override
+    public Tile getCurrentTile() {
+        return currentTile;
+    }
+
+    public int getPieceCounter() {
+        return pieceCounter;
+    }
+
     public String getImageName() {
         return imageName;
     }
@@ -249,6 +279,14 @@ public class KnightPiece implements Piece, Cloneable {
     @Override
     public int getValue() {
         return value;
+    }
+
+    public boolean isKingSide() {
+        return isKingSide;
+    }
+
+    public boolean isQueenSide() {
+        return isQueenSide;
     }
 
     @Override
@@ -278,13 +316,19 @@ public class KnightPiece implements Piece, Cloneable {
 
     @Override
     public boolean hasMoved() {
-        return false;
+        return hasMoved;
     }
 
     @Override
     public Piece getLastPieceEaten() {
         if (capturedPieces.size() == 0) return null;
         return capturedPieces.peek();
+    }
+
+    @Override
+    public Tile getLastMove() {
+        if (historyMoves.size() == 0) return null;
+        return historyMoves.peek();
     }
 
     @Override

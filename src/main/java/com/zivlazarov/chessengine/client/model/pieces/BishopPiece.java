@@ -1,22 +1,24 @@
-package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.move.Move;
-import com.zivlazarov.chessengine.model.player.Player;
+package com.zivlazarov.chessengine.client.model.pieces;
+
+import com.zivlazarov.chessengine.client.model.board.Board;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.board.Tile;
+import com.zivlazarov.chessengine.client.model.move.Move;
+import com.zivlazarov.chessengine.client.model.player.Player;
+import com.zivlazarov.chessengine.client.model.utils.MyObservable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-//import javafx.scene.image.ImageView;
 
-import javax.persistence.*;
 import javax.swing.*;
 import java.util.*;
 
-//import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.client.ui.Game.createImageView;
 
-public class RookPiece implements Piece, Cloneable {
+public class BishopPiece implements Piece, Cloneable {
 
     private Player player;
+
+    private MyObservable observable;
 
     private ObjectProperty<Tile> currentTileProperty;
 
@@ -29,7 +31,7 @@ public class RookPiece implements Piece, Cloneable {
     private final List<Piece> piecesUnderThreat;
     private final Stack<Tile> historyMoves;
     private Tile lastTile;
-    private final Stack<Piece> capturedPieces;
+    private Stack<Piece> capturedPieces;
     private final Board board;
 
     private String name;
@@ -38,31 +40,24 @@ public class RookPiece implements Piece, Cloneable {
 
     private boolean isAlive = true;
     private boolean isInDanger = false;
-    private boolean hasMoved = false;
     private Tile currentTile;
     private PieceColor pieceColor;
     private String imageName;
-
-    private Tile kingSideCastlingTile = null;
-    private Tile queenSideCastlingTile = null;
-    private final boolean isKingSide;
-    private final boolean isQueenSide;
     private Icon imageIcon;
 
-
-    private int value = 5;
+    private final int value = 3;
 
     private final Object[] allFields;
 
-    public RookPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean isKingSide, int pieceCounter) {
+    public BishopPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
         this.board = board;
 
-//        name = 'R';
+//        name = "B";
         pieceColor = pc;
-        possibleMoves = new ArrayList<Tile>();
+        possibleMoves = new ArrayList<>();
         piecesUnderThreat = new ArrayList<>();
-        historyMoves = new Stack<>();
+        historyMoves = new Stack<Tile>();
         capturedPieces = new Stack<>();
         moves = new HashSet<>();
 
@@ -70,34 +65,29 @@ public class RookPiece implements Piece, Cloneable {
         lastTile = currentTile;
 
         this.pieceCounter = pieceCounter;
-        this.isKingSide = isKingSide;
-        this.isQueenSide = !isKingSide;
 
         if (pieceColor == PieceColor.BLACK) {
-            name = "bR";
-            imageName = "blackRook.png";
+            name = "bB";
+            imageName = "blackBishop.png";
         }
         if (pieceColor == PieceColor.WHITE) {
-            name = "wR";
-            imageName = "whiteRook.png";
+            name = "wB";
+            imageName = "whiteBishop.png";
         }
-
-        if (isKingSide) {
-            kingSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
-        } else queenSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 3];
-
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
 
         currentTileProperty = new SimpleObjectProperty<>(this, "currentTile", currentTile);
-//        generateTilesToMoveTo();
+
         allFields = new Object[] {player, pieceType, possibleMoves, piecesUnderThreat,
                 historyMoves, lastTile, capturedPieces,
                 name, pieceCounter, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
 
-        id = value * player.getPlayerDirection() * new Random().nextInt();
+        pieceType = PieceType.BISHOP;
+
+        id = 100 * value * player.getPlayerDirection() + player.getId() + pieceCounter;
     }
 
     @Override
@@ -118,10 +108,10 @@ public class RookPiece implements Piece, Cloneable {
     public void generateMoves() {
         if (!isAlive) return;
         int[][] directions = {
-            {1, 0},
-            {-1, 0},
-            {0, 1},
-            {0, -1}
+                {1, 1},
+                {1, -1},
+                {-1, -1},
+                {-1, 1}
         };
 
         int x = currentTile.getRow();
@@ -134,7 +124,7 @@ public class RookPiece implements Piece, Cloneable {
             if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
 
             for (int i = 1; i < board.getBoard().length; i++) {
-                if (x + i*r > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
+                if (x+r*i > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
                 Tile targetTile = board.getBoard()[x+r*i][y+c*i];
                 if (targetTile.isEmpty()) {
                     Move move = new Move.Builder()
@@ -185,33 +175,13 @@ public class RookPiece implements Piece, Cloneable {
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
     public boolean isAlive() {
         return !isAlive;
     }
 
     @Override
-    public void setIsAlive(boolean isAlive) {
-        this.isAlive = isAlive;
-    }
-
-    @Override
     public boolean getIsInDanger() {
-        return isInDanger;
-    }
-
-//    @Override
-//    public ImageView getImageIcon() {
-//        return imageIcon;
-//    }
-
-    @Override
-    public void setIsInDanger(boolean isInDanger) {
-        this.isInDanger = isInDanger;
+        return false;
     }
 
     @Override
@@ -222,6 +192,30 @@ public class RookPiece implements Piece, Cloneable {
     @Override
     public PieceColor getPieceColor() {
         return pieceColor;
+    }
+
+    @Override
+    public Tile getCurrentTile() {
+        return currentTile;
+    }
+
+    public int getPieceCounter() {
+        return pieceCounter;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void setIsAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
+
+    @Override
+    public void setIsInDanger(boolean isInDanger) {
+        this.isInDanger = isInDanger;
     }
 
     @Override
@@ -243,34 +237,6 @@ public class RookPiece implements Piece, Cloneable {
         return player;
     }
 
-    @Override
-    public void setCurrentTile(Tile currentTile) {
-        this.currentTile = currentTile;
-        if (currentTile == null) return;
-        currentTile.setPiece(this);
-    }
-
-    public Tile getKingSideCastlingTile() {
-        return kingSideCastlingTile;
-    }
-
-    public Tile getQueenSideCastlingTile() {
-        return queenSideCastlingTile;
-    }
-
-    public void setHasMoved(boolean moved) {
-        hasMoved = moved;
-    }
-
-    @Override
-    public Tile getCurrentTile() {
-        return currentTile;
-    }
-
-    public int getPieceCounter() {
-        return pieceCounter;
-    }
-
     public String getImageName() {
         return imageName;
     }
@@ -280,23 +246,20 @@ public class RookPiece implements Piece, Cloneable {
         return value;
     }
 
-    public boolean isKingSide() {
-        return isKingSide;
-    }
-
-    public boolean isQueenSide() {
-        return isQueenSide;
+    @Override
+    public void setCurrentTile(Tile currentTile) {
+        this.currentTile = currentTile;
+        if (currentTile == null) return;
+        currentTile.setPiece(this);
     }
 
     @Override
     public boolean isThreatenedAtTile(Tile tile) {
         if (pieceColor == PieceColor.WHITE) {
-            if (tile.isThreatenedByBlack()) return true;
-            else return false;
+            return tile.isThreatenedByBlack();
         }
         if (pieceColor == PieceColor.BLACK) {
-            if (tile.isThreatenedByWhite()) return true;
-            else return false;
+            return tile.isThreatenedByWhite();
         }
         return false;
     }
@@ -315,7 +278,7 @@ public class RookPiece implements Piece, Cloneable {
 
     @Override
     public boolean hasMoved() {
-        return hasMoved;
+        return false;
     }
 
     @Override
@@ -367,12 +330,10 @@ public class RookPiece implements Piece, Cloneable {
         this.imageIcon = imageIcon;
     }
 
-    @Override
     public Tile getCurrentTileProperty() {
         return currentTileProperty.get();
     }
 
-    @Override
     public ObjectProperty<Tile> currentTilePropertyProperty() {
         return currentTileProperty;
     }

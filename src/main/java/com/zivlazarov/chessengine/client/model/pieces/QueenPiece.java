@@ -1,25 +1,21 @@
-package com.zivlazarov.chessengine.model.pieces;
-
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.move.Move;
-import com.zivlazarov.chessengine.model.player.Player;
-import com.zivlazarov.chessengine.model.utils.MyObservable;
+package com.zivlazarov.chessengine.client.model.pieces;
+import com.zivlazarov.chessengine.client.model.board.Board;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.board.Tile;
+import com.zivlazarov.chessengine.client.model.move.Move;
+import com.zivlazarov.chessengine.client.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+//import javafx.scene.image.ImageView;
 
-import javax.persistence.*;
 import javax.swing.*;
 import java.util.*;
 
-//import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.client.ui.Game.createImageView;
 
-public class BishopPiece implements Piece, Cloneable {
+public class QueenPiece implements Piece, Cloneable {
 
     private Player player;
-
-    private MyObservable observable;
 
     private ObjectProperty<Tile> currentTileProperty;
 
@@ -37,8 +33,6 @@ public class BishopPiece implements Piece, Cloneable {
 
     private String name;
 
-    private final int pieceCounter;
-
     private boolean isAlive = true;
     private boolean isInDanger = false;
     private Tile currentTile;
@@ -46,47 +40,47 @@ public class BishopPiece implements Piece, Cloneable {
     private String imageName;
     private Icon imageIcon;
 
-    private final int value = 3;
+    private int value = 9;
 
     private final Object[] allFields;
 
-    public BishopPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
+    public QueenPiece(Player player, Board board, PieceColor pc, Tile initTile) {
         this.player = player;
         this.board = board;
 
-//        name = "B";
+//        name = 'Q';
         pieceColor = pc;
-        possibleMoves = new ArrayList<>();
+        possibleMoves = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
-        historyMoves = new Stack<Tile>();
+        historyMoves = new Stack<>();
         capturedPieces = new Stack<>();
         moves = new HashSet<>();
 
         currentTile = initTile;
         lastTile = currentTile;
 
-        this.pieceCounter = pieceCounter;
-
         if (pieceColor == PieceColor.BLACK) {
-            name = "bB";
-            imageName = "blackBishop.png";
+            name = "bQ";
+            imageName = "blackQueen.png";
         }
         if (pieceColor == PieceColor.WHITE) {
-            name = "wB";
-            imageName = "whiteBishop.png";
+            name = "wQ";
+            imageName = "whiteQueen.png";
         }
         player.addPieceToAlive(this);
 
         currentTile.setPiece(this);
 
         currentTileProperty = new SimpleObjectProperty<>(this, "currentTile", currentTile);
-
+//        generateTilesToMoveTo();
         allFields = new Object[] {player, pieceType, possibleMoves, piecesUnderThreat,
                 historyMoves, lastTile, capturedPieces,
-                name, pieceCounter, isAlive, isInDanger, currentTile,
+                name, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
 
-        id = value * player.getPlayerDirection() * new Random().nextInt();
+        pieceType = PieceType.QUEEN;
+
+        id = 100 * value * player.getPlayerDirection() + player.getId() - 2;
     }
 
     @Override
@@ -107,6 +101,10 @@ public class BishopPiece implements Piece, Cloneable {
     public void generateMoves() {
         if (!isAlive) return;
         int[][] directions = {
+                {1, 0},
+                {-1, 0},
+                {0, 1},
+                {0, -1},
                 {1, 1},
                 {1, -1},
                 {-1, -1},
@@ -123,7 +121,7 @@ public class BishopPiece implements Piece, Cloneable {
             if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
 
             for (int i = 1; i < board.getBoard().length; i++) {
-                if (x+r*i > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
+                if (x + i*r > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
                 Tile targetTile = board.getBoard()[x+r*i][y+c*i];
                 if (targetTile.isEmpty()) {
                     Move move = new Move.Builder()
@@ -180,7 +178,7 @@ public class BishopPiece implements Piece, Cloneable {
 
     @Override
     public boolean getIsInDanger() {
-        return false;
+        return isInDanger;
     }
 
     @Override
@@ -193,13 +191,18 @@ public class BishopPiece implements Piece, Cloneable {
         return pieceColor;
     }
 
+//    @Override
+//    public ImageView getImageIcon() {
+//        return imageIcon;
+//    }
+
     @Override
     public Tile getCurrentTile() {
         return currentTile;
     }
 
-    public int getPieceCounter() {
-        return pieceCounter;
+    public Player getPlayer() {
+        return player;
     }
 
     @Override
@@ -228,12 +231,21 @@ public class BishopPiece implements Piece, Cloneable {
     }
 
     @Override
+    public Tile getLastMove() {
+        if (historyMoves.size() == 0) return null;
+        return historyMoves.peek();
+    }
+
+    @Override
     public List<Piece> getPiecesUnderThreat() {
         return piecesUnderThreat;
     }
 
-    public Player getPlayer() {
-        return player;
+    @Override
+    public void setCurrentTile(Tile currentTile) {
+        this.currentTile = currentTile;
+        if (currentTile == null) return;
+        currentTile.setPiece(this);
     }
 
     public String getImageName() {
@@ -245,20 +257,20 @@ public class BishopPiece implements Piece, Cloneable {
         return value;
     }
 
-    @Override
-    public void setCurrentTile(Tile currentTile) {
-        this.currentTile = currentTile;
-        if (currentTile == null) return;
-        currentTile.setPiece(this);
-    }
+//    @Override
+//    public void setImageIcon(ImageView imageIcon) {
+//        this.imageIcon = imageIcon;
+//    }
 
     @Override
     public boolean isThreatenedAtTile(Tile tile) {
         if (pieceColor == PieceColor.WHITE) {
-            return tile.isThreatenedByBlack();
+            if (tile.isThreatenedByBlack()) return true;
+            else return false;
         }
         if (pieceColor == PieceColor.BLACK) {
-            return tile.isThreatenedByWhite();
+            if (tile.isThreatenedByWhite()) return true;
+            else return false;
         }
         return false;
     }
@@ -287,12 +299,6 @@ public class BishopPiece implements Piece, Cloneable {
     }
 
     @Override
-    public Tile getLastMove() {
-        if (historyMoves.size() == 0) return null;
-        return historyMoves.peek();
-    }
-
-    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -301,7 +307,7 @@ public class BishopPiece implements Piece, Cloneable {
     public boolean equals(Piece piece) {
         return currentTile.getRow() == piece.getCurrentTile().getRow() &&
                 currentTile.getCol() == piece.getCurrentTile().getCol() &&
-                (name + pieceCounter).equals(piece.getName() + pieceCounter);
+                name.equals(piece.getName());
     }
 
     @Override
@@ -329,10 +335,12 @@ public class BishopPiece implements Piece, Cloneable {
         this.imageIcon = imageIcon;
     }
 
+    @Override
     public Tile getCurrentTileProperty() {
         return currentTileProperty.get();
     }
 
+    @Override
     public ObjectProperty<Tile> currentTilePropertyProperty() {
         return currentTileProperty;
     }
@@ -364,5 +372,10 @@ public class BishopPiece implements Piece, Cloneable {
     @Override
     public Set<Move> getMoves() {
         return moves;
+    }
+
+    @Override
+    public int getPieceCounter() {
+        return -2;
     }
 }

@@ -1,21 +1,19 @@
-package com.zivlazarov.chessengine.model.pieces;
-
-import com.zivlazarov.chessengine.model.move.Move;
-import com.zivlazarov.chessengine.model.utils.Pair;
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.player.Player;
+package com.zivlazarov.chessengine.client.model.pieces;
+import com.zivlazarov.chessengine.client.model.board.Board;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.board.Tile;
+import com.zivlazarov.chessengine.client.model.move.Move;
+import com.zivlazarov.chessengine.client.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+//import javafx.scene.image.ImageView;
 
-import javax.persistence.*;
 import javax.swing.*;
 import java.util.*;
 
-//import static com.zivlazarov.chessengine.ui.Game.createImageView;
+//import static com.zivlazarov.chessengine.client.ui.Game.createImageView;
 
-public class PawnPiece implements Piece, Cloneable {
+public class KnightPiece implements Piece, Cloneable {
 
     private Player player;
 
@@ -42,21 +40,17 @@ public class PawnPiece implements Piece, Cloneable {
     private Tile currentTile;
     private PieceColor pieceColor;
     private String imageName;
-    private boolean hasMoved = false;
-    private boolean executedEnPassant = false;
-
-    private Tile enPassantTile;
     private Icon imageIcon;
 
-    private int value = 1;
+    private int value = 3;
 
     private final Object[] allFields;
 
-    public PawnPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
+    public KnightPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
         this.player = player;
         this.board = board;
 
-//        name = 'P';
+//        name = 'N';
         pieceColor = pc;
         possibleMoves = new ArrayList<Tile>();
         piecesUnderThreat = new ArrayList<>();
@@ -68,14 +62,13 @@ public class PawnPiece implements Piece, Cloneable {
         lastTile = currentTile;
 
         this.pieceCounter = pieceCounter;
-
         if (pieceColor == PieceColor.BLACK) {
-            name = "bP";
-            imageName = "blackPawn.png";
+            name = "bN";
+            imageName = "blackKnight.png";
         }
         if (pieceColor == PieceColor.WHITE) {
-            name = "wP";
-            imageName = "whitePawn.png";
+            name = "wN";
+            imageName = "whiteKnight.png";
         }
         player.addPieceToAlive(this);
 
@@ -88,7 +81,9 @@ public class PawnPiece implements Piece, Cloneable {
                 name, pieceCounter, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
 
-        id = value * player.getPlayerDirection() * new Random().nextInt();
+        pieceType = PieceType.KNIGHT;
+
+        id = 100 * value * player.getPlayerDirection() + player.getId() + pieceCounter;
     }
 
     @Override
@@ -108,102 +103,43 @@ public class PawnPiece implements Piece, Cloneable {
     @Override
     public void generateMoves() {
         if (!isAlive) return;
-        Map<PieceColor, Integer> map = new HashMap<>();
-        map.put(PieceColor.WHITE, 1);
-        map.put(PieceColor.BLACK, -1);
-        int[] eatingDirections = new int[]{-1, 1};
+        int[][] directions ={
+                {1, 2},
+                {1, -2},
+                {-1, 2},
+                {-1, -2},
+                {2, 1},
+                {2, -1},
+                {-2, 1},
+                {-2 ,-1}
+        };
 
         int x = currentTile.getRow();
         int y = currentTile.getCol();
 
-        boolean canMoveFurther = !hasMoved;
+        for (int[] direction : directions) {
+            int r = direction[0];
+            int c = direction[1];
 
-        int direction = player.getPlayerDirection();
-        int longDirection = direction * 2;
-
-        if (x + map.get(pieceColor) > board.getBoard().length - 1 || x + map.get(pieceColor) < 0) return;
-
-        if (board.getBoard()[x+direction][y].isEmpty()) {
-            Move move = new Move.Builder()
-                    .board(board)
-                    .player(player)
-                    .movingPiece(this)
-                    .targetTile(board.getBoard()[x+direction][y])
-                    .build();
-            moves.add(move);
-            possibleMoves.add(board.getBoard()[x + direction][y]);
-            if (canMoveFurther) {
-                if (x + longDirection < 0 || x + longDirection > board.getBoard().length - 1) return;
-                if (board.getBoard()[x+longDirection][y].isEmpty()) {
-                    Move move1 = new Move.Builder()
-                            .board(board)
-                            .player(player)
-                            .movingPiece(this)
-                            .targetTile(board.getBoard()[x+longDirection][y])
-                            .build();
-                    moves.add(move1);
-                    possibleMoves.add(board.getBoard()[x+longDirection][y]);
+            if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
+            Tile targetTile = board.getBoard()[x+r][y+c];
+            if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(player)
+                        .movingPiece(this)
+                        .targetTile(targetTile)
+                        .build();
+                moves.add(move);
+                possibleMoves.add(targetTile);
+                if (!targetTile.isEmpty()) {
+                    if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
                 }
             }
         }
-        for (int d : eatingDirections) {
-            if (y + d > board.getBoard().length - 1 || y + d < 0) continue;
-            if (!board.getBoard()[x+direction][y+d].isEmpty() &&
-                    board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
-                Move move = new Move.Builder()
-                        .board(board)
-                        .player(player)
-                        .movingPiece(this)
-                        .targetTile(board.getBoard()[x+direction][y+d])
-                        .build();
-                moves.add(move);
-                possibleMoves.add(board.getBoard()[x+direction][y+d]);
-                piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
-            }
-            // setting potential capturing tiles as threats
-            board.getBoard()[x+direction][y+d].setThreatenedByColor(pieceColor, true);
-            // insert en passant
-            if (canEnPassant(d)) {
-                Move move = new Move.Builder()
-                        .board(board)
-                        .player(player)
-                        .movingPiece(this)
-                        .targetTile(enPassantTile)
-                        .build();
-                moves.add(move);
-                possibleMoves.add(enPassantTile);
-                // setting the adjacent pawn piece as under threat
-                // only move in chess where piece can be eaten without moving to it's tile
-                piecesUnderThreat.add(board.getBoard()[x][y+d].getPiece());
-            }
-        }
+        possibleMoves.forEach(tile -> tile.setThreatenedByColor(pieceColor, true));
         player.getLegalMoves().addAll(possibleMoves);
         player.getMoves().addAll(moves);
-    }
-
-    public boolean canEnPassant(int eatingDirection) {
-        int x = currentTile.getRow();
-        int y = currentTile.getCol();
-
-        // checking borders of board
-        if (y + eatingDirection < 0 || y + eatingDirection > board.getBoard().length - 1
-        || x - 2 * player.getOpponentPlayer().getPlayerDirection() < 0) return false;
-
-        // checking if piece next to pawn is of type pawn and is opponent's piece
-        if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece pawn &&
-               pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant()) {
-            // checking to see if opponent's last move is pawn's move 2 tiles forward
-            if (board.getGameHistoryMoves().lastElement()/*.getSecond()*/.equals(new Pair<>(
-//                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
-                    pawn,
-                    pawn.getCurrentTile()))) {
-                if (board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection].isEmpty()) {
-                    enPassantTile = board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection];
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     @Override
@@ -231,6 +167,11 @@ public class PawnPiece implements Piece, Cloneable {
         return !isAlive;
     }
 
+//    @Override
+//    public ImageView getImageIcon() {
+//        return imageIcon;
+//    }
+
     @Override
     public void setIsAlive(boolean isAlive) {
         this.isAlive = isAlive;
@@ -238,7 +179,7 @@ public class PawnPiece implements Piece, Cloneable {
 
     @Override
     public boolean getIsInDanger() {
-        return false;
+        return isInDanger;
     }
 
     @Override
@@ -261,6 +202,11 @@ public class PawnPiece implements Piece, Cloneable {
         this.pieceColor = pieceColor;
     }
 
+//    @Override
+//    public void setImageIcon(ImageView imageIcon) {
+//        this.imageIcon = imageIcon;
+//    }
+
     @Override
     public Tile getCurrentTile() {
         return currentTile;
@@ -268,18 +214,6 @@ public class PawnPiece implements Piece, Cloneable {
 
     public int getPieceCounter() {
         return pieceCounter;
-    }
-
-    public boolean hasExecutedEnPassant() {
-        return executedEnPassant;
-    }
-
-    public void setExecutedEnPassant(boolean executedEnPassant) {
-        this.executedEnPassant = executedEnPassant;
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 
     @Override
@@ -298,15 +232,15 @@ public class PawnPiece implements Piece, Cloneable {
         return piecesUnderThreat;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     @Override
     public void setCurrentTile(Tile currentTile) {
         this.currentTile = currentTile;
         if (currentTile == null) return;
         currentTile.setPiece(this);
-    }
-
-    public void setHasMoved(boolean moved) {
-        hasMoved = moved;
     }
 
     public String getImageName() {
@@ -336,10 +270,6 @@ public class PawnPiece implements Piece, Cloneable {
         if (tile.isEmpty()) {
             return true;
         } else return tile.getPiece().getPieceColor() != pieceColor;
-    }
-
-    public Tile getEnPassantTile() {
-        return enPassantTile;
     }
 
     @Override

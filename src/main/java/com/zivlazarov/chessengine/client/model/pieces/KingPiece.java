@@ -1,13 +1,12 @@
-package com.zivlazarov.chessengine.model.pieces;
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.move.Move;
-import com.zivlazarov.chessengine.model.player.Player;
+package com.zivlazarov.chessengine.client.model.pieces;
+import com.zivlazarov.chessengine.client.model.board.Board;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.board.Tile;
+import com.zivlazarov.chessengine.client.model.move.Move;
+import com.zivlazarov.chessengine.client.model.player.Player;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import javax.persistence.*;
 import javax.swing.*;
 import java.util.*;
 
@@ -89,7 +88,9 @@ public class KingPiece implements Piece, Cloneable {
                 name, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
 
-        id = 10 * player.getPlayerDirection() * new Random().nextInt();
+        pieceType = PieceType.KING;
+
+        id = 1000 * player.getPlayerDirection() + player.getId() - 1;
 
         board.getKingsMap().put(player, this);
     }
