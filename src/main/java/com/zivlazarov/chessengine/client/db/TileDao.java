@@ -1,16 +1,14 @@
-package com.zivlazarov.chessengine.db;
+package com.zivlazarov.chessengine.client.db;
 
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.board.TileColor;
-import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.client.model.board.Tile;
+import com.zivlazarov.chessengine.client.model.board.TileColor;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static com.zivlazarov.chessengine.db.DatabaseUtils.*;
+import static com.zivlazarov.chessengine.client.db.DatabaseUtils.*;
 
 public class TileDao {
 
@@ -44,8 +42,6 @@ public class TileDao {
                     color + ");";
 
             statement.executeUpdate(query);
-
-            System.out.println("Insertion complete.");
 
         } catch (SQLException /*| ClassNotFoundException*/ e) {
             e.printStackTrace();

@@ -1,14 +1,15 @@
-package com.zivlazarov.test.db;
+package com.zivlazarov.test.client.db;
 
-import com.zivlazarov.chessengine.db.PieceDao;
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.pieces.Piece;
-import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.client.db.PieceDao;
+import com.zivlazarov.chessengine.client.model.board.Board;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.pieces.Piece;
+import com.zivlazarov.chessengine.client.model.player.Player;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class PieceDaoTest {
 
@@ -45,5 +46,12 @@ public class PieceDaoTest {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testInsertAllPieces() {
+        List<Piece> pieces = player.getAlivePieces();
+        int [] ids = pieceDao.insertAllPieces(pieces);
+        for (int id : ids) System.out.println(id);
     }
 }

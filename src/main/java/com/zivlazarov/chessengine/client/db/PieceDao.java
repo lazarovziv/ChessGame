@@ -1,14 +1,16 @@
-package com.zivlazarov.chessengine.db;
+package com.zivlazarov.chessengine.client.db;
 
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.pieces.Piece;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.pieces.Piece;
+import com.zivlazarov.chessengine.client.model.pieces.PieceType;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
-import static com.zivlazarov.chessengine.db.DatabaseUtils.*;
+import static com.zivlazarov.chessengine.client.db.DatabaseUtils.*;
 
 public class PieceDao implements Dao {
 
@@ -23,23 +25,34 @@ public class PieceDao implements Dao {
         int tileID = piece.getCurrentTile().getId();
         PieceColor pieceColor = piece.getPieceColor();
         int color = pieceColor == PieceColor.WHITE ? 1 : 0;
+        PieceType pieceType = piece.getPieceType();
+        int type = pieceTypeMap.get(pieceType);
+
+//        int type = -1;
+//        switch (pieceType) {
+//            case PAWN -> type = 0;
+//            case BISHOP -> type = 1;
+//            case KNIGHT ->  type = 2;
+//            case ROOK -> type = 3;
+//            case QUEEN -> type = 4;
+//            case KING -> type = 5;
+//        }
 
         try {
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
             statement = connection.createStatement();
 
-            String query = "INSERT INTO Piece(id, player_id, pieceCounter, isAlive, tile_id, pieceColor) " +
+            String query = "INSERT INTO Piece(id, player_id, pieceCounter, isAlive, tile_id, pieceColor, type) " +
                     "VALUES (" + id + ", " +
                     playerID + ", " +
 //                    name + ", " +
                     pieceCounter + ", " +
                     isAlive + ", " +
                     tileID + ", " +
-                    color + ");";
+                    color + ", " +
+                    type + ");";
 
             statement.executeUpdate(query);
-
-            System.out.println("Insertion complete.");
 
         } catch (SQLException /*| ClassNotFoundException*/ e) {
             e.printStackTrace();
@@ -50,5 +63,18 @@ public class PieceDao implements Dao {
                 connection.close();
         }
         return id;
+    }
+
+    public int[] insertAllPieces(List<Piece> pieces) {
+        int[] piecesIDs = new int[pieces.size()];
+        for (int i = 0; i < piecesIDs.length; i++) {
+            try {
+                insertPiece(pieces.get(i));
+                piecesIDs[i] = pieces.get(i).getId();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return piecesIDs;
     }
 }

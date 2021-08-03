@@ -1,26 +1,19 @@
-package com.zivlazarov.chessengine.db;
+package com.zivlazarov.chessengine.client.db;
 
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.player.Player;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.player.Player;
 
-import javax.persistence.*;
-import java.io.File;
 import java.sql.*;
-import java.util.List;
-import java.util.UUID;
 
-import static com.zivlazarov.chessengine.db.DatabaseUtils.*;
+import static com.zivlazarov.chessengine.client.db.DatabaseUtils.*;
 
 public class PlayerDao implements Dao {
 
-    public long insertPlayer(Player player) throws SQLException {
+    public int insertPlayer(Player player) throws SQLException {
         Connection connection = null;
         Statement statement = null;
 
-        long id = player.getId();
+        int id = 0;
         boolean isAI = player.isAI();
         boolean isCurrentPlayer = player.isCurrentPlayer();
         String name = player.getName();
@@ -31,23 +24,35 @@ public class PlayerDao implements Dao {
         if (playerColor == PieceColor.WHITE) color = 0;
         else color = 1;
 
+        int playerID;
+
         try {
 //            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
             statement = connection.createStatement();
 
-            String query = "INSERT INTO Player(id, isAI, isCurrentPlayer, name, playerDirection, playerScore, playerColor) " +
+            // counting all players in Player table to auto increment player's id
+            String playerIDQuery = "SELECT COUNT(*) FROM Player;";
+            PreparedStatement preparedStatement = connection.prepareStatement(playerIDQuery);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            resultSet.next();
+            playerID = resultSet.getInt(1) + 1;
+
+            player.setId(playerID);
+            id = player.getId();
+
+            String query = "INSERT INTO Player(id, isAI, isCurrentPlayer, playerDirection, playerScore, playerColor) " +
                     "VALUES (" + id + ", " +
                     isAI + ", " +
                     isCurrentPlayer + ", " +
-                    name + ", " +
+//                    name + ", " +
                     playerDirection + ", " +
                     playerScore + ", " +
                     color  + ");";
 
             statement.executeUpdate(query);
-
-            System.out.println("Insertion complete.");
 
         } catch (SQLException /*| ClassNotFoundException*/ e) {
             e.printStackTrace();
@@ -60,11 +65,11 @@ public class PlayerDao implements Dao {
         return id;
     }
 
-    public long deletePlayer(Player player) throws SQLException {
+    public int deletePlayer(Player player) throws SQLException {
         Connection connection = null;
         Statement statement = null;
 
-        long id = player.getId();
+        int id = player.getId();
 
         try {
 //            Class.forName("com.mysql.cj.jdbc.Driver");
@@ -88,7 +93,7 @@ public class PlayerDao implements Dao {
         return id;
     }
 
-    public Player findPlayerByID(long id) throws SQLException {
+    public Player findPlayerByID(int id) throws SQLException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
 

@@ -1,8 +1,8 @@
-package com.zivlazarov.test.db;
+package com.zivlazarov.test.client.db;
 
-import com.zivlazarov.chessengine.db.TileDao;
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.client.db.TileDao;
+import com.zivlazarov.chessengine.client.model.board.Board;
+import com.zivlazarov.chessengine.client.model.board.Tile;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

@@ -1,14 +1,13 @@
-package com.zivlazarov.test.db;
+package com.zivlazarov.test.client.db;
 
-import com.zivlazarov.chessengine.db.PlayerDao;
-import com.zivlazarov.chessengine.model.board.Board;
-import com.zivlazarov.chessengine.model.board.PieceColor;
-import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.client.db.PlayerDao;
+import com.zivlazarov.chessengine.client.model.board.Board;
+import com.zivlazarov.chessengine.client.model.board.PieceColor;
+import com.zivlazarov.chessengine.client.model.player.Player;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 public class PlayerDaoTest {
 
@@ -38,9 +37,9 @@ public class PlayerDaoTest {
 
     @Test
     public void testInsertPlayer() {
-        long id = 0;
+        int id = 0;
         try {
-            id = playerDao.insertPlayer(player);
+            id = playerDao.insertPlayer(opponent);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -60,7 +59,7 @@ public class PlayerDaoTest {
 
     @Test
     public void testDeletePlayer() {
-        long id = 0;
+        int id = 0;
         try {
             id = playerDao.deletePlayer(player);
         } catch (SQLException e) {
