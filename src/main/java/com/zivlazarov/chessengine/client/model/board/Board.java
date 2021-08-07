@@ -39,6 +39,8 @@ public class Board implements MyObservable, Serializable {
     private Player currentPlayer;
 
     private final Map<Player, KingPiece> kingsMap;
+    private final Map<Player, RookPiece> kingSideRooksMap;
+    private final Map<Player, RookPiece> queenSideRooksMap;
 
     private GameSituation gameSituation;
     private final List<MyObserver> observers;
@@ -63,6 +65,8 @@ public class Board implements MyObservable, Serializable {
         states = new Stack<>();
 
         kingsMap = new HashMap<>();
+        kingSideRooksMap = new HashMap<>();
+        queenSideRooksMap = new HashMap<>();
 
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
@@ -243,8 +247,15 @@ public class Board implements MyObservable, Serializable {
                             Piece playerPiece = playerPiecesInTheWay.get(0);
 
                             currentPlayer.getMoves().removeIf(move -> move.getMovingPiece().equals(playerPiece));
-                            playerPiece.getPossibleMoves().removeIf(t -> !t.equals(opponentPiece.getCurrentTile()));
-                            playerPiece.getMoves().removeIf(move -> !move.getTargetTile().equals(opponentPiece.getCurrentTile()));
+                            if (directionsOfDanger.get(opponentPiece).size() > 1) {
+                                playerPiece.getPossibleMoves().removeIf(t -> !directionsOfDanger.get(opponentPiece).contains(t));
+                                playerPiece.getMoves().removeIf(move -> !directionsOfDanger.get(opponentPiece).contains(
+                                        move.getTargetTile()
+                                ));
+                            } else {
+                                playerPiece.getPossibleMoves().removeIf(t -> !t.equals(opponentPiece.getCurrentTile()));
+                                playerPiece.getMoves().removeIf(move -> !move.getTargetTile().equals(opponentPiece.getCurrentTile()));
+                            }
                             currentPlayer.getMoves().addAll(playerPiece.getMoves());
                         }
                     }
@@ -605,6 +616,14 @@ public class Board implements MyObservable, Serializable {
 
     public Map<Player, KingPiece> getKingsMap() {
         return kingsMap;
+    }
+
+    public Map<Player, RookPiece> getKingSideRooksMap() {
+        return kingSideRooksMap;
+    }
+
+    public Map<Player, RookPiece> getQueenSideRooksMap() {
+        return queenSideRooksMap;
     }
 
     @Override
