@@ -2,35 +2,29 @@ package com.zivlazarov.chessengine.client.model.move;
 
 import com.zivlazarov.chessengine.client.model.board.Board;
 import com.zivlazarov.chessengine.client.model.board.Tile;
-import com.zivlazarov.chessengine.client.model.pieces.KingPiece;
-import com.zivlazarov.chessengine.client.model.pieces.PawnPiece;
-import com.zivlazarov.chessengine.client.model.pieces.Piece;
-import com.zivlazarov.chessengine.client.model.pieces.RookPiece;
+import com.zivlazarov.chessengine.client.model.pieces.*;
 import com.zivlazarov.chessengine.client.model.player.Player;
 import com.zivlazarov.chessengine.client.model.utils.Pair;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-//@Entity
 public class Move implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 3L;
 
-//    @Id
-//    @GeneratedValue
     private int id;
 
     private Player player;
 
-//    @ManyToOne
-//    @JoinColumn(name = "moving_piece_id")
     private Piece movingPiece;
 
     private Tile targetTile;
 
     private transient Board board;
+
+    private String label;
 
     public Move() {}
 
@@ -55,23 +49,33 @@ public class Move implements Serializable {
         boolean isSpecialMove = false;
 
         if (movingPiece instanceof PawnPiece) {
+            if (checkBoard && !movingPiece.hasMoved()) {
+                movingPiece.setHasMoved(true);
+            }
             isSpecialMove = player.handleEnPassantMove(movingPiece, targetTile);
-            if (checkBoard)
-                ((PawnPiece) movingPiece).setHasMoved(true);
+            if (isSpecialMove) label = "En Passant";
             movingPiece = player.handlePawnPromotion(movingPiece, targetTile);
+            if (movingPiece instanceof QueenPiece) label = "Pawn Promotion";
         } else if (movingPiece instanceof KingPiece) {
+            if (checkBoard && !movingPiece.hasMoved()) {
+                movingPiece.setHasMoved(true);
+            }
             isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
-            if (!isSpecialMove) isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
-            if (checkBoard)
-                ((KingPiece) movingPiece).setHasMoved(true);
+            if (isSpecialMove) label = "King Side Castle";
+            if (!isSpecialMove) {
+                isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
+                if (isSpecialMove) label = "Queen Side Castle";
+            }
         } else if (movingPiece instanceof RookPiece) {
-            if (checkBoard)
-                ((RookPiece) movingPiece).setHasMoved(true);
+            if (checkBoard && !movingPiece.hasMoved()) {
+                movingPiece.setHasMoved(true);
+            }
         }
 
         if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != player.getPlayerColor()) {
             movingPiece.getCapturedPieces().push(targetTile.getPiece());
             player.getOpponentPlayer().addPieceToDead(targetTile.getPiece());
+            label = "Capture";
         }
 
         movingPiece.setLastTile(currentTile);
@@ -106,20 +110,20 @@ public class Move implements Serializable {
 
         // getting last captured piece
         if (movingPiece.getCapturedPieces().size() > 0) {
-            capturedPiece = movingPiece.getLastPieceEaten();
+            capturedPiece = movingPiece.getLastCapturedPiece();
 
-            // if captured piece's last tile is the last move's previous tile, return the captured piece to the game
-            // and place captured piece in that tile while clearing the current piece from there
+            // if CAPTURED piece's last tile is the last move's previous tile, return the CAPTURED piece to the game
+            // and place CAPTURED piece in that tile while clearing the CAPTURING piece from there
             if (currentTile.equals(capturedPiece.getLastTile())) {
-                // adding the captured piece to the game
+                // adding the CAPTURED piece to the game
                 player.getOpponentPlayer().addPieceToAlive(capturedPiece);
-                // removing the captured piece from capturing piece's capturedPieces list
+                // removing the CAPTURED piece from capturing piece's capturedPieces list
                 movingPiece.getCapturedPieces().remove(movingPiece.getCapturedPieces().size() - 1);
-                // clearing capturing piece from it's tile
+                // clearing CAPTURING piece from it's tile
                 player.clearTileFromPiece(currentTile);
-                // setting captured piece's tile
+                // setting CAPTURED piece's tile
                 capturedPiece.setCurrentTile(currentTile);
-                // setting capturing piece to it's previous tile
+                // setting CAPTURING piece to it's previous tile
                 movingPiece.setCurrentTile(previousTile);
             }
             // no capturing involved in last move
@@ -130,20 +134,20 @@ public class Move implements Serializable {
         }
 
         // if it was their first move, revert their hasMoved field to false
-        if (movingPiece.getHistoryMoves().size() == 1) {
-            if (movingPiece instanceof PawnPiece) ((PawnPiece) movingPiece).setHasMoved(false);
-            else if (movingPiece instanceof RookPiece) ((RookPiece) movingPiece).setHasMoved(false);
-            else if (movingPiece instanceof KingPiece) ((KingPiece) movingPiece).setHasMoved(false);
+        if (movingPiece.getHistoryMoves().size() <= 1) {
+            if (movingPiece instanceof PawnPiece) movingPiece.setHasMoved(false);
+            else if (movingPiece instanceof RookPiece) movingPiece.setHasMoved(false);
+            else if (movingPiece instanceof KingPiece) movingPiece.setHasMoved(false);
         }
 
         // deleting last move made from logs
         if (movingPiece.getHistoryMoves().size() > 0)
-            movingPiece.getHistoryMoves().remove(movingPiece.getHistoryMoves().lastElement());
+            movingPiece.getHistoryMoves().removeElementAt(movingPiece.getHistoryMoves().size() - 1);
         if (board.getGameHistoryMoves().size() > 0)
-            board.getGameHistoryMoves().remove(board.getGameHistoryMoves().lastElement());
+            board.getGameHistoryMoves().removeElementAt(board.getGameHistoryMoves().size() - 1);
         player.getLastMove().remove(movingPiece);
         if (board.getMatchPlays().size() > 0)
-            board.getMatchPlays().remove(board.getMatchPlays().size() - 1);
+            board.getMatchPlays().removeElementAt(board.getMatchPlays().size() - 1);
 
         board.setCurrentPlayer(board.getCurrentPlayer());
 
@@ -170,7 +174,11 @@ public class Move implements Serializable {
     public Tile getTargetTile() {
         return targetTile;
     }
-    
+
+    public String getLabel() {
+        return label;
+    }
+
     public String toString() {
       return movingPiece.getName() + ": " + movingPiece.getLastTile() + " -> " + targetTile;
     }
