@@ -31,19 +31,22 @@ public class KingPieceTest {
         opponent = new Player(board, PieceColor.BLACK);
         opponent.setOpponentPlayer(player);
         player.setOpponentPlayer(opponent);
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+        board.setCurrentPlayer(player);
 //        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[3][4], 0);
-//        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3], false);
-        opponentKingPiece = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][4], false);
+        kingPiece = new KingPiece(player, board, board.getBoard()[0][4]);
+        opponentKingPiece = new KingPiece(opponent, board, board.getBoard()[7][4]);
 //        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][3], 0);
-        opponentKnightPiece = new KnightPiece(opponent, board, PieceColor.BLACK, board.getBoard()[4][1], 0);
-        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][1], 0);
+        opponentKnightPiece = new KnightPiece(opponent, board, board.getBoard()[2][3], 0);
+        pawnPiece = new PawnPiece(player, board, board.getBoard()[1][2], 0);
 //        board.checkBoard();
     }
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
-        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], false);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
+        kingPiece = new KingPiece(player, board, board.getBoard()[1][4]);
+        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[2][4], 0);
         board.checkBoard();
         List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
         board.printBoard();
@@ -66,9 +69,9 @@ public class KingPieceTest {
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenNoPieceInterferes() {
-        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[1][4], false);
+        kingPiece = new KingPiece(player, board, board.getBoard()[1][4]);
 //        pawnPiece.getCurrentTile().setPiece(null);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][4], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[2][4], 0);
 //        opponentPawnPiece.moveToTile(board.getBoard()[opponentPawnPiece.getCurrentTile().getRow() - 1][opponentPawnPiece.getCurrentTile().getCol()]);
         board.checkBoard();
 
@@ -97,10 +100,10 @@ public class KingPieceTest {
 //        pawnPiece.getCurrentTile().setPiece(null);
 //        opponentPawnPiece.getCurrentTile().setPiece(null);
 //        kingPiece = new KingPiece(board, PieceColor.WHITE, board.getBoard()[0][3]);
-        RookPiece rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], true, 0);
-        RookPiece rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], false, 1);
-        RookPiece blackRook0 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][0], true, 0);
-        RookPiece blackRook1 = new RookPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7], false, 1);
+        RookPiece rookPiece = new RookPiece(player, board, board.getBoard()[0][7], 0);
+        RookPiece rookPiece1 = new RookPiece(player, board, board.getBoard()[0][0], 1);
+        RookPiece blackRook0 = new RookPiece(opponent, board, board.getBoard()[7][0], 0);
+        RookPiece blackRook1 = new RookPiece(opponent, board, board.getBoard()[7][7], 1);
         board.checkBoard();
 
         List<Tile> tilesGenerated = kingPiece.getPossibleMoves();
@@ -145,14 +148,29 @@ public class KingPieceTest {
 
     @Test
     public void testMoveToPotentialCapturingTileByPawn() {
-        Piece opponentRook = new RookPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][3], false, 7);
-        Piece opponentPawn1 = new PawnPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[1][3], 6);
-        kingPiece = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][3], true);
+        Piece opponentRook = new RookPiece(opponent, board, board.getBoard()[7][3], 7);
+        Piece opponentPawn1 = new PawnPiece(opponent, board, board.getBoard()[1][3], 6);
+        kingPiece = new KingPiece(player, board, board.getBoard()[0][3]);
         board.printBoard();
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
         board.setCurrentPlayer(player);
         board.checkBoard();
         for (Move move : player.getMoves()) System.out.println(move);
+    }
+
+    @Test
+    public void testCastlingAfterCheck() {
+        Piece queenSideRook = new RookPiece(player, board, board.getBoard()[0][0], 0);
+        Piece kingSideRook = new RookPiece(player, board, board.getBoard()[0][7], 1);
+        board.printBoard();
+        board.checkBoard();
+
+        Move move = (Move) player.getMoves().toArray()[2];
+        move.makeMove(true);
+
+        board.printBoard();
+        Move opponentMove = (Move) opponent.getMoves().toArray()[0];
+        opponentMove.makeMove(true);
     }
 }

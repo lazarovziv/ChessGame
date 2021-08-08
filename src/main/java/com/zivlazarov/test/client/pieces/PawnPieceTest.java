@@ -29,10 +29,10 @@ public class PawnPieceTest {
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
         opponent.setOpponentPlayer(player);
-        KingPiece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[7][4], false);
-        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][0], 0);
-        knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[3][0], 0);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][1], 0);
+        KingPiece kingPiece = new KingPiece(player, board, board.getBoard()[7][4]);
+        pawnPiece = new PawnPiece(player, board, board.getBoard()[1][0], 0);
+        knightPiece = new KnightPiece(player, board, board.getBoard()[3][0], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[2][1], 0);
         board.checkBoard();
     }
 
@@ -67,8 +67,8 @@ public class PawnPieceTest {
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
 
-        PawnPiece pawn = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][3], 0);
-        PawnPiece opponentPawn = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[6][3], 0);
+        PawnPiece pawn = new PawnPiece(player, board, board.getBoard()[1][3], 0);
+        PawnPiece opponentPawn = new PawnPiece(opponent, board, board.getBoard()[6][3], 0);
 //        KingPiece whiteKing = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0]);
 //        KingPiece blackKing = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7]);
 
@@ -110,7 +110,7 @@ public class PawnPieceTest {
 
     @Test
     public void testPawnPromotion() {
-        Piece pawn = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[6][3], 6);
+        Piece pawn = new PawnPiece(player, board, board.getBoard()[6][3], 6);
         board.printBoard();
         board.checkBoard();
 

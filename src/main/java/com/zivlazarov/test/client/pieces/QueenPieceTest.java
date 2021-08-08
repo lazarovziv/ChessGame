@@ -27,9 +27,9 @@ public class QueenPieceTest {
         board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        queenPiece = new QueenPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3]);
-        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[4][3], 0);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[5][3], 0);
+        queenPiece = new QueenPiece(player, board, board.getBoard()[3][3]);
+        pawnPiece = new PawnPiece(player, board, board.getBoard()[4][3], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[5][3], 0);
         board.checkBoard();
     }
 
@@ -110,7 +110,7 @@ public class QueenPieceTest {
     @Test
     public void testWhatTilesAreBeingGenerated() {
         queenPiece.getCurrentTile().setPiece(null);
-        queenPiece = new QueenPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3]);
+        queenPiece = new QueenPiece(player, board, board.getBoard()[3][3]);
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 

@@ -27,9 +27,9 @@ public class BishopPieceTest {
         board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        bishopPiece = new BishopPiece(player, board, PieceColor.WHITE, board.getBoard()[0][2], 0);
-        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][3], 0);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][1], 0);
+        bishopPiece = new BishopPiece(player, board, board.getBoard()[0][2], 0);
+        pawnPiece = new PawnPiece(player, board, board.getBoard()[1][3], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[1][1], 0);
         board.checkBoard();
     }
 
@@ -92,7 +92,7 @@ public class BishopPieceTest {
     @Test
     public void testWhatTilesAreBeingGenerated() {
         bishopPiece.getCurrentTile().setPiece(null);
-        bishopPiece = new BishopPiece(player, board, PieceColor.WHITE, board.getBoard()[3][3], 0);
+        bishopPiece = new BishopPiece(player, board, board.getBoard()[3][3], 0);
         pawnPiece.getCurrentTile().setPiece(null);
         opponentPawnPiece.getCurrentTile().setPiece(null);
 

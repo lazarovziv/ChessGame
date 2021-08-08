@@ -27,9 +27,9 @@ public class KnightPieceTest {
         board = Board.getInstance();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        knightPiece = new KnightPiece(player, board, PieceColor.WHITE, board.getBoard()[0][1], 0);
-        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[2][2], 0);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[1][3], 0);
+        knightPiece = new KnightPiece(player, board, board.getBoard()[0][1], 0);
+        pawnPiece = new PawnPiece(player, board, board.getBoard()[2][2], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[1][3], 0);
         board.checkBoard();
     }
 

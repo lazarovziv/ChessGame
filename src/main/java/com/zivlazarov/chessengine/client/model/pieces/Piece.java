@@ -1,101 +1,280 @@
 package com.zivlazarov.chessengine.client.model.pieces;
 
-//import javafx.scene.image.ImageView;
-
+import com.zivlazarov.chessengine.client.model.board.Board;
 import com.zivlazarov.chessengine.client.model.board.PieceColor;
 import com.zivlazarov.chessengine.client.model.board.Tile;
 import com.zivlazarov.chessengine.client.model.move.Move;
 import com.zivlazarov.chessengine.client.model.player.Player;
-import com.zivlazarov.chessengine.client.model.utils.Pair;
-import javafx.beans.property.ObjectProperty;
 
-import javax.swing.*;
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
-//@MappedSuperclass
-public interface Piece extends Cloneable, Serializable {
+// worst case scenario, revert this back to an interface and apply it on all pieces
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Piece implements Cloneable, Serializable {
 
     @Serial
     static final long serialVersionUID = 2L;
 
-    int id = 0;
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    protected int id;
 
-//    @ManyToOne
-//    @JoinColumn(name = "player_id")
-    Player player = null;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "player_id", referencedColumnName = "id")
+    protected Player player;
 
-    String name = "";
-    boolean isAlive = true;
-    boolean isInDanger = false;
-    final ArrayList<Tile> possibleMoves = new ArrayList<>();
-    PieceColor pieceColor = PieceColor.WHITE;
-    final ArrayList<Piece> piecesUnderThreat = new ArrayList<>();
-    final Stack<Pair<Tile, Tile>> historyMoves = new Stack<>();
-//    @OneToMany(targetEntity = Move.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "movingPiece")
-    final Set<Move> moves = new HashSet<>();
-    int value = 0;
-    int pieceCounter = 0;
-//    ImageView imageIcon = null;
+    protected String name;
 
-    int getId();
-    void setId(int id);
+    protected boolean isAlive;
 
-    String getName();
-    boolean isAlive();
-    boolean getIsInDanger();
-    List<Tile> getPossibleMoves();
-    PieceColor getPieceColor();
-    Tile getCurrentTile();
-    Stack<Tile> getHistoryMoves();
-    Tile getLastMove();
-    List<Piece> getPiecesUnderThreat();
-    Player getPlayer();
-    String getImageName();
-    int getPieceCounter();
+    protected PieceColor pieceColor;
 
-    Tile getLastTile();
+    @OneToMany(targetEntity = Tile.class, mappedBy = "piece")
+    protected final Stack<Tile> historyMoves = new Stack<>();
 
-    Set<Move> getMoves();
+    protected int value;
 
-    boolean canMove();
+    protected int pieceCounter;
 
-    void setName(String name);
-    void setIsAlive(boolean isAlive);
-    void setIsInDanger(boolean isInDanger);
-    void setPieceColor(PieceColor pieceColor);
-    void setCurrentTile(Tile tile);
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "current_tile_id", referencedColumnName = "id")
+    protected Tile currentTile;
 
-    void setPieceType(PieceType pieceType);
-    PieceType getPieceType();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "last_tile_id", referencedColumnName = "id")
+    protected Tile lastTile;
 
-    Object[] getAllFields();
+    protected String imageName;
 
-    Tile getCurrentTileProperty();
-    ObjectProperty<Tile> currentTilePropertyProperty();
-    void setCurrentTileProperty(Tile currentTileProperty);
+    protected PieceType pieceType;
 
-    void setLastTile(Tile tile);
+    protected boolean hasMoved;
 
-    Icon getImageIcon();
-    void setImageIcon(Icon imageView);
+    @Transient
+    protected Board board;
+    @Transient
+    protected boolean isInDanger;
+    @Transient
+    protected final Set<Move> moves;
+    @Transient
+    protected final ArrayList<Tile> possibleMoves;
+    @Transient
+    protected final ArrayList<Piece> piecesUnderThreat;
+    @Transient
+    protected final Stack<Piece> capturedPieces;
 
-    Piece getLastPieceEaten();
+    public Piece() {
+        moves = new HashSet<>();
+        possibleMoves = new ArrayList<>();
+        piecesUnderThreat = new ArrayList<>();
+        capturedPieces = new Stack<>();
 
-    Stack<Piece> getCapturedPieces();
+        isAlive = true;
+        isInDanger = false;
+        hasMoved = false;
+    }
 
-    void generateMoves();
+//    public abstract int getId();
+//    public abstract void setId(int id);
+//
+//    public abstract String getName();
+//    public abstract boolean isAlive();
+//    public abstract boolean getIsInDanger();
+//    public abstract List<Tile> getPossibleMoves();
+//    public abstract PieceColor getPieceColor();
+//    public abstract Tile getCurrentTile();
+//    public abstract Stack<Tile> getHistoryMoves();
+//    public abstract Tile getLastMove();
+//    public abstract List<Piece> getPiecesUnderThreat();
+//    public abstract String getImageName();
+//    public abstract int getPieceCounter();
+//
+//    public abstract Tile getLastTile();
+//
+//    public abstract Set<Move> getMoves();
+//
+//    public abstract boolean canMove();
+//
+//    public abstract void setName(String name);
+//    public abstract void setIsAlive(boolean isAlive);
+//    public abstract void setIsInDanger(boolean isInDanger);
+//    public abstract void setPieceColor(PieceColor pieceColor);
+//    public abstract void setCurrentTile(Tile tile);
+//
+//    public abstract void setPieceType(PieceType pieceType);
+//    public abstract PieceType getPieceType();
+//
+//    public abstract void setLastTile(Tile tile);
+//
+//    public abstract Piece getLastPieceEaten();
+//
+//    public abstract Stack<Piece> getCapturedPieces();
+//
+//    public abstract void generateMoves();
+//
+//    public abstract boolean isThreatenedAtTile(Tile tile);
+//
+//    public abstract boolean isTileAvailable(Tile tile);
+//
+//    public abstract void refresh();
+//
+//    public abstract int getValue();
+//
+//    public abstract boolean hasMoved();
+//
+//    public abstract boolean equals(Piece piece);
+//
+//    public abstract void setPlayer(Player player);
+//    public abstract Player getPlayer();
 
-    boolean isThreatenedAtTile(Tile tile);
+    public abstract void refresh();
 
-    boolean isTileAvailable(Tile tile);
+    public abstract void generateMoves();
 
-//    void setOnClickListener();
+    public int getId() {
+        return id;
+    }
 
-    void refresh();
+    public Player getPlayer() {
+        return player;
+    }
 
-    default void reset() {
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setIsAlive(boolean alive) {
+        isAlive = alive;
+    }
+
+    public PieceColor getPieceColor() {
+        return pieceColor;
+    }
+
+    public void setPieceColor(PieceColor pieceColor) {
+        this.pieceColor = pieceColor;
+    }
+
+    public Stack<Tile> getHistoryMoves() {
+        return historyMoves;
+    }
+
+    public Tile getLastMove() {
+        return historyMoves.peek();
+    }
+
+    public Piece getLastCapturedPiece() {
+        return capturedPieces.peek();
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public int getPieceCounter() {
+        return pieceCounter;
+    }
+
+    public void setPieceCounter(int pieceCounter) {
+        this.pieceCounter = pieceCounter;
+    }
+
+    public Tile getCurrentTile() {
+        return currentTile;
+    }
+
+    public void setCurrentTile(Tile currentTile) {
+        this.currentTile = currentTile;
+        if (currentTile == null) return;
+        currentTile.setPiece(this);
+    }
+
+    public Tile getLastTile() {
+        return lastTile;
+    }
+
+    public void setLastTile(Tile lastTile) {
+        this.lastTile = lastTile;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    public PieceType getPieceType() {
+        return pieceType;
+    }
+
+    public void setPieceType(PieceType pieceType) {
+        this.pieceType = pieceType;
+    }
+
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
+
+    public Set<Move> getMoves() {
+        return moves;
+    }
+
+    public boolean isInDanger() {
+        return isInDanger;
+    }
+
+    public void setIsInDanger(boolean inDanger) {
+        isInDanger = inDanger;
+    }
+
+    public ArrayList<Tile> getPossibleMoves() {
+        return possibleMoves;
+    }
+
+    public ArrayList<Piece> getPiecesUnderThreat() {
+        return piecesUnderThreat;
+    }
+
+    public Stack<Piece> getCapturedPieces() {
+        return capturedPieces;
+    }
+
+    public boolean isTileAvailable(Tile tile) {
+        if (tile.isEmpty()) {
+            return true;
+        } else return tile.getPiece().getPieceColor() != pieceColor;
+    }
+
+    public boolean canMove() {
+        return moves.size() > 0;
+    }
+
+    public void reset() {
         if (possibleMoves.size() != 0) {
             possibleMoves.clear();
         }
@@ -106,12 +285,4 @@ public interface Piece extends Cloneable, Serializable {
             moves.clear();
         }
     }
-
-    int getValue();
-
-    boolean hasMoved();
-
-    boolean equals(Piece piece);
-
-    void setPlayer(Player player);
 }

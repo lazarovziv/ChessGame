@@ -3,16 +3,18 @@ package com.zivlazarov.chessengine.client.model.pieces;
 import com.zivlazarov.chessengine.client.model.board.Board;
 import com.zivlazarov.chessengine.client.model.board.PieceColor;
 import com.zivlazarov.chessengine.client.model.board.Tile;
-import com.zivlazarov.chessengine.client.model.move.Move;
 import com.zivlazarov.chessengine.client.model.player.Player;
 import com.zivlazarov.chessengine.client.model.utils.MyObservable;
 import com.zivlazarov.chessengine.client.model.utils.Pair;
 import javafx.beans.property.ObjectProperty;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
-public class ChessPiece implements Piece {
+public class ChessPiece extends Piece implements Cloneable {
 
     private Player player;
 
@@ -164,6 +166,11 @@ public class ChessPiece implements Piece {
                 historyMoves, lastTile, capturedPieces,
                 name, pieceCounter, isAlive, isInDanger, currentTile,
                 pieceColor, imageName, imageIcon};
+    }
+
+    @Override
+    public void refresh() {
+
     }
 
     @Override
@@ -367,7 +374,7 @@ public class ChessPiece implements Piece {
                     if (x+r > board.getBoard().length - 1 || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
                     Tile targetTile = board.getBoard()[x+r][y+c];
                     if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
-                        if (!isThreatenedAtTile(targetTile)) {
+                        if (targetTile.isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) {
                             possibleMoves.add(targetTile);
                             if (!targetTile.isEmpty()) {
                                 if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
@@ -510,300 +517,270 @@ public class ChessPiece implements Piece {
 //        moveToTile(board.getBoard()[x][y-2]);
 //        rookPiece.moveToTile(board.getBoard()[x][rookPiece.getCurrentTile().getCol() + 3]);
     }
-
-    @Override
-    public int getId() {
-        return 0;
-    }
-
-    @Override
-    public void setId(int id) {
-
-    }
-
-    @Override
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    @Override
-    public ArrayList<Tile> getPossibleMoves() {
-        return possibleMoves;
-    }
-
-    @Override
-    public ArrayList<Piece> getPiecesUnderThreat() {
-        return piecesUnderThreat;
-    }
-
-    @Override
-    public Stack<Tile> getHistoryMoves() {
-        return historyMoves;
-    }
-
-    @Override
-    public Tile getLastTile() {
-        return lastTile;
-    }
-
-    @Override
-    public void setLastTile(Tile lastTile) {
-        this.lastTile = lastTile;
-    }
-
-    @Override
-    public Stack<Piece> getCapturedPieces() {
-        return capturedPieces;
-    }
-
-    public void setCapturedPieces(Stack<Piece> capturedPieces) {
-        this.capturedPieces = capturedPieces;
-    }
-
-    public PieceType getPieceType() {
-        return pieceType;
-    }
-
-    public void setPieceType(PieceType pieceType) {
-        this.pieceType = pieceType;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPieceCounter() {
-        return pieceCounter;
-    }
-
-    @Override
-    public boolean isAlive() {
-        return isAlive;
-    }
-
-    public void setAlive(boolean alive) {
-        isAlive = alive;
-    }
-
-    public boolean isInDanger() {
-        return isInDanger;
-    }
-
-    public void setInDanger(boolean inDanger) {
-        isInDanger = inDanger;
-    }
-
-    @Override
-    public Tile getCurrentTile() {
-        return currentTile;
-    }
-
-    @Override
-    public void setCurrentTile(Tile currentTile) {
-        this.currentTile = currentTile;
-    }
-
-    @Override
-    public PieceColor getPieceColor() {
-        return pieceColor;
-    }
-
-    @Override
-    public void setPieceColor(PieceColor pieceColor) {
-        this.pieceColor = pieceColor;
-    }
-
-    @Override
-    public String getImageName() {
-        return imageName;
-    }
-
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
-    }
-
-    @Override
-    public Icon getImageIcon() {
-        return imageIcon;
-    }
-
-    @Override
-    public void setImageIcon(Icon imageIcon) {
-        this.imageIcon = imageIcon;
-    }
-
-    @Override
-    public boolean hasMoved() {
-        return hasMoved;
-    }
-
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
-    }
-
-    public Tile getEnPassantTile() {
-        return enPassantTile;
-    }
-
-    public void setEnPassantTile(Tile enPassantTile) {
-        this.enPassantTile = enPassantTile;
-    }
-
-    public Tile getKingSideCastlingTile() {
-        return kingSideCastlingTile;
-    }
-
-    public void setKingSideCastlingTile(Tile kingSideCastlingTile) {
-        this.kingSideCastlingTile = kingSideCastlingTile;
-    }
-
-    public Tile getQueenSideCastlingTile() {
-        return queenSideCastlingTile;
-    }
-
-    public void setQueenSideCastlingTile(Tile queenSideCastlingTile) {
-        this.queenSideCastlingTile = queenSideCastlingTile;
-    }
-
-    public boolean isKingSide() {
-        return isKingSide;
-    }
-
-    public void setKingSide(boolean kingSide) {
-        isKingSide = kingSide;
-    }
-
-    public boolean isQueenSide() {
-        return isQueenSide;
-    }
-
-    public void setQueenSide(boolean queenSide) {
-        isQueenSide = queenSide;
-    }
-
-    public Tile getKingSideCastleTile() {
-        return kingSideCastleTile;
-    }
-
-    public void setKingSideCastleTile(Tile kingSideCastleTile) {
-        this.kingSideCastleTile = kingSideCastleTile;
-    }
-
-    public Tile getQueenSideCastleTile() {
-        return queenSideCastleTile;
-    }
-
-    public void setQueenSideCastleTile(Tile queenSideCastleTile) {
-        this.queenSideCastleTile = queenSideCastleTile;
-    }
-
-    @Override
-    public int getValue() {
-        return value;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
-    }
-
-    @Override
-    public boolean getIsInDanger() {
-        return isInDanger;
-    }
-
-    @Override
-    public Tile getLastMove() {
-        if (historyMoves.size() == 0) return null;
-        return historyMoves.peek();
-    }
-
-    @Override
-    public boolean canMove() {
-        return possibleMoves.size() != 0;
-    }
-
-    @Override
-    public void setIsAlive(boolean isAlive) {
-        this.isAlive = isAlive;
-    }
-
-    @Override
-    public void setIsInDanger(boolean isInDanger) {
-        this.isInDanger = isInDanger;
-    }
-
-    @Override
-    public Tile getCurrentTileProperty() {
-        return null;
-    }
-
-    @Override
-    public ObjectProperty<Tile> currentTilePropertyProperty() {
-        return null;
-    }
-
-    @Override
-    public void setCurrentTileProperty(Tile currentTileProperty) {
-        this.currentTileProperty.setValue(currentTileProperty);
-    }
-
-    @Override
-    public Piece getLastPieceEaten() {
-        if (capturedPieces.size() == 0) return null;
-        return capturedPieces.peek();
-    }
-
-    @Override
-    public boolean isThreatenedAtTile(Tile tile) {
-        if (pieceColor == PieceColor.WHITE) {
-            return tile.isThreatenedByBlack();
-        }
-        if (pieceColor == PieceColor.BLACK) {
-            return tile.isThreatenedByWhite();
-        }
-        return false;
-    }
-
-    @Override
-    public boolean isTileAvailable(Tile tile) {
-        if (tile.isEmpty()) {
-            return true;
-        } else return tile.getPiece().getPieceColor() != pieceColor;
-    }
-
-    @Override
-    public void refresh() {
-        if (possibleMoves.size() != 0) {
-            possibleMoves.clear();
-        }
-        if (piecesUnderThreat.size() != 0) {
-            piecesUnderThreat.clear();
-        }
-        generateMoves();
-    }
-
-    @Override
-    public boolean equals(Piece piece) {
-        return piece.getPieceType() == pieceType && piece.getCurrentTile() == currentTile;
-    }
-
-    @Override
-    public Object[] getAllFields() {
-        return allFields;
-    }
-
-    @Override
-    public Set<Move> getMoves() {
-        return null;
-    }
+//
+//    @Override
+//    public int getId() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public void setId(int id) {
+//
+//    }
+//
+//    @Override
+//    public Player getPlayer() {
+//        return player;
+//    }
+//
+//    public void setPlayer(Player player) {
+//        this.player = player;
+//    }
+//
+//    @Override
+//    public ArrayList<Tile> getPossibleMoves() {
+//        return possibleMoves;
+//    }
+//
+//    @Override
+//    public ArrayList<Piece> getPiecesUnderThreat() {
+//        return piecesUnderThreat;
+//    }
+//
+//    @Override
+//    public Stack<Tile> getHistoryMoves() {
+//        return historyMoves;
+//    }
+//
+//    @Override
+//    public Tile getLastTile() {
+//        return lastTile;
+//    }
+//
+//    @Override
+//    public void setLastTile(Tile lastTile) {
+//        this.lastTile = lastTile;
+//    }
+//
+//    @Override
+//    public Stack<Piece> getCapturedPieces() {
+//        return capturedPieces;
+//    }
+//
+//    public void setCapturedPieces(Stack<Piece> capturedPieces) {
+//        this.capturedPieces = capturedPieces;
+//    }
+//
+//    public PieceType getPieceType() {
+//        return pieceType;
+//    }
+//
+//    public void setPieceType(PieceType pieceType) {
+//        this.pieceType = pieceType;
+//    }
+//
+//    @Override
+//    public String getName() {
+//        return name;
+//    }
+//
+//    @Override
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+//
+//    public int getPieceCounter() {
+//        return pieceCounter;
+//    }
+//
+//    @Override
+//    public boolean isAlive() {
+//        return isAlive;
+//    }
+//
+//    public void setAlive(boolean alive) {
+//        isAlive = alive;
+//    }
+//
+//    public boolean isInDanger() {
+//        return isInDanger;
+//    }
+//
+//    public void setInDanger(boolean inDanger) {
+//        isInDanger = inDanger;
+//    }
+//
+//    @Override
+//    public Tile getCurrentTile() {
+//        return currentTile;
+//    }
+//
+//    @Override
+//    public void setCurrentTile(Tile currentTile) {
+//        this.currentTile = currentTile;
+//    }
+//
+//    @Override
+//    public PieceColor getPieceColor() {
+//        return pieceColor;
+//    }
+//
+//    @Override
+//    public void setPieceColor(PieceColor pieceColor) {
+//        this.pieceColor = pieceColor;
+//    }
+//
+//    @Override
+//    public String getImageName() {
+//        return imageName;
+//    }
+//
+//    public void setImageName(String imageName) {
+//        this.imageName = imageName;
+//    }
+//
+//    @Override
+//    public boolean hasMoved() {
+//        return hasMoved;
+//    }
+//
+//    public void setHasMoved(boolean hasMoved) {
+//        this.hasMoved = hasMoved;
+//    }
+//
+//    public Tile getEnPassantTile() {
+//        return enPassantTile;
+//    }
+//
+//    public void setEnPassantTile(Tile enPassantTile) {
+//        this.enPassantTile = enPassantTile;
+//    }
+//
+//    public Tile getKingSideCastlingTile() {
+//        return kingSideCastlingTile;
+//    }
+//
+//    public void setKingSideCastlingTile(Tile kingSideCastlingTile) {
+//        this.kingSideCastlingTile = kingSideCastlingTile;
+//    }
+//
+//    public Tile getQueenSideCastlingTile() {
+//        return queenSideCastlingTile;
+//    }
+//
+//    public void setQueenSideCastlingTile(Tile queenSideCastlingTile) {
+//        this.queenSideCastlingTile = queenSideCastlingTile;
+//    }
+//
+//    public boolean isKingSide() {
+//        return isKingSide;
+//    }
+//
+//    public void setKingSide(boolean kingSide) {
+//        isKingSide = kingSide;
+//    }
+//
+//    public boolean isQueenSide() {
+//        return isQueenSide;
+//    }
+//
+//    public void setQueenSide(boolean queenSide) {
+//        isQueenSide = queenSide;
+//    }
+//
+//    public Tile getKingSideCastleTile() {
+//        return kingSideCastleTile;
+//    }
+//
+//    public void setKingSideCastleTile(Tile kingSideCastleTile) {
+//        this.kingSideCastleTile = kingSideCastleTile;
+//    }
+//
+//    public Tile getQueenSideCastleTile() {
+//        return queenSideCastleTile;
+//    }
+//
+//    public void setQueenSideCastleTile(Tile queenSideCastleTile) {
+//        this.queenSideCastleTile = queenSideCastleTile;
+//    }
+//
+//    @Override
+//    public int getValue() {
+//        return value;
+//    }
+//
+//    public void setValue(int value) {
+//        this.value = value;
+//    }
+//
+//    @Override
+//    public boolean getIsInDanger() {
+//        return isInDanger;
+//    }
+//
+//    @Override
+//    public Tile getLastMove() {
+//        if (historyMoves.size() == 0) return null;
+//        return historyMoves.peek();
+//    }
+//
+//    @Override
+//    public boolean canMove() {
+//        return possibleMoves.size() != 0;
+//    }
+//
+//    @Override
+//    public void setIsAlive(boolean isAlive) {
+//        this.isAlive = isAlive;
+//    }
+//
+//    @Override
+//    public void setIsInDanger(boolean isInDanger) {
+//        this.isInDanger = isInDanger;
+//    }
+//
+//    @Override
+//    public Piece getLastPieceEaten() {
+//        if (capturedPieces.size() == 0) return null;
+//        return capturedPieces.peek();
+//    }
+//
+//    @Override
+//    public boolean isThreatenedAtTile(Tile tile) {
+//        if (pieceColor == PieceColor.WHITE) {
+//            return tile.isThreatenedByBlack();
+//        }
+//        if (pieceColor == PieceColor.BLACK) {
+//            return tile.isThreatenedByWhite();
+//        }
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isTileAvailable(Tile tile) {
+//        if (tile.isEmpty()) {
+//            return true;
+//        } else return tile.getPiece().getPieceColor() != pieceColor;
+//    }
+//
+//    @Override
+//    public void refresh() {
+//        if (possibleMoves.size() != 0) {
+//            possibleMoves.clear();
+//        }
+//        if (piecesUnderThreat.size() != 0) {
+//            piecesUnderThreat.clear();
+//        }
+//        generateMoves();
+//    }
+//
+//    @Override
+//    public boolean equals(Piece piece) {
+//        return piece.getPieceType() == pieceType && piece.getCurrentTile() == currentTile;
+//    }
+//
+//    @Override
+//    public Set<Move> getMoves() {
+//        return null;
+//    }
 }
