@@ -5,19 +5,23 @@ package com.zivlazarov.chessengine.client.model.board;
 import com.zivlazarov.chessengine.client.model.pieces.Piece;
 import javafx.scene.image.ImageView;
 
+import javax.persistence.*;
 import javax.swing.*;
 import java.io.Serial;
 import java.io.Serializable;
 
+@Entity
 public class Tile implements Serializable {
 
 	@Serial
 	private static final long serialVersionUID = 4L;
 
+	@Id @GeneratedValue
 	private int id;
 
+	@Column(name = "tile_row")
 	private int row;
-
+	@Column(name = "tile_col")
 	private int col;
 
 	private TileColor tileColor;
@@ -28,17 +32,18 @@ public class Tile implements Serializable {
 
 	private boolean isThreatenedByWhite;
 
-
+	@OneToOne(mappedBy = "piece")
 	private Piece piece;
 
+	@Transient
 	private transient ImageView tileImageView;
-
+	@Transient
 	private transient ImageView pieceImageView;
-
+	@Transient
 	private transient JLabel label;
-
+	@Transient
 	private transient JButton button;
-
+	@Transient
 	private static final char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 
 	public Tile() {}
@@ -118,7 +123,7 @@ public class Tile implements Serializable {
 
 	public void setPiece(Piece p) {
 		piece = p;
-		isEmpty = piece == null || piece.isAlive();
+		isEmpty = piece == null; /*|| piece.isAlive();*/
 	}
 
 	public void setThreatenedByWhite(boolean threatenedByWhite) {
