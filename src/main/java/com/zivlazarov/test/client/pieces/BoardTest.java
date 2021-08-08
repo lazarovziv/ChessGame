@@ -105,9 +105,9 @@ public class BoardTest {
 
     @Test
     public void testStalemate() {
-        Piece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[7][7], true);
-        Piece opponentKingPiece = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[6][4], true);
-        Piece opponentQueenPiece = new QueenPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[5][6]);
+        Piece kingPiece = new KingPiece(player, board, board.getBoard()[7][7]);
+        Piece opponentKingPiece = new KingPiece(opponent, board, board.getBoard()[6][4]);
+        Piece opponentQueenPiece = new QueenPiece(opponent, board, board.getBoard()[5][6]);
         board.printBoard();
         board.checkBoard();
 //        opponentKingPiece.getMoves().get(3).makeMove(true);
@@ -118,11 +118,11 @@ public class BoardTest {
 
     @Test
     public void testCalculatePotentialDangerForKing() {
-        Piece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[3][3], true);
-        Piece pawnPiece = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[3][4], 0);
-        Piece pawnPiece1 = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[4][2], 1);
-        Piece opponentQueenPiece = new QueenPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[3][7]);
-        Piece opponentBishopPiece = new BishopPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[5][1], 0);
+        Piece kingPiece = new KingPiece(player, board, board.getBoard()[3][3]);
+        Piece pawnPiece = new PawnPiece(player, board, board.getBoard()[3][4], 0);
+        Piece pawnPiece1 = new PawnPiece(player, board, board.getBoard()[4][2], 1);
+        Piece opponentQueenPiece = new QueenPiece(opponent, board, board.getBoard()[3][7]);
+        Piece opponentBishopPiece = new BishopPiece(opponent, board, board.getBoard()[5][1], 0);
         board.checkBoard();
         board.printBoard();
 

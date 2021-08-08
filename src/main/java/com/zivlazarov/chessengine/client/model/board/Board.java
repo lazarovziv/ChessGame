@@ -43,6 +43,7 @@ public class Board implements MyObservable, Serializable {
     private final Map<Player, RookPiece> queenSideRooksMap;
 
     private GameSituation gameSituation;
+
     private final List<MyObserver> observers;
 
     private final Stack<Pair<Piece, Tile>> gameHistoryMoves;
@@ -101,11 +102,6 @@ public class Board implements MyObservable, Serializable {
         if (instance != null) {
             synchronized (Board.class) {
                 if (instance != null) {
-//                    for (Tile[] tiles : board) {
-//                        for (Tile tile : tiles) {
-//                            tile.setPiece(null);
-//                        }
-//                    }
                     instance = null;
                 }
             }
@@ -113,47 +109,47 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void initBoard() {
-        Piece whiteRookKingSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][7], true, 0);
-        Piece whiteRookQueenSide = new RookPiece(whitePlayer, instance, PieceColor.WHITE, board[0][0], false, 1);
+        Piece whiteRookKingSide = new RookPiece(whitePlayer, instance, board[0][7], 0);
+        Piece whiteRookQueenSide = new RookPiece(whitePlayer, instance, board[0][0], 1);
 
-        Piece blackRookQueenSide = new RookPiece(blackPlayer, instance, PieceColor.BLACK, board[7][0], false, 0);
-        Piece blackRookKingSide = new RookPiece(blackPlayer, instance, PieceColor.BLACK, board[7][7], true, 1);
+        Piece blackRookQueenSide = new RookPiece(blackPlayer, instance, board[7][0], 0);
+        Piece blackRookKingSide = new RookPiece(blackPlayer, instance, board[7][7], 1);
 
-        Piece whiteKnightKingSide = new KnightPiece(whitePlayer, instance, PieceColor.WHITE, board[0][1], 0);
-        Piece whiteKnightQueenSide = new KnightPiece(whitePlayer, instance, PieceColor.WHITE, board[0][6], 1);
+        Piece whiteKnightKingSide = new KnightPiece(whitePlayer, instance, board[0][1], 0);
+        Piece whiteKnightQueenSide = new KnightPiece(whitePlayer, instance, board[0][6], 1);
 
-        Piece blackKnightKingSide = new KnightPiece(blackPlayer, instance, PieceColor.BLACK, board[7][1], 0);
-        Piece blackKnightQueenSide = new KnightPiece(blackPlayer, instance, PieceColor.BLACK, board[7][6], 1);
+        Piece blackKnightKingSide = new KnightPiece(blackPlayer, instance, board[7][1], 0);
+        Piece blackKnightQueenSide = new KnightPiece(blackPlayer, instance, board[7][6], 1);
 
-        Piece whiteBishopKingSide = new BishopPiece(whitePlayer, instance, PieceColor.WHITE, board[0][2], 0);
-        Piece whiteBishopQueenSide = new BishopPiece(whitePlayer, instance, PieceColor.WHITE, board[0][5], 1);
+        Piece whiteBishopKingSide = new BishopPiece(whitePlayer, instance, board[0][2], 0);
+        Piece whiteBishopQueenSide = new BishopPiece(whitePlayer, instance, board[0][5], 1);
 
-        Piece blackBishopKingSide = new BishopPiece(blackPlayer, instance, PieceColor.BLACK, board[7][5], 0);
-        Piece blackBishopQueenSide = new BishopPiece(blackPlayer, instance, PieceColor.BLACK, board[7][2], 1);
+        Piece blackBishopKingSide = new BishopPiece(blackPlayer, instance, board[7][5], 0);
+        Piece blackBishopQueenSide = new BishopPiece(blackPlayer, instance, board[7][2], 1);
 
-        Piece whiteQueen = new QueenPiece(whitePlayer, instance, PieceColor.WHITE, board[0][3]);
-        Piece blackQueen = new QueenPiece(blackPlayer, instance, PieceColor.BLACK, board[7][3]);
+        Piece whiteQueen = new QueenPiece(whitePlayer, instance, board[0][3]);
+        Piece blackQueen = new QueenPiece(blackPlayer, instance, board[7][3]);
 
-        Piece whitePawn0 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][0], 0);
-        Piece whitePawn1 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][1], 1);
-        Piece whitePawn2 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][2], 2);
-        Piece whitePawn3 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][3], 3);
-        Piece whitePawn4 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][4], 4);
-        Piece whitePawn5 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][5], 5);
-        Piece whitePawn6 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][6], 6);
-        Piece whitePawn7 = new PawnPiece(whitePlayer, instance, PieceColor.WHITE, board[1][7], 7);
+        Piece whitePawn0 = new PawnPiece(whitePlayer, instance, board[1][0], 0);
+        Piece whitePawn1 = new PawnPiece(whitePlayer, instance, board[1][1], 1);
+        Piece whitePawn2 = new PawnPiece(whitePlayer, instance, board[1][2], 2);
+        Piece whitePawn3 = new PawnPiece(whitePlayer, instance, board[1][3], 3);
+        Piece whitePawn4 = new PawnPiece(whitePlayer, instance, board[1][4], 4);
+        Piece whitePawn5 = new PawnPiece(whitePlayer, instance, board[1][5], 5);
+        Piece whitePawn6 = new PawnPiece(whitePlayer, instance, board[1][6], 6);
+        Piece whitePawn7 = new PawnPiece(whitePlayer, instance, board[1][7], 7);
 
-        Piece blackPawn0 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][0], 0);
-        Piece blackPawn1 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][1], 1);
-        Piece blackPawn2 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][2], 2);
-        Piece blackPawn3 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][3], 3);
-        Piece blackPawn4 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][4], 4);
-        Piece blackPawn5 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][5], 5);
-        Piece blackPawn6 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][6], 6);
-        Piece blackPawn7 = new PawnPiece(blackPlayer, instance, PieceColor.BLACK, board[6][7], 7);
+        Piece blackPawn0 = new PawnPiece(blackPlayer, instance, board[6][0], 0);
+        Piece blackPawn1 = new PawnPiece(blackPlayer, instance, board[6][1], 1);
+        Piece blackPawn2 = new PawnPiece(blackPlayer, instance, board[6][2], 2);
+        Piece blackPawn3 = new PawnPiece(blackPlayer, instance, board[6][3], 3);
+        Piece blackPawn4 = new PawnPiece(blackPlayer, instance, board[6][4], 4);
+        Piece blackPawn5 = new PawnPiece(blackPlayer, instance, board[6][5], 5);
+        Piece blackPawn6 = new PawnPiece(blackPlayer, instance, board[6][6], 6);
+        Piece blackPawn7 = new PawnPiece(blackPlayer, instance, board[6][7], 7);
 
-        Piece whiteKing = new KingPiece(whitePlayer, instance, PieceColor.WHITE, board[0][4], false);
-        Piece blackKing = new KingPiece(blackPlayer, instance, PieceColor.BLACK, board[7][4], false);
+        Piece whiteKing = new KingPiece(whitePlayer, instance, board[0][4]);
+        Piece blackKing = new KingPiece(blackPlayer, instance, board[7][4]);
 
         node = new BoardNode(instance, whitePlayer);
         currentNode = node;
@@ -317,8 +313,8 @@ public class Board implements MyObservable, Serializable {
                             // if opponent contains queen or rook, all tiles in this row/column with player's pieces in between king and
                             // queen/rook shouldn't be able to move so the next tiles can't affect, so break
                             allDirections.put(opponentPiece, currentTiles);
-                            break;
                         }
+                        break;
                     } else continue;
                 }
                 if (i == board.length - 1) allDirections.put(null, currentTiles);
@@ -347,8 +343,8 @@ public class Board implements MyObservable, Serializable {
                         Piece opponentPiece = currentTile.getPiece();
                         if (opponentPiece instanceof QueenPiece || opponentPiece instanceof BishopPiece) {
                             allDirections.put(opponentPiece, currentTiles);
-                            break;
                         }
+                        break;
                     } else continue;
                 }
                 if (i == board.length - 1) allDirections.put(null, currentTiles);
@@ -728,4 +724,61 @@ public class Board implements MyObservable, Serializable {
         printBoard();
         return "\n";
     }
+//    public void generateMovesWhenInCheckNew(Player player) {
+//        List<Move> actualLegalMoves = new ArrayList<>();
+//
+//
+//        List<Piece> whitePieces = new ArrayList<>(whitePlayer.getAlivePieces());
+//        List<Piece> blackPieces = new ArrayList<>(blackPlayer.getAlivePieces());
+//
+//        Map<Tile, Piece> tilePieceMap = new HashMap<>();
+//
+//        for (Piece piece : whitePieces) {
+//            tilePieceMap.put(piece.getCurrentTile(), piece);
+//        }
+//        for (Piece piece : blackPieces) {
+//            tilePieceMap.put(piece.getCurrentTile(), piece);
+//        }
+//
+//        for (Move move : new ArrayList<>(player.getMoves())) {
+//            boolean successfulMove = move.makeMove(false);
+//
+//            if (!successfulMove) continue;
+//            else updateObservers();
+//
+//            if (!player.isInCheck()) actualLegalMoves.add(move);
+//
+//            for (Tile[] tiles : board) {
+//                for (Tile tile : tiles) {
+//                    if (!tile.isEmpty()) {
+//                        tile.setPiece(null);
+//                    }
+//                    if (tilePieceMap.get(tile) != null) {
+//                        tile.setPiece(tilePieceMap.get(tile));
+//                    }
+//                }
+//            }
+//            updateObservers();
+//        }
+//
+//        if (actualLegalMoves.size() == 0) {
+//            gameSituation = checkmateSituations.get(player.getPlayerColor());
+//            return;
+//        }
+//
+////        player.getLegalMoves().clear();
+//        player.getAlivePieces().forEach(piece -> piece.getPossibleMoves().clear());
+//        player.getMoves().clear();
+//        player.getMoves().addAll(actualLegalMoves);
+//
+//        for (Move move : player.getMoves()) {
+//            Piece piece = move.getMovingPiece();
+//            Tile tile = move.getTargetTile();
+//
+//            piece.getPossibleMoves().add(tile);
+//        }
+//
+//        setCurrentPlayer(player);
+//    }
+
 }

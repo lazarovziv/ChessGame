@@ -30,10 +30,10 @@ public class PlayerTest {
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
         opponent.setOpponentPlayer(player);
-        pawnPiece = new PawnPiece(player, board, player.getPlayerColor(), board.getBoard()[5][3], 0);
-        bishopPiece = new BishopPiece(player, board, player.getPlayerColor(), board.getBoard()[1][0], 0);
-        opponentKingPiece = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][4], false);
-        opponentPawnPiece = new PawnPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[6][2], 0);
+        pawnPiece = new PawnPiece(player, board, board.getBoard()[5][3], 0);
+        bishopPiece = new BishopPiece(player, board, board.getBoard()[1][0], 0);
+        opponentKingPiece = new KingPiece(opponent, board, board.getBoard()[7][4]);
+        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[6][2], 0);
         board.checkBoard();
     }
 
@@ -48,7 +48,7 @@ public class PlayerTest {
 
     @Test
     public void testSaveAndLoadState() {
-        KingPiece kingPiece = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[1][4], false);
+        KingPiece kingPiece = new KingPiece(player, board, board.getBoard()[1][4]);
         System.out.println("Player pieces: ");
         for (Piece piece : player.getAlivePieces()) {
             System.out.println(piece.getName() + " - " + piece.getCurrentTile());
@@ -84,7 +84,7 @@ public class PlayerTest {
         if (player.movePiece(pawnPiece, board.getBoard()[6][2])) {
             board.checkBoard();
             board.printBoard();
-            player.undoLastMove();
+//            player.undoLastMove();
             board.printBoard();
         }
         opponentPawnPiece.getPossibleMoves().forEach(System.out::println);
