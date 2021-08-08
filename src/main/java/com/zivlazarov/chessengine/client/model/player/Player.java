@@ -15,12 +15,13 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Entity
 public class Player implements MyObserver, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @GeneratedValue
+    @Id @GeneratedValue
     private int id;
 
     private boolean isAI;
@@ -36,9 +37,11 @@ public class Player implements MyObserver, Serializable {
     private PieceColor playerColor;
 
 //    @OneToMany(targetEntity = Piece.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
+    @OneToMany(targetEntity = Piece.class, mappedBy = "player")
     private final List<Piece> alivePieces;
 
 //    @OneToMany(targetEntity = Piece.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
+    @OneToMany(targetEntity = Piece.class, mappedBy = "player")
     private final List<Piece> deadPieces;
 
     @Transient
@@ -91,6 +94,7 @@ public class Player implements MyObserver, Serializable {
         if (moves.size() != 0) moves.clear();
 
         for (Piece piece : alivePieces) {
+            piece.setIsInDanger(false);
             piece.refresh();
         }
     }
@@ -167,45 +171,16 @@ public class Player implements MyObserver, Serializable {
         return true;
     }
 
-    public void undoLastMove() {
-        Piece piece = new ArrayList<>(lastMove.keySet()).get(0);
-        Tile previousTile = lastMove.get(piece).getFirst();
-        Tile currentTile = lastMove.get(piece).getSecond();
-
-        Piece capturedPiece = null;
-
-        // getting last eaten piece
-        if (piece.getCapturedPieces().size() != 0) {
-            capturedPiece = piece.getLastPieceEaten();
-
-            // if eaten piece's last tile is the last move's previous tile, return the eaten piece to the game
-            // and place eaten piece in that tile while clearing the current piece from there
-            if (currentTile.equals(capturedPiece.getLastTile())) {
-                opponentPlayer.addPieceToAlive(capturedPiece);
-                piece.getCapturedPieces().remove(piece.getCapturedPieces().size() - 1);
-                clearTileFromPiece(currentTile);
-                capturedPiece.setCurrentTile(currentTile);
-            }
-        }
-        // if last tile is not empty then clear it and set piece to it's previous tile
-        if (!currentTile.isEmpty()) clearTileFromPiece(currentTile);
-        piece.setCurrentTile(previousTile);
-
-        board.setCurrentPlayer(this);
-
-        board.checkBoard();
-    }
-
     public Piece handlePawnPromotion(Piece piece, Tile tile) {
         if (piece.getPieceColor() == PieceColor.WHITE) {
             if (tile.getRow() == 7) {
                 addPieceToDead(piece);
-                piece = new QueenPiece(this, board, playerColor, tile);
+                piece = new QueenPiece(this, board, tile);
             }
         } else {
             if (tile.getRow() == 0) {
                 addPieceToDead(piece);
-                piece = new QueenPiece(this, board, playerColor, tile);
+                piece = new QueenPiece(this, board, tile);
             }
         }
         return piece;
@@ -226,10 +201,9 @@ public class Player implements MyObserver, Serializable {
     }
 
     public boolean handleKingSideCastling(Piece piece, Tile tile) {
-        if (!piece.hasMoved() && tile.equals(((KingPiece) piece).getKingSideCastleTile())
+        if (/*!piece.hasMoved() && */tile.equals(((KingPiece) piece).getKingSideCastleTile())
                 && getKingSideRookPiece() != null
                 && !getKingSideRookPiece().hasMoved()) {
-//                player.kingSideCastle((KingPiece) piece, (RookPiece) ((KingPiece) piece).getKingSideCastleTile().getPiece());
             // logging rook move
             RookPiece kingSideRookPiece = getKingSideRookPiece();
             kingSideRookPiece.getHistoryMoves().push(kingSideRookPiece.getKingSideCastlingTile());
@@ -245,10 +219,9 @@ public class Player implements MyObserver, Serializable {
     }
 
     public boolean handleQueenSideCastling(Piece piece, Tile tile) {
-        if (!piece.hasMoved() && tile.equals(((KingPiece) piece).getQueenSideCastleTile())
+        if (/*!piece.hasMoved() && */tile.equals(((KingPiece) piece).getQueenSideCastleTile())
                 && getQueenSideRookPiece() != null
                 && !getQueenSideRookPiece().hasMoved()) {
-//                player.queenSideCastle((KingPiece) piece, (RookPiece) ((KingPiece) piece).getQueenSideCastleTile().getPiece());
             // logging rook move
             RookPiece queenSideRookPiece = getQueenSideRookPiece();
             queenSideRookPiece.getHistoryMoves().push(queenSideRookPiece.getQueenSideCastlingTile());
@@ -265,21 +238,23 @@ public class Player implements MyObserver, Serializable {
     }
 
     public RookPiece getKingSideRookPiece() {
-        for (Piece piece : alivePieces) {
-            if (piece instanceof RookPiece) {
-                if (((RookPiece) piece).isKingSide()) return (RookPiece) piece;
-            }
-        }
-        return null;
+        return board.getKingSideRooksMap().get(this);
+//        for (Piece piece : alivePieces) {
+//            if (piece instanceof RookPiece) {
+//                if (((RookPiece) piece).isKingSide()) return (RookPiece) piece;
+//            }
+//        }
+//        return null;
     }
 
     public RookPiece getQueenSideRookPiece() {
-        for (Piece piece : alivePieces) {
-            if (piece instanceof RookPiece) {
-                if (((RookPiece) piece).isQueenSide()) return (RookPiece) piece;
-            }
-        }
-        return null;
+        return board.getQueenSideRooksMap().get(this);
+//        for (Piece piece : alivePieces) {
+//            if (piece instanceof RookPiece) {
+//                if (((RookPiece) piece).isQueenSide()) return (RookPiece) piece;
+//            }
+//        }
+//        return null;
     }
 
     public void addPieceToAlive(Piece piece) {
@@ -356,6 +331,10 @@ public class Player implements MyObserver, Serializable {
         return id;
     }
 
+    public void setId(int value) {
+        id = value;
+    }
+
     public boolean equals(Player other) {
         return playerColor == other.getPlayerColor();
     }
@@ -413,10 +392,6 @@ public class Player implements MyObserver, Serializable {
         }
     }
 
-    public void setId(int value) {
-        id = value;
-    }
-
     public void setPlayerScore(int playerScore) {
         this.playerScore = playerScore;
     }
@@ -466,7 +441,7 @@ public class Player implements MyObserver, Serializable {
     }
 
     public void restoreFromMemento(Memento<Board> memento) {
-
+        board = memento.getSavedState();
     }
 
     @Override
