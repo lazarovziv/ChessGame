@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.List;
 
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
@@ -35,8 +34,14 @@ public class BoardFrame {
     private final BoardPanel boardPanel;
     private static Board board;
 
-    private static final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
-    private static final Map<PieceColor, GameSituation> checkmateSituations = new HashMap<>();
+    private static final Map<PieceColor, GameSituation> checkSituations = Map.of(
+            PieceColor.WHITE, GameSituation.WHITE_IN_CHECK,
+            PieceColor.BLACK, GameSituation.BLACK_IN_CHECK
+    );
+    private static final Map<PieceColor, GameSituation> checkmateSituations = Map.of(
+            PieceColor.WHITE, GameSituation.WHITE_CHECKMATED,
+            PieceColor.BLACK, GameSituation.BLACK_CHECKMATED
+    );
 
     private static Player whitePlayer;
     private static Player blackPlayer;
@@ -136,7 +141,8 @@ public class BoardFrame {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
 
-//        playRandomly(1200);
+        board.printBoard();
+//        playRandomly(500);
     }
 
     public static void initGame(boolean loadGame) {
@@ -153,18 +159,11 @@ public class BoardFrame {
             whitePlayer.setOpponentPlayer(blackPlayer);
         }
 
-        checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
-        checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
-
-        checkmateSituations.put(PieceColor.WHITE, GameSituation.WHITE_CHECKMATED);
-        checkmateSituations.put(PieceColor.BLACK, GameSituation.BLACK_CHECKMATED);
-
         board.setWhitePlayer(whitePlayer);
         board.setBlackPlayer(blackPlayer);
 
-        board.initBoard();
-
         if (!loadGame) {
+            board.initBoard();
             board.setCurrentPlayer(whitePlayer);
         } else {
             if (whitePlayer.isCurrentPlayer()) board.setCurrentPlayer(whitePlayer);
@@ -180,8 +179,6 @@ public class BoardFrame {
                 board.getGameSituation() != GameSituation.STALEMATE) {
             try {
                 Thread.sleep(milliseconds);
-
-                Collections.shuffle((List<?>) board.getCurrentPlayer().getMoves());
 
                 int number = new Random().nextInt(board.getCurrentPlayer().getMoves().size());
 
@@ -216,7 +213,8 @@ public class BoardFrame {
                     break;
                 };
 
-                SwingUtilities.invokeLater(boardPanel::drawBoard);
+                SwingUtilities.invokeLater(() -> boardPanel.drawBoard(false));
+//                SwingUtilities.invokeLater(boardPanel::drawBoard);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -255,7 +253,7 @@ public class BoardFrame {
             validate();
         }
 
-        public void drawBoard() {
+        public void drawBoard(boolean showDialog) {
             removeAll();
 
             for (TilePanel tilePanel : tilePanels) {
@@ -265,7 +263,11 @@ public class BoardFrame {
             validate();
             repaint();
 
-            showDialogInSituation();
+            board.printBoard();
+
+            if (showDialog) {
+                showDialogInSituation();
+            }
         }
 
         public void showDialogInSituation() {
@@ -273,7 +275,7 @@ public class BoardFrame {
                     board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
                 ImageIcon icon = null;
                 try {
-                    BufferedImage image = ImageIO.read(new File(TilePanel.currentPath + "/src/"
+                    BufferedImage image = ImageIO.read(new File(TilePanel.currentPath + "/src/main/java/"
                             + board.getCurrentPlayer().getKing().getImageName()));
                     icon = new ImageIcon(image);
                 } catch (IOException e) {
@@ -389,6 +391,14 @@ public class BoardFrame {
                                             .build();
 
                                     move.makeMove(true);
+
+                                    if (move.getLabel() == null) {
+                                        System.out.println(board.getCurrentPlayer().getName() + " has executed a regular move");
+                                    } else if (move.getLabel().equals("En Passant")) {
+                                        System.out.println(board.getCurrentPlayer().getName() + " has executed an " + move.getLabel());
+                                    } else {
+                                        System.out.println(board.getCurrentPlayer().getName() + " has executed a " + move.getLabel());
+                                    }
                                 }
 
                                 sourceTile = null;
@@ -399,7 +409,8 @@ public class BoardFrame {
                                     boardPanel.tilePanelMap.get(markedTile).setBackground(tileColorMap.get(markedTile.getTileColor()));
                                 }
 
-                                SwingUtilities.invokeLater(boardPanel::drawBoard);
+                                SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
+//                                SwingUtilities.invokeLater(boardPanel::drawBoard);
                             }
                         }
                         // right clicking resets chosen piece/tile

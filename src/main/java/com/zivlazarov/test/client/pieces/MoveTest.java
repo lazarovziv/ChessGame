@@ -31,10 +31,10 @@ public class MoveTest {
         player.setOpponentPlayer(opponent);
 
         board.setCurrentPlayer(player);
-        Piece king = new KingPiece(player, board, player.getPlayerColor(), board.getBoard()[5][5], true);
-        Piece oKing = new KingPiece(opponent, board, opponent.getPlayerColor(), board.getBoard()[7][7], true);
-        pawnPiece = new PawnPiece(player, board, PieceColor.WHITE, board.getBoard()[1][2], 0);
-        opponentPawnPiece = new PawnPiece(opponent, board, PieceColor.BLACK, board.getBoard()[2][3], 0);
+        Piece king = new KingPiece(player, board, board.getBoard()[5][5]);
+        Piece oKing = new KingPiece(opponent, board, board.getBoard()[7][7]);
+        pawnPiece = new PawnPiece(player, board, board.getBoard()[1][2], 0);
+        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[2][3], 0);
 
         board.checkBoard();
     }

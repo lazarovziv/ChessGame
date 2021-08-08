@@ -3,9 +3,7 @@ package com.zivlazarov.chessengine.client.model.ai;
 import com.zivlazarov.chessengine.client.model.board.Board;
 import com.zivlazarov.chessengine.client.model.board.GameSituation;
 import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.board.Tile;
 import com.zivlazarov.chessengine.client.model.move.Move;
-import com.zivlazarov.chessengine.client.model.pieces.Piece;
 import com.zivlazarov.chessengine.client.model.player.Player;
 
 import java.util.ArrayList;
@@ -102,44 +100,6 @@ public class Minimax {
 
                 beta = Math.min(beta, value);
                 if (value <= alpha) break;
-            }
-        }
-        return value;
-    }
-
-    public int search1(Board board, int depth, int alpha, int beta, boolean isMaximizing) {
-        if (depth == 0 || board.getGameSituation() == GameSituation.BLACK_CHECKMATED
-                || board.getGameSituation() == GameSituation.WHITE_CHECKMATED) return board.evaluateBoard();
-
-        int value;
-
-        if (isMaximizing) {
-            value = Integer.MIN_VALUE;
-
-            for (Piece piece : board.getCurrentPlayer().getAlivePieces()) {
-                Collections.shuffle(piece.getPossibleMoves());
-                for (Tile tile : new ArrayList<>(piece.getPossibleMoves())) {
-                    board.getCurrentPlayer().movePiece(piece, tile);
-                    value = Math.max(value, search1(board, depth - 1, alpha, beta,  false));
-                    board.getCurrentPlayer().undoLastMove();
-
-                    alpha = Math.max(alpha, value);
-                    if (value >= beta) break;
-                }
-            }
-        } else {
-            value = Integer.MAX_VALUE;
-
-            for (Piece piece : board.getCurrentPlayer().getAlivePieces()) {
-                Collections.shuffle(piece.getPossibleMoves());
-                for (Tile tile : new ArrayList<>(piece.getPossibleMoves())) {
-                    board.getCurrentPlayer().movePiece(piece, tile);
-                    value = Math.min(value, search1(board, depth - 1, alpha, beta,  false));
-                    board.getCurrentPlayer().undoLastMove();
-
-                    beta = Math.min(beta, value);
-                    if (value <= alpha) break;
-                }
             }
         }
         return value;
