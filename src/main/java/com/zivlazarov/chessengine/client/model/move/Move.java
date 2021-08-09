@@ -36,7 +36,8 @@ public class Move implements Serializable {
     }
 
     public boolean makeMove(boolean checkBoard) {
-        if (player.getMoves().stream().noneMatch(move -> move.equals(this))) return false;
+        if (player.getMoves().size() == 0) return false;
+//        if (player.getMoves().stream().noneMatch(move -> move.equals(this))) return false;
 //        if (!movingPiece.getPossibleMoves().contains(targetTile)) return false;
 //        if (!player.getLegalMoves().contains(targetTile)) return false;
 //        if (!player.getMoves().contains(this)) return false;
@@ -106,6 +107,8 @@ public class Move implements Serializable {
         Tile previousTile = movingPiece.getLastTile();
         Tile currentTile = movingPiece.getCurrentTile();
 
+        if (currentTile == null) return;
+
         Piece capturedPiece;
 
         // getting last captured piece
@@ -115,6 +118,11 @@ public class Move implements Serializable {
             // if CAPTURED piece's last tile is the last move's previous tile, return the CAPTURED piece to the game
             // and place CAPTURED piece in that tile while clearing the CAPTURING piece from there
             if (currentTile.equals(capturedPiece.getLastTile())) {
+                // order of things:
+                // 1. set capturing piece back to previous tile
+                // 2. remove captured piece from deadPieces
+                // 3. set captured piece in it's previous tile
+
                 // adding the CAPTURED piece to the game
                 player.getOpponentPlayer().addPieceToAlive(capturedPiece);
                 // removing the CAPTURED piece from capturing piece's capturedPieces list
@@ -129,6 +137,7 @@ public class Move implements Serializable {
             // no capturing involved in last move
         } else {
             // if last tile is not empty then clear it and set piece to it's previous tile
+//            if (currentTile != null) {}
             if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
             movingPiece.setCurrentTile(previousTile);
         }
