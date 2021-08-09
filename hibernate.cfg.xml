@@ -40,7 +40,6 @@
         <mapping class="com.zivlazarov.chessengine.client.model.pieces.PawnPiece" />
         <mapping class="com.zivlazarov.chessengine.client.model.pieces.QueenPiece" />
         <mapping class="com.zivlazarov.chessengine.client.model.pieces.RookPiece" />
-        <mapping class="com.zivlazarov.chessengine.client.model.move.Move" />
         <mapping class="com.zivlazarov.chessengine.client.model.board.Tile" />
 
     </session-factory>
