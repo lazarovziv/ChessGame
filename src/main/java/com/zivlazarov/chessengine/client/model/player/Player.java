@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
+@Table(name = "player")
 public class Player implements MyObserver, Serializable {
 
     @Serial
@@ -24,16 +25,22 @@ public class Player implements MyObserver, Serializable {
     @Id @GeneratedValue
     private int id;
 
+    @Column(name = "isAI")
     private boolean isAI;
 
+    @Column(name = "isCurrentPlayer")
     private boolean isCurrentPlayer;
 
+    @Column(name = "name")
     private String name;
 
+    @Column(name = "playerDirection")
     private int playerDirection;
 
+    @Column(name = "playerScore")
     private int playerScore = 0;
 
+    @Column(name = "playerColor")
     private PieceColor playerColor;
 
 //    @OneToMany(targetEntity = Piece.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
