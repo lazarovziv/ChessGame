@@ -34,6 +34,7 @@ public abstract class Piece implements Cloneable, Serializable {
     protected PieceColor pieceColor;
 
 //    @OneToMany(targetEntity = Tile.class, mappedBy = "piece")
+    // TODO: change type to List
     @Transient
     protected final Stack<Tile> historyMoves = new Stack<>();
 
