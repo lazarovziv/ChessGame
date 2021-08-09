@@ -19,7 +19,7 @@ public class MoveDao implements Dao {
         int tileID = move.getTargetTile().getId();
         int playerID = move.getPlayer().getId();
 
-        move.setId(pieceID * move.getPlayer().getPlayerDirection() * playerID);
+//        move.setId(pieceID * move.getPlayer().getPlayerDirection() * playerID);
         int id = move.getId();
 
         try {
