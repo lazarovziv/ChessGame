@@ -5,10 +5,9 @@ import com.zivlazarov.chessengine.client.model.board.Tile;
 import com.zivlazarov.chessengine.client.model.move.Move;
 import com.zivlazarov.chessengine.client.model.player.Player;
 
-//import javafx.scene.image.ImageView;
+import javax.persistence.Entity;
 
-//import static com.zivlazarov.chessengine.client.ui.Game.createImageView;
-
+@Entity
 public class KnightPiece extends Piece implements Cloneable {
 
     public KnightPiece(Player player, Board board, Tile initTile, int pieceCounter) {

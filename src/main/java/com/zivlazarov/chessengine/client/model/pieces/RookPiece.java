@@ -5,6 +5,9 @@ import com.zivlazarov.chessengine.client.model.board.Tile;
 import com.zivlazarov.chessengine.client.model.move.Move;
 import com.zivlazarov.chessengine.client.model.player.Player;
 
+import javax.persistence.Entity;
+
+@Entity
 public class RookPiece extends Piece implements Cloneable {
 
     private Tile kingSideCastlingTile;

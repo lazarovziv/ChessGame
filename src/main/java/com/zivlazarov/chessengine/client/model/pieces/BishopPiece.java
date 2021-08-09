@@ -6,7 +6,9 @@ import com.zivlazarov.chessengine.client.model.board.Tile;
 import com.zivlazarov.chessengine.client.model.move.Move;
 import com.zivlazarov.chessengine.client.model.player.Player;
 
-//@Entity
+import javax.persistence.Entity;
+
+@Entity
 public class BishopPiece extends Piece implements Cloneable {
 
     public BishopPiece(Player player, Board board, Tile initTile, int pieceCounter) {

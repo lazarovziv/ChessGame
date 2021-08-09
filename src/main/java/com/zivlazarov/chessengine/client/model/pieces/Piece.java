@@ -14,6 +14,7 @@ import java.util.*;
 // worst case scenario, revert this back to an interface and apply it on all pieces
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Table(name = "piece")
 public abstract class Piece implements Cloneable, Serializable {
 
     @Serial
@@ -32,7 +33,8 @@ public abstract class Piece implements Cloneable, Serializable {
 
     protected PieceColor pieceColor;
 
-    @OneToMany(targetEntity = Tile.class, mappedBy = "piece")
+//    @OneToMany(targetEntity = Tile.class, mappedBy = "piece")
+    @Transient
     protected final Stack<Tile> historyMoves = new Stack<>();
 
     protected int value;
@@ -45,6 +47,7 @@ public abstract class Piece implements Cloneable, Serializable {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "last_tile_id", referencedColumnName = "id")
+    @Transient
     protected Tile lastTile;
 
     protected String imageName;

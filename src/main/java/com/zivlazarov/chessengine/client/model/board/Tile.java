@@ -1,7 +1,5 @@
 package com.zivlazarov.chessengine.client.model.board;
 
-//import javafx.scene.image.ImageView;
-
 import com.zivlazarov.chessengine.client.model.pieces.Piece;
 import javafx.scene.image.ImageView;
 
@@ -11,6 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
+@Table(name = "tile")
 public class Tile implements Serializable {
 
 	@Serial
@@ -32,7 +31,6 @@ public class Tile implements Serializable {
 
 	private boolean isThreatenedByWhite;
 
-	@OneToOne(mappedBy = "piece")
 	private Piece piece;
 
 	@Transient

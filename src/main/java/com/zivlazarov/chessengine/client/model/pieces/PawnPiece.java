@@ -7,18 +7,17 @@ import com.zivlazarov.chessengine.client.model.move.Move;
 import com.zivlazarov.chessengine.client.model.player.Player;
 import com.zivlazarov.chessengine.client.model.utils.Pair;
 
-import java.util.*;
+import javax.persistence.Entity;
+import java.util.HashMap;
+import java.util.Map;
 
-//import static com.zivlazarov.chessengine.client.ui.Game.createImageView;
-
+@Entity
 public class PawnPiece extends Piece implements Cloneable {
 
     private boolean executedEnPassant = false;
 
     private Tile enPassantTile;
 
-    // add enPassant field
-    // TODO: add value to each piece
     public PawnPiece(Player player, Board board, Tile initTile, int pieceCounter) {
         super();
 
