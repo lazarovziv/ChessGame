@@ -1,11 +1,11 @@
 package com.zivlazarov.test.client.pieces;
 
-import com.zivlazarov.chessengine.client.model.pieces.PawnPiece;
-import com.zivlazarov.chessengine.client.model.pieces.QueenPiece;
-import com.zivlazarov.chessengine.client.model.board.Board;
-import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.board.Tile;
-import com.zivlazarov.chessengine.client.model.player.Player;
+import com.zivlazarov.chessengine.model.pieces.PawnPiece;
+import com.zivlazarov.chessengine.model.pieces.QueenPiece;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class QueenPieceTest {
 
     @BeforeAll
     public static void setup() {
-        board = Board.getInstance();
+        board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         queenPiece = new QueenPiece(player, board, board.getBoard()[3][3]);

@@ -1,11 +1,12 @@
 package com.zivlazarov.test.client.pieces;
 
-import com.zivlazarov.chessengine.client.model.board.Tile;
-import com.zivlazarov.chessengine.client.model.pieces.*;
-import com.zivlazarov.chessengine.client.model.board.Board;
-import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.player.Player;
-import com.zivlazarov.chessengine.client.model.utils.Memento;
+import com.google.gson.Gson;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.model.utils.PipedDeepCopy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,12 +29,13 @@ public class BoardTest {
 
     @BeforeAll
     public static void setup() {
-        board = Board.getInstance();
+        board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponentPlayer(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
+        board.initBoard();
         board.setCurrentPlayer(opponent);
 //        rookPiece = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][7], false, 0);
 //        rookPiece1 = new RookPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0], true, 1);
@@ -92,31 +94,6 @@ public class BoardTest {
     }
 
     @Test
-    public void testMemento() {
-        board.printBoard();
-        Memento<Board> boardMemento = board.saveToMemento();
-        Memento<Player> playerMemento = player.saveToMemento();
-        player.movePiece(kingPiece, board.getBoard()[0][3]);
-        board.printBoard();
-        board.restoreFromMemento(boardMemento);
-        board.printBoard();
-
-    }
-
-    @Test
-    public void testStalemate() {
-        Piece kingPiece = new KingPiece(player, board, board.getBoard()[7][7]);
-        Piece opponentKingPiece = new KingPiece(opponent, board, board.getBoard()[6][4]);
-        Piece opponentQueenPiece = new QueenPiece(opponent, board, board.getBoard()[5][6]);
-        board.printBoard();
-        board.checkBoard();
-//        opponentKingPiece.getMoves().get(3).makeMove(true);
-        board.printBoard();
-        System.out.println(board.getGameSituation());
-        player.getMoves().forEach(System.out::println);
-    }
-
-    @Test
     public void testCalculatePotentialDangerForKing() {
         Piece kingPiece = new KingPiece(player, board, board.getBoard()[3][3]);
         Piece pawnPiece = new PawnPiece(player, board, board.getBoard()[3][4], 0);
@@ -135,5 +112,131 @@ public class BoardTest {
             map.get(piece).forEach(System.out::println);
         }
 //        player.getMoves().forEach(System.out::println);
+    }
+
+    @Test
+    public void testSaveBoard() {
+        Gson gson = new Gson();
+        board.printBoard();
+        Board boardCopy = gson.fromJson(gson.toJson(board), Board.class);
+        Assertions.assertNotSame(board, boardCopy);
+    }
+
+    @Test
+    public void testPipedDeepCopy() {
+        Board copy = (Board) PipedDeepCopy.copy(board);
+        board.printBoard();
+        copy.printBoard();
+
+        Assertions.assertNotEquals(copy, board);
+    }
+
+    @Test
+    public void testDraw() {
+        Board b = new Board();
+        Player whitePlayer;
+        Player blackPlayer;
+
+        whitePlayer = new Player(PieceColor.WHITE);
+        blackPlayer = new Player(PieceColor.BLACK);
+
+        whitePlayer.setName("Ziv");
+        blackPlayer.setName("Guy");
+
+        whitePlayer.setAI(false);
+        blackPlayer.setAI(false);
+
+        whitePlayer.setOpponentPlayer(blackPlayer);
+
+        b.setWhitePlayer(whitePlayer);
+        b.setBlackPlayer(blackPlayer);
+
+        whitePlayer.setBoard(b);
+        blackPlayer.setBoard(b);
+
+        b.setCurrentPlayer(whitePlayer);
+
+        Piece whiteKing = new KingPiece(whitePlayer, b, b.getBoard()[0][4]);
+        Piece blackKing = new KingPiece(blackPlayer, b, b.getBoard()[7][4]);
+        Piece whiteBishop = new BishopPiece(whitePlayer, b, b.getBoard()[0][2], 0);
+        Piece blackBishop = new BishopPiece(blackPlayer, b, b.getBoard()[7][2], 0);
+
+        b.checkBoard();
+
+        b.printBoard();
+
+        System.out.println(b.getGameSituation());
+    }
+
+    @Test
+    public void testStalemateCase0() {
+        Board b = new Board();
+        Player whitePlayer;
+        Player blackPlayer;
+
+        whitePlayer = new Player(PieceColor.WHITE);
+        blackPlayer = new Player(PieceColor.BLACK);
+
+        whitePlayer.setName("Ziv");
+        blackPlayer.setName("Guy");
+
+        whitePlayer.setAI(false);
+        blackPlayer.setAI(false);
+
+        whitePlayer.setOpponentPlayer(blackPlayer);
+
+        b.setWhitePlayer(whitePlayer);
+        b.setBlackPlayer(blackPlayer);
+
+        whitePlayer.setBoard(b);
+        blackPlayer.setBoard(b);
+
+        b.setCurrentPlayer(whitePlayer);
+
+        Piece whiteKing = new KingPiece(whitePlayer, b, b.getBoard()[0][0]);
+        Piece blackKing = new KingPiece(blackPlayer, b, b.getBoard()[2][2]);
+        Piece blackRook = new RookPiece(blackPlayer, b, b.getBoard()[1][1], 0);
+
+        b.checkBoard();
+
+        b.printBoard();
+
+        System.out.println(b.getGameSituation());
+    }
+
+    @Test
+    public void testStalemateCase1() {
+        Board b = new Board();
+        Player whitePlayer;
+        Player blackPlayer;
+
+        whitePlayer = new Player(PieceColor.WHITE);
+        blackPlayer = new Player(PieceColor.BLACK);
+
+        whitePlayer.setName("Ziv");
+        blackPlayer.setName("Guy");
+
+        whitePlayer.setAI(false);
+        blackPlayer.setAI(false);
+
+        whitePlayer.setOpponentPlayer(blackPlayer);
+
+        b.setWhitePlayer(whitePlayer);
+        b.setBlackPlayer(blackPlayer);
+
+        whitePlayer.setBoard(b);
+        blackPlayer.setBoard(b);
+
+        b.setCurrentPlayer(whitePlayer);
+
+        Piece whiteKing = new KingPiece(whitePlayer, b, b.getBoard()[0][5]);
+        Piece blackKing = new KingPiece(blackPlayer, b, b.getBoard()[2][5]);
+        Piece blackRook = new PawnPiece(blackPlayer, b, b.getBoard()[1][5], 0);
+
+        b.checkBoard();
+
+        b.printBoard();
+
+        System.out.println(b.getGameSituation());
     }
 }
