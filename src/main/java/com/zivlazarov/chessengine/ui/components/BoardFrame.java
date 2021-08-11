@@ -1,14 +1,16 @@
-package com.zivlazarov.chessengine.client.ui.components;
+package com.zivlazarov.chessengine.ui.components;
 
-import com.zivlazarov.chessengine.client.db.MoveDao;
-import com.zivlazarov.chessengine.client.db.PieceDao;
-import com.zivlazarov.chessengine.client.db.PlayerDao;
-import com.zivlazarov.chessengine.client.db.TileDao;
-import com.zivlazarov.chessengine.client.model.board.*;
-import com.zivlazarov.chessengine.client.model.move.Move;
-import com.zivlazarov.chessengine.client.model.pieces.Piece;
-import com.zivlazarov.chessengine.client.model.pieces.RookPiece;
-import com.zivlazarov.chessengine.client.model.player.Player;
+import com.zivlazarov.chessengine.db.dao.MoveDao;
+import com.zivlazarov.chessengine.db.dao.PieceDao;
+import com.zivlazarov.chessengine.db.dao.PlayerDao;
+import com.zivlazarov.chessengine.db.dao.TileDao;
+import com.zivlazarov.chessengine.model.board.*;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.move.MoveLabel;
+import com.zivlazarov.chessengine.model.pieces.Piece;
+import com.zivlazarov.chessengine.model.pieces.RookPiece;
+import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.ui.utils.Utilities;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -20,11 +22,12 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.*;
 
+import static com.zivlazarov.chessengine.model.move.MoveLabel.EN_PASSANT;
+import static com.zivlazarov.chessengine.ui.utils.Utilities.createImageIcon;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
@@ -32,6 +35,12 @@ public class BoardFrame {
 
     private final JFrame gameFrame;
     private final BoardPanel boardPanel;
+    private final SidePanel whiteSidePanel;
+    private final SidePanel blackSidePanel;
+    private final SidePanel movesSidePanel;
+
+    private final Map<Player, SidePanel> playerSidePanelMap;
+
     private static Board board;
 
     private static final Map<PieceColor, GameSituation> checkSituations = Map.of(
@@ -51,9 +60,7 @@ public class BoardFrame {
     private static Piece playerPiece;
 
     public BoardFrame() {
-        board = Board.getInstance();
-
-        initGame(false);
+        initGame();
 
         PlayerDao playerDao = new PlayerDao();
         MoveDao moveDao = new MoveDao();
@@ -64,6 +71,14 @@ public class BoardFrame {
         gameFrame.setUndecorated(true);
         gameFrame.setLayout(new BorderLayout());
         boardPanel = new BoardPanel(board);
+        whiteSidePanel = new SidePanel();
+        blackSidePanel = new SidePanel();
+        movesSidePanel = new SidePanel();
+
+        playerSidePanelMap  = Map.of(
+                whitePlayer, whiteSidePanel,
+                blackPlayer, blackSidePanel
+        );
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Options");
@@ -133,50 +148,48 @@ public class BoardFrame {
 
         gameFrame.setJMenuBar(menuBar);
 
-        gameFrame.setSize(600, 600);
+        gameFrame.setSize(725, 600);
         gameFrame.add(boardPanel, BorderLayout.CENTER);
+//        gameFrame.add(whiteSidePanel, BorderLayout.WEST);
+//        gameFrame.add(blackSidePanel, BorderLayout.EAST);
+        gameFrame.add(movesSidePanel, BorderLayout.WEST);
         gameFrame.setVisible(true);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // setting window in center
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
 
-        board.printBoard();
-//        playRandomly(500);
+//        playRandomly(100);
     }
 
-    public static void initGame(boolean loadGame) {
-        if (!loadGame) {
-            whitePlayer = new Player(board, PieceColor.WHITE);
-            blackPlayer = new Player(board, PieceColor.BLACK);
+    public static void initGame() {
+        whitePlayer = new Player(PieceColor.WHITE);
+        blackPlayer = new Player(PieceColor.BLACK);
 
-            whitePlayer.setName("Ziv");
-            blackPlayer.setName("Guy");
+        whitePlayer.setName("Ziv");
+        blackPlayer.setName("Guy");
 
-            whitePlayer.setAI(false);
-            blackPlayer.setAI(false);
+        whitePlayer.setAI(false);
+        blackPlayer.setAI(false);
 
-            whitePlayer.setOpponentPlayer(blackPlayer);
-        }
+        whitePlayer.setOpponentPlayer(blackPlayer);
+
+        board = new Board();
 
         board.setWhitePlayer(whitePlayer);
         board.setBlackPlayer(blackPlayer);
 
-        if (!loadGame) {
-            board.initBoard();
-            board.setCurrentPlayer(whitePlayer);
-        } else {
-            if (whitePlayer.isCurrentPlayer()) board.setCurrentPlayer(whitePlayer);
-            else board.setCurrentPlayer(blackPlayer);
-        }
+        whitePlayer.setBoard(board);
+        blackPlayer.setBoard(board);
 
+        board.setCurrentPlayer(whitePlayer);
+
+        board.initBoard();
         board.checkBoard();
     }
 
     public void playRandomly(long milliseconds) {
-        while (board.getGameSituation() != GameSituation.BLACK_CHECKMATED ||
-                board.getGameSituation() != GameSituation.WHITE_CHECKMATED ||
-                board.getGameSituation() != GameSituation.STALEMATE) {
+        while (board.canContinueGame()) {
             try {
                 Thread.sleep(milliseconds);
 
@@ -184,19 +197,17 @@ public class BoardFrame {
 
                 Iterator<Move> iterator = board.getCurrentPlayer().getMoves().iterator();
                 Move move = iterator.next();
-//                Move move = board.getCurrentPlayer().getMoves().get(number);
-                System.out.println(board.getCurrentPlayer());
-                System.out.println(move.getMovingPiece().getCurrentTile() + " -> " + move.getTargetTile());
+
                 move.makeMove(true);
-                board.printBoard();
+
                 System.out.println(board.getGameSituation());
-                if (board.getGameSituation() == GameSituation.STALEMATE || board.getGameSituation() == GameSituation.BLACK_CHECKMATED ||
-                board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
-                    if (board.getGameSituation() == GameSituation.BLACK_CHECKMATED ||
-                            board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
+
+                if (!board.canContinueGame()) {
+                        Thread.currentThread().interrupt();
                         ImageIcon icon = null;
                         try {
-                            BufferedImage image = ImageIO.read(new File(TilePanel.currentPath + "/src/" + whitePlayer.getKing().getImageName()));
+                            BufferedImage image = ImageIO.read(new File(Utilities.currentPath +
+                                    "/src/" + whitePlayer.getKing().getImageName()));
                             icon = new ImageIcon(image);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -206,10 +217,9 @@ public class BoardFrame {
                                 JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, icon, options, options[1]);
                         if (answer == 1) {
                             gameFrame.dispose();
-                            board.resetBoard();
+//                            board.resetBoard();
                             new BoardFrame();
                         } else System.exit(1);
-                    }
                     break;
                 };
 
@@ -223,8 +233,40 @@ public class BoardFrame {
 
     private void restartGame() {
         gameFrame.dispose();
-        board.resetBoard();
+//        board.resetBoard();
         new BoardFrame();
+    }
+
+    private class SidePanel extends JPanel {
+
+        SidePanel() {
+            super(new GridLayout(50, 1));
+
+//            setBackground(Color.BLACK);
+
+            setPreferredSize(new Dimension(125, 350));
+            validate();
+        }
+
+        private void drawMoves() {
+            removeAll();
+
+            validate();
+            repaint();
+
+            List<JLabel> labels = new ArrayList<>();
+
+            for (Move move : board.getMatchPlays()) {
+                labels.add(new JLabel(move.toString()));
+            }
+
+            for (JLabel label : labels) {
+                add(label);
+            }
+
+            validate();
+            repaint();
+        }
     }
 
     private class BoardPanel extends JPanel {
@@ -260,10 +302,9 @@ public class BoardFrame {
                 tilePanel.drawTile();
                 add(tilePanel);
             }
+            // redraw side panels
             validate();
             repaint();
-
-            board.printBoard();
 
             if (showDialog) {
                 showDialogInSituation();
@@ -275,7 +316,7 @@ public class BoardFrame {
                     board.getGameSituation() == GameSituation.WHITE_CHECKMATED) {
                 ImageIcon icon = null;
                 try {
-                    BufferedImage image = ImageIO.read(new File(TilePanel.currentPath + "/src/main/java/"
+                    BufferedImage image = ImageIO.read(new File(Utilities.currentPath + "/src/main/java/"
                             + board.getCurrentPlayer().getKing().getImageName()));
                     icon = new ImageIcon(image);
                 } catch (IOException e) {
@@ -286,7 +327,7 @@ public class BoardFrame {
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, icon, options, options[1]);
                 if (answer == 1) {
                     gameFrame.dispose();
-                    board.resetBoard();
+//                    board.resetBoard();
                     new BoardFrame();
                 } else System.exit(1);
             } else if (board.getGameSituation() == GameSituation.BLACK_IN_CHECK ||
@@ -321,9 +362,6 @@ public class BoardFrame {
 
         private static final Map<TileColor, Color> tileColorMap = Map.of(TileColor.WHITE, whiteTileColor,
                 TileColor.BLACK, blackTileColor);
-
-        private static final Path path = Paths.get("");
-        private static final String currentPath = path.toAbsolutePath().toString();
 
         private static ArrayList<Tile> markedTiles;
 
@@ -392,12 +430,12 @@ public class BoardFrame {
 
                                     move.makeMove(true);
 
-                                    if (move.getLabel() == null) {
-                                        System.out.println(board.getCurrentPlayer().getName() + " has executed a regular move");
-                                    } else if (move.getLabel().equals("En Passant")) {
-                                        System.out.println(board.getCurrentPlayer().getName() + " has executed an " + move.getLabel());
+                                    if (move.getLabel() == MoveLabel.REGULAR) {
+                                        System.out.println(move.getPlayer().getName() + " has executed a regular move");
+                                    } else if (move.getLabel() == EN_PASSANT) {
+                                        System.out.println(move.getPlayer().getName() + " has executed an " + move.getLabel());
                                     } else {
-                                        System.out.println(board.getCurrentPlayer().getName() + " has executed a " + move.getLabel());
+                                        System.out.println(move.getPlayer().getName() + " has executed a " + move.getLabel());
                                     }
                                 }
 
@@ -410,6 +448,7 @@ public class BoardFrame {
                                 }
 
                                 SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
+                                SwingUtilities.invokeLater(movesSidePanel::drawMoves);
 //                                SwingUtilities.invokeLater(boardPanel::drawBoard);
                             }
                         }
@@ -506,30 +545,11 @@ public class BoardFrame {
 
                 }
             });
-//            } else if (board.getCurrentPlayer().isAI()) {
-//                Move move = board.getCurrentPlayer().calculateNextMove(new Minimax(), 6);
-//                System.out.println(move);
-//                move.makeMove();
-//
-//                board.checkBoard(board.getCurrentPlayer());
-//
-//                System.out.println(board.getGameSituation());
-//
-//                System.out.println();
-//                System.out.println(
-//                        board.getGameHistoryMoves().lastElement().getFirst().getName()
-//                                + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
-//
-//                SwingUtilities.invokeLater(boardPanel::drawBoard);
-//            }
 
             validate();
         }
 
         public void drawTile() {
-
-//            if (tile.getTileColor() == TileColor.WHITE) setBackground(whiteTileColor);
-//            else setBackground(blackTileColor);
 
             removeAll();
 
@@ -541,49 +561,12 @@ public class BoardFrame {
             removeAll();
 
             if (!tile.isEmpty()) {
-                add(new JLabel(createImageIcon(tile.getPiece())));
+                if (tile.getPiece().isAlive())
+                    add(new JLabel(createImageIcon(tile.getPiece())));
             }
 
             validate();
             repaint();
         }
-
-        private ImageIcon createImageIcon(Piece piece) {
-            if (piece != null) {
-                try {
-                    BufferedImage image = ImageIO.read(new File(currentPath + "/src/main/java/" + piece.getImageName()));
-                    return new ImageIcon(image);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-//        @Override
-//        public void paintComponent(Graphics g){
-//            super.paintComponent(g);
-//            g.setColor(Color.BLACK);
-//
-//            if(drawPossibleMoves) {
-//                g.fillOval(tile.getRow() + (this.getSize().width / 2), tile.getCol() + (this.getSize().height / 2), 30, 30);
-//                g.setColor(Color.BLACK);
-//                g.drawOval(tile.getRow() + (this.getSize().width / 2), tile.getCol() + (this.getSize().height / 2), 30, 30);
-//            }
-//            validate();
-////            repaint();
-//        }
-
-//        @Override
-//        public void paint(Graphics g) {
-//            super.paint(g);
-//            int x = tile.getRow() - (5 / 2);
-//            int y = tile.getCol() - (5 / 2);
-//
-//            g.setColor(tileColorMap.get(tile.getTileColor()));
-//            g.fillOval(x, y, 5, 5);
-//            g.setColor(Color.LIGHT_GRAY);
-//            g.drawOval(x, y, 5, 5);
-//        }
     }
 }
