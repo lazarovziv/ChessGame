@@ -38,6 +38,7 @@ public class BoardFrame {
     private final SidePanel whiteSidePanel;
     private final SidePanel blackSidePanel;
     private final SidePanel movesSidePanel;
+    private final SidePanel capturedPiecesPanel;
 
     private final Map<Player, SidePanel> playerSidePanelMap;
 
@@ -73,7 +74,12 @@ public class BoardFrame {
         boardPanel = new BoardPanel(board);
         whiteSidePanel = new SidePanel();
         blackSidePanel = new SidePanel();
+
         movesSidePanel = new SidePanel();
+        movesSidePanel.setLayout(new GridLayout(50, 1));
+
+        capturedPiecesPanel = new SidePanel();
+        capturedPiecesPanel.setLayout(new GridLayout(8, 2));
 
         playerSidePanelMap  = Map.of(
                 whitePlayer, whiteSidePanel,
@@ -148,11 +154,12 @@ public class BoardFrame {
 
         gameFrame.setJMenuBar(menuBar);
 
-        gameFrame.setSize(725, 600);
+        gameFrame.setSize(850, 600);
         gameFrame.add(boardPanel, BorderLayout.CENTER);
 //        gameFrame.add(whiteSidePanel, BorderLayout.WEST);
 //        gameFrame.add(blackSidePanel, BorderLayout.EAST);
         gameFrame.add(movesSidePanel, BorderLayout.WEST);
+        gameFrame.add(capturedPiecesPanel, BorderLayout.EAST);
         gameFrame.setVisible(true);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // setting window in center
@@ -240,7 +247,7 @@ public class BoardFrame {
     private class SidePanel extends JPanel {
 
         SidePanel() {
-            super(new GridLayout(50, 1));
+//            super(new GridLayout(50, 1));
 
 //            setBackground(Color.BLACK);
 
@@ -263,6 +270,28 @@ public class BoardFrame {
             for (JLabel label : labels) {
                 add(label);
             }
+
+            validate();
+            repaint();
+        }
+
+        private void drawPiece() {
+            removeAll();
+            validate();
+            repaint();
+
+            List<JLabel> whiteLabels = new ArrayList<>();
+            List<JLabel> blackLabels = new ArrayList<>();
+
+            for (Piece piece : board.getWhitePlayer().getDeadPieces()) {
+                whiteLabels.add(new JLabel(createImageIcon(piece)));
+            }
+            for (Piece piece : board.getBlackPlayer().getDeadPieces()) {
+                blackLabels.add(new JLabel(createImageIcon(piece)));
+            }
+
+            whiteLabels.forEach(this::add);
+            blackLabels.forEach(this::add);
 
             validate();
             repaint();
@@ -449,6 +478,7 @@ public class BoardFrame {
 
                                 SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
                                 SwingUtilities.invokeLater(movesSidePanel::drawMoves);
+                                SwingUtilities.invokeLater(capturedPiecesPanel::drawPiece);
 //                                SwingUtilities.invokeLater(boardPanel::drawBoard);
                             }
                         }
