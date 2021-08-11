@@ -141,7 +141,7 @@ public class Player implements MyObserver, Serializable {
 
         Tile pieceTile = piece.getCurrentTile();
         if (pieceTile != null) {
-            clearTileFromPiece(pieceTile);
+            clearPieceFromTile(pieceTile);
         }
 
         // checking if an en passant or castling has been made to know if can continue to the rest of method's statements
@@ -293,7 +293,7 @@ public class Player implements MyObserver, Serializable {
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
             alivePieces.remove(piece);
-            clearTileFromPiece(piece.getCurrentTile());
+            clearPieceFromTile(piece.getCurrentTile());
             piece.setLastTile(piece.getCurrentTile());
             piece.setCurrentTile(null);
             piece.setIsAlive(false);
@@ -306,7 +306,7 @@ public class Player implements MyObserver, Serializable {
                 .collect(Collectors.toList()));
     }
 
-    public void clearTileFromPiece(Tile tile) {
+    public void clearPieceFromTile(Tile tile) {
         if (tile != null) {
             tile.setPiece(null);
         }

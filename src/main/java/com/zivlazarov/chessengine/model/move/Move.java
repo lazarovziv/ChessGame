@@ -50,7 +50,7 @@ public class Move implements Serializable {
         player.getLastMove().clear();
 
         Tile currentTile = movingPiece.getCurrentTile();
-        if (currentTile != null) player.clearTileFromPiece(currentTile);
+        if (currentTile != null) player.clearPieceFromTile(currentTile);
 
         boolean isSpecialMove = false;
 
@@ -121,18 +121,18 @@ public class Move implements Serializable {
     public void unmakeMove(boolean checkBoard) {
         switch (label) {
             case REGULAR -> {
-                player.clearTileFromPiece(targetTile);
+                player.clearPieceFromTile(targetTile);
                 movingPiece.setCurrentTile(sourceTile);
             }
             case PAWN_PROMOTION -> {
-                player.clearTileFromPiece(targetTile);
+                player.clearPieceFromTile(targetTile);
                 player.addPieceToDead(movingPiece);
                 movingPiece = player.getDeadPieces().get(player.getDeadPieces().size() - 2);
                 movingPiece.setCurrentTile(sourceTile);
                 player.addPieceToAlive(movingPiece);
             }
             case EN_PASSANT -> {
-                player.clearTileFromPiece(targetTile);
+                player.clearPieceFromTile(targetTile);
                 Piece opponentPiece = player.getOpponentPlayer().getDeadPieces().get(player.getOpponentPlayer().getDeadPieces().size() - 1);
                 movingPiece.getCapturedPieces().remove(opponentPiece);
                 player.getOpponentPlayer().addPieceToAlive(opponentPiece);
@@ -140,23 +140,25 @@ public class Move implements Serializable {
                 movingPiece.setCurrentTile(sourceTile);
             }
             case CAPTURE -> {
-                player.clearTileFromPiece(targetTile);
+                player.clearPieceFromTile(targetTile);
+                movingPiece.setCurrentTile(sourceTile);
                 Piece opponentPiece = player.getOpponentPlayer().getDeadPieces().get(player.getOpponentPlayer().getDeadPieces().size() - 1);
                 movingPiece.getCapturedPieces().remove(opponentPiece);
                 player.getOpponentPlayer().addPieceToAlive(opponentPiece);
-                movingPiece.setCurrentTile(sourceTile);
                 opponentPiece.setCurrentTile(targetTile);
             }
             case KING_SIDE_CASTLE -> {
-                player.clearTileFromPiece(targetTile);
+                player.clearPieceFromTile(targetTile);
                 Piece kingSideRook = player.getKingSideRookPiece();
+                kingSideRook.setLastTile(kingSideRook.getCurrentTile());
                 kingSideRook.setCurrentTile(board.getBoard()[targetTile.getRow()][7]);
                 movingPiece.setCurrentTile(sourceTile);
             }
             case QUEEN_SIDE_CASTLE -> {
-                player.clearTileFromPiece(targetTile);
-                Piece kingSideRook = player.getQueenSideRookPiece();
-                kingSideRook.setCurrentTile(board.getBoard()[targetTile.getRow()][0]);
+                player.clearPieceFromTile(targetTile);
+                Piece queenSideRook = player.getQueenSideRookPiece();
+                queenSideRook.setLastTile(queenSideRook.getCurrentTile());
+                queenSideRook.setCurrentTile(board.getBoard()[targetTile.getRow()][0]);
                 movingPiece.setCurrentTile(sourceTile);
             }
         }
