@@ -1,10 +1,10 @@
-package com.zivlazarov.chessengine.client.model.pieces;
+package com.zivlazarov.chessengine.model.pieces;
 
-import com.zivlazarov.chessengine.client.model.board.Board;
-import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.board.Tile;
-import com.zivlazarov.chessengine.client.model.move.Move;
-import com.zivlazarov.chessengine.client.model.player.Player;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.player.Player;
 
 import javax.persistence.*;
 import java.io.Serial;
@@ -36,7 +36,7 @@ public abstract class Piece implements Cloneable, Serializable {
 //    @OneToMany(targetEntity = Tile.class, mappedBy = "piece")
     // TODO: change type to List
     @Transient
-    protected final Stack<Tile> historyMoves = new Stack<>();
+    protected final Stack<Tile> historyMoves;
 
     protected int value;
 
@@ -75,66 +75,17 @@ public abstract class Piece implements Cloneable, Serializable {
         possibleMoves = new ArrayList<>();
         piecesUnderThreat = new ArrayList<>();
         capturedPieces = new Stack<>();
+        historyMoves = new Stack<>();
 
         isAlive = true;
         isInDanger = false;
         hasMoved = false;
     }
 
-//    public abstract int getId();
-//    public abstract void setId(int id);
-//
-//    public abstract String getName();
-//    public abstract boolean isAlive();
-//    public abstract boolean getIsInDanger();
-//    public abstract List<Tile> getPossibleMoves();
-//    public abstract PieceColor getPieceColor();
-//    public abstract Tile getCurrentTile();
-//    public abstract Stack<Tile> getHistoryMoves();
-//    public abstract Tile getLastMove();
-//    public abstract List<Piece> getPiecesUnderThreat();
-//    public abstract String getImageName();
-//    public abstract int getPieceCounter();
-//
-//    public abstract Tile getLastTile();
-//
-//    public abstract Set<Move> getMoves();
-//
-//    public abstract boolean canMove();
-//
-//    public abstract void setName(String name);
-//    public abstract void setIsAlive(boolean isAlive);
-//    public abstract void setIsInDanger(boolean isInDanger);
-//    public abstract void setPieceColor(PieceColor pieceColor);
-//    public abstract void setCurrentTile(Tile tile);
-//
-//    public abstract void setPieceType(PieceType pieceType);
-//    public abstract PieceType getPieceType();
-//
-//    public abstract void setLastTile(Tile tile);
-//
-//    public abstract Piece getLastPieceEaten();
-//
-//    public abstract Stack<Piece> getCapturedPieces();
-//
-//    public abstract void generateMoves();
-//
-//    public abstract boolean isThreatenedAtTile(Tile tile);
-//
-//    public abstract boolean isTileAvailable(Tile tile);
-//
-//    public abstract void refresh();
-//
-//    public abstract int getValue();
-//
-//    public abstract boolean hasMoved();
-//
-//    public abstract boolean equals(Piece piece);
-//
-//    public abstract void setPlayer(Player player);
-//    public abstract Player getPlayer();
-
-    public abstract void refresh();
+    public void refresh() {
+        reset();
+        generateMoves();
+    }
 
     public abstract void generateMoves();
 
@@ -290,3 +241,56 @@ public abstract class Piece implements Cloneable, Serializable {
         }
     }
 }
+
+//    public abstract int getId();
+//    public abstract void setId(int id);
+//
+//    public abstract String getName();
+//    public abstract boolean isAlive();
+//    public abstract boolean getIsInDanger();
+//    public abstract List<Tile> getPossibleMoves();
+//    public abstract PieceColor getPieceColor();
+//    public abstract Tile getCurrentTile();
+//    public abstract Stack<Tile> getHistoryMoves();
+//    public abstract Tile getLastMove();
+//    public abstract List<Piece> getPiecesUnderThreat();
+//    public abstract String getImageName();
+//    public abstract int getPieceCounter();
+//
+//    public abstract Tile getLastTile();
+//
+//    public abstract Set<Move> getMoves();
+//
+//    public abstract boolean canMove();
+//
+//    public abstract void setName(String name);
+//    public abstract void setIsAlive(boolean isAlive);
+//    public abstract void setIsInDanger(boolean isInDanger);
+//    public abstract void setPieceColor(PieceColor pieceColor);
+//    public abstract void setCurrentTile(Tile tile);
+//
+//    public abstract void setPieceType(PieceType pieceType);
+//    public abstract PieceType getPieceType();
+//
+//    public abstract void setLastTile(Tile tile);
+//
+//    public abstract Piece getLastPieceEaten();
+//
+//    public abstract Stack<Piece> getCapturedPieces();
+//
+//    public abstract void generateMoves();
+//
+//    public abstract boolean isThreatenedAtTile(Tile tile);
+//
+//    public abstract boolean isTileAvailable(Tile tile);
+//
+//    public abstract void refresh();
+//
+//    public abstract int getValue();
+//
+//    public abstract boolean hasMoved();
+//
+//    public abstract boolean equals(Piece piece);
+//
+//    public abstract void setPlayer(Player player);
+//    public abstract Player getPlayer();

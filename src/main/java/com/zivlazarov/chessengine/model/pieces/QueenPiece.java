@@ -1,9 +1,9 @@
-package com.zivlazarov.chessengine.client.model.pieces;
-import com.zivlazarov.chessengine.client.model.board.Board;
-import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.board.Tile;
-import com.zivlazarov.chessengine.client.model.move.Move;
-import com.zivlazarov.chessengine.client.model.player.Player;
+package com.zivlazarov.chessengine.model.pieces;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.player.Player;
 
 import javax.persistence.Entity;
 
@@ -37,12 +37,6 @@ public class QueenPiece extends Piece implements Cloneable {
     }
 
     @Override
-    public void refresh() {
-        reset();
-        generateMoves();
-    }
-
-    @Override
     public void generateMoves() {
         if (!isAlive) return;
         int[][] directions = {
@@ -55,6 +49,8 @@ public class QueenPiece extends Piece implements Cloneable {
                 {-1, -1},
                 {-1, 1}
         };
+
+        if (currentTile == null) return;
 
         int x = currentTile.getRow();
         int y = currentTile.getCol();
@@ -88,8 +84,7 @@ public class QueenPiece extends Piece implements Cloneable {
                     possibleMoves.add(targetTile);
                     piecesUnderThreat.add(targetTile.getPiece());
                     break;
-                }
-                if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) {
+                } else {
                     // setting it as threatened in the case of the piece on the tile will be captured
                     targetTile.setThreatenedByColor(pieceColor, true);
                     break;

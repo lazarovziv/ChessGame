@@ -1,24 +1,19 @@
-package com.zivlazarov.chessengine.client.model.pieces;
-
-import com.zivlazarov.chessengine.client.model.board.Board;
-import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.board.Tile;
-import com.zivlazarov.chessengine.client.model.move.Move;
-import com.zivlazarov.chessengine.client.model.player.Player;
-import com.zivlazarov.chessengine.client.model.utils.Pair;
+package com.zivlazarov.chessengine.model.pieces;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.player.Player;
 
 import javax.persistence.Entity;
-import java.util.HashMap;
-import java.util.Map;
 
 @Entity
-public class PawnPiece extends Piece implements Cloneable {
+public class KingPiece extends Piece implements Cloneable {
 
-    private boolean executedEnPassant = false;
+    private Tile kingSideCastleTile;
+    private Tile queenSideCastleTile;
 
-    private Tile enPassantTile;
-
-    public PawnPiece(Player player, Board board, Tile initTile, int pieceCounter) {
+    public KingPiece(Player player, Board board, Tile initTile) {
         super();
 
         this.player = player;
@@ -26,145 +21,155 @@ public class PawnPiece extends Piece implements Cloneable {
         this.pieceColor = player.getPlayerColor();
         this.currentTile = initTile;
         this.lastTile = currentTile;
-        this.pieceCounter = pieceCounter;
+        this.pieceCounter = -1;
 
-        this.value = 1;
+        this.value = 100;
 
         if (this.pieceColor == PieceColor.BLACK) {
-            this.name = "bP";
-            this.imageName = "blackPawn.png";
+            this.name = "bK";
+            this.imageName = "blackKing.png";
         }
         if (this.pieceColor == PieceColor.WHITE) {
-            this.name = "wP";
-            this.imageName = "whitePawn.png";
+            this.name = "wK";
+            this.imageName = "whiteKing.png";
         }
 
         this.player.addPieceToAlive(this);
         this.currentTile.setPiece(this);
-        this.pieceType = PieceType.PAWN;
-    }
+        this.pieceType = PieceType.KING;
 
-    @Override
-    public void refresh() {
-        reset();
-        generateMoves();
+        if (currentTile.getCol() + 2 <= 7 && currentTile.getCol() - 2 >= 0) {
+            kingSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
+            queenSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
+        }
+
+        board.getKingsMap().put(player, this);
     }
 
     @Override
     public void generateMoves() {
         if (!isAlive) return;
-        Map<PieceColor, Integer> map = new HashMap<>();
-        map.put(PieceColor.WHITE, 1);
-        map.put(PieceColor.BLACK, -1);
-        int[] eatingDirections = new int[]{-1, 1};
+        int[][] directions = {
+                {1,0},
+                {1,1},
+                {1,-1},
+                {0,1},
+                {0,-1},
+                {-1,0},
+                {-1,1},
+                {-1,-1}
+        };
 
         int x = currentTile.getRow();
         int y = currentTile.getCol();
 
-        boolean canMoveFurther = !hasMoved;
-
-        int direction = player.getPlayerDirection();
-        int longDirection = direction * 2;
-
-        if (x + map.get(pieceColor) > board.getBoard().length - 1 || x + map.get(pieceColor) < 0) return;
-
-        if (board.getBoard()[x+direction][y].isEmpty()) {
-            Move move = new Move.Builder()
-                    .board(board)
-                    .player(player)
-                    .movingPiece(this)
-                    .targetTile(board.getBoard()[x+direction][y])
-                    .build();
-            moves.add(move);
-            possibleMoves.add(board.getBoard()[x + direction][y]);
-            if (canMoveFurther) {
-                if (x + longDirection < 0 || x + longDirection > board.getBoard().length - 1) return;
-                if (board.getBoard()[x+longDirection][y].isEmpty()) {
-                    Move move1 = new Move.Builder()
+        for (int[] direction : directions) {
+            int r = direction[0];
+            int c = direction[1];
+            if (x+r > board.getBoard().length - 1 || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
+            Tile targetTile = board.getBoard()[x+r][y+c];
+            if (!targetTile.isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) {
+                if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
+                    Move move = new Move.Builder()
                             .board(board)
                             .player(player)
                             .movingPiece(this)
-                            .targetTile(board.getBoard()[x+longDirection][y])
+                            .targetTile(targetTile)
                             .build();
-                    moves.add(move1);
-                    possibleMoves.add(board.getBoard()[x+longDirection][y]);
+                    moves.add(move);
+                    possibleMoves.add(targetTile);
+                    if (!targetTile.isEmpty()) {
+                        if (targetTile.getPiece().getPieceColor() != pieceColor) {
+                            piecesUnderThreat.add(targetTile.getPiece());
+                        }
+                    }
+                }
+            }
+            if (!targetTile.isEmpty()) {
+                if (targetTile.getPiece().getPieceColor() == pieceColor) targetTile.setThreatenedByColor(pieceColor, true);
+            }
+        }
+
+        if (y + 2 <= 7) {
+            if (canKingSideCastle()) {
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(player)
+                        .movingPiece(this)
+                        .targetTile(board.getBoard()[x][y+2])
+                        .build();
+                moves.add(move);
+                possibleMoves.add(board.getBoard()[x][y + 2]);
+            }
+        }
+
+        if (y - 2 >= 0) {
+            if (canQueenSideCastle()) {
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(player)
+                        .movingPiece(this)
+                        .targetTile(board.getBoard()[x][y-2])
+                        .build();
+                moves.add(move);
+                possibleMoves.add(board.getBoard()[x][y - 2]);
+            }
+        }
+
+        for (Tile tile : possibleMoves) {
+            if (!tile.isEmpty()) {
+                if (tile.getPiece().getPieceColor() != pieceColor) {
+                    piecesUnderThreat.add(tile.getPiece());
                 }
             }
         }
-        for (int d : eatingDirections) {
-            if (y + d > board.getBoard().length - 1 || y + d < 0) continue;
-            if (!board.getBoard()[x+direction][y+d].isEmpty() &&
-                    board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
-                Move move = new Move.Builder()
-                        .board(board)
-                        .player(player)
-                        .movingPiece(this)
-                        .targetTile(board.getBoard()[x+direction][y+d])
-                        .build();
-                moves.add(move);
-                possibleMoves.add(board.getBoard()[x+direction][y+d]);
-                piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
-            }
-            // setting potential capturing tiles as threats
-            board.getBoard()[x+direction][y+d].setThreatenedByColor(pieceColor, true);
-            // insert en passant
-            if (canEnPassant(d)) {
-                Move move = new Move.Builder()
-                        .board(board)
-                        .player(player)
-                        .movingPiece(this)
-                        .targetTile(enPassantTile)
-                        .build();
-                moves.add(move);
-                possibleMoves.add(enPassantTile);
-                // setting the adjacent pawn piece as under threat
-                // only move in chess where piece can be eaten without moving to it's tile
-                piecesUnderThreat.add(board.getBoard()[x][y+d].getPiece());
-            }
-        }
+        possibleMoves.forEach(tile -> tile.setThreatenedByColor(pieceColor, true));
         player.getLegalMoves().addAll(possibleMoves);
         player.getMoves().addAll(moves);
     }
 
-    public boolean canEnPassant(int eatingDirection) {
+// castling rules
+// The king has not previously moved;
+// Your chosen rook has not previously moved;
+// There must be no pieces between the king and the chosen rook;
+// The king is not currently in check;
+// Your king must not pass through a square that is under attack by enemy pieces;
+// The king must not end up in check.
+
+    // king moves 2 tiles rook moves 2 tiles
+    public boolean canKingSideCastle() {
         int x = currentTile.getRow();
         int y = currentTile.getCol();
 
-        // checking borders of board
-        if (y + eatingDirection < 0 || y + eatingDirection > board.getBoard().length - 1
-        || x - 2 * player.getOpponentPlayer().getPlayerDirection() < 0) return false;
-
-        // checking if piece next to pawn is of type pawn and is opponent's piece
-        if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece pawn &&
-               pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant()) {
-            // checking to see if opponent's last move is pawn's move 2 tiles forward
-            if (board.getGameHistoryMoves().lastElement()/*.getSecond()*/.equals(new Pair<>(
-//                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
-                    pawn,
-                    pawn.getCurrentTile()))) {
-                if (board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection].isEmpty()) {
-                    enPassantTile = board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection];
-                    return true;
-                }
-            }
+        for (int i = 1; y+i < 7; i++) {
+            if (board.getBoard()[x][7].getPiece() == null || hasMoved || isInDanger) return false;
+            if (!board.getBoard()[x][y+i].isEmpty() || board.getBoard()[x][7].getPiece().hasMoved()
+                    || board.getBoard()[x][y+i].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())
+                    || board.getBoard()[x][7].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) return false;
         }
-        return false;
+        return true;
     }
 
-    public boolean hasExecutedEnPassant() {
-        return executedEnPassant;
+    // king moves 2 tiles rook moves 3 tiles
+    public boolean canQueenSideCastle() {
+        int x = currentTile.getRow();
+        int y = currentTile.getCol();
+
+        for (int i = 1; y-i > 0; i++) {
+            if (board.getBoard()[x][0].getPiece() == null || hasMoved || isInDanger) return false;
+            if (!board.getBoard()[x][y-i].isEmpty() || board.getBoard()[x][0].getPiece().hasMoved()
+                    || board.getBoard()[x][y-i].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())
+                    || board.getBoard()[x][0].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) return false;
+        }
+        return true;
     }
 
-    public void setExecutedEnPassant(boolean executedEnPassant) {
-        this.executedEnPassant = executedEnPassant;
+    public Tile getKingSideCastleTile() {
+        return kingSideCastleTile;
     }
 
-    public Tile getEnPassantTile() {
-        return enPassantTile;
-    }
-
-    public void setEnPassantTile(Tile enPassantTile) {
-        this.enPassantTile = enPassantTile;
+    public Tile getQueenSideCastleTile() {
+        return queenSideCastleTile;
     }
 
     //
@@ -181,35 +186,34 @@ public class PawnPiece extends Piece implements Cloneable {
 //    private final List<Piece> piecesUnderThreat;
 //    private final Stack<Tile> historyMoves;
 //    private Tile lastTile;
-//    private Stack<Piece> capturedPieces;
+//    private final Stack<Piece> capturedPieces;
 //    private final Board board;
 //
 //    private String name;
 //
-//    private int pieceCounter;
-//
 //    private boolean isAlive = true;
 //    private boolean isInDanger = false;
+//    private boolean hasMoved = false;
 //    private Tile currentTile;
 //    private PieceColor pieceColor;
 //    private String imageName;
-//    private boolean hasMoved = false;
-//    private boolean executedEnPassant = false;
-//
-//    private Tile enPassantTile;
 //    private Icon imageIcon;
 //
-//    private int value = 1;
+//    private Tile kingSideCastleTile;
+//    private Tile queenSideCastleTile;
+//
+//
+//    private final int value = 0;
 //
 //    private final Object[] allFields;
 //
-//    public PawnPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
+//    public KingPiece(Player player, Board board, PieceColor pc, Tile initTile, boolean test) {
 //        this.player = player;
 //        this.board = board;
 //
-////        name = 'P';
+////        name = 'K';
 //        pieceColor = pc;
-//        possibleMoves = new ArrayList<Tile>();
+//        possibleMoves = new ArrayList<>();
 //        piecesUnderThreat = new ArrayList<>();
 //        historyMoves = new Stack<>();
 //        capturedPieces = new Stack<>();
@@ -218,16 +222,22 @@ public class PawnPiece extends Piece implements Cloneable {
 //        currentTile = initTile;
 //        lastTile = currentTile;
 //
-//        this.pieceCounter = pieceCounter;
-//
 //        if (pieceColor == PieceColor.BLACK) {
-//            name = "bP";
-//            imageName = "blackPawn.png";
+//            name = "bK";
+//            imageName = "blackKing.png";
 //        }
 //        if (pieceColor == PieceColor.WHITE) {
-//            name = "wP";
-//            imageName = "whitePawn.png";
+//            name = "wK";
+//            imageName = "whiteKing.png";
 //        }
+//
+//        kingSideCastleTile = null;
+//        queenSideCastleTile = null;
+//
+//        if (!test)
+//            kingSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 2];
+//            queenSideCastleTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
+//
 //        player.addPieceToAlive(this);
 //
 //        currentTile.setPiece(this);
@@ -236,14 +246,13 @@ public class PawnPiece extends Piece implements Cloneable {
 ////        generateTilesToMoveTo();
 //        allFields = new Object[] {player, pieceType, possibleMoves, piecesUnderThreat,
 //                historyMoves, lastTile, capturedPieces,
-//                name, pieceCounter, isAlive, isInDanger, currentTile,
+//                name, isAlive, isInDanger, currentTile,
 //                pieceColor, imageName, imageIcon};
 //
-//        pieceType = PieceType.PAWN;
+//        pieceType = PieceType.KING;
 //
-//        id = 100 * value * player.getPlayerDirection() + player.getId() + pieceCounter;
+//        board.getKingsMap().put(player, this);
 //    }
-
     //
 //    @Override
 //    public int getId() {
@@ -277,7 +286,7 @@ public class PawnPiece extends Piece implements Cloneable {
 //
 //    @Override
 //    public boolean getIsInDanger() {
-//        return false;
+//        return isThreatenedAtTile(currentTile);
 //    }
 //
 //    @Override
@@ -296,25 +305,8 @@ public class PawnPiece extends Piece implements Cloneable {
 //    }
 //
 //    @Override
-//    public void setPieceColor(PieceColor pieceColor) {
-//        this.pieceColor = pieceColor;
-//    }
-//
-//    @Override
 //    public Tile getCurrentTile() {
 //        return currentTile;
-//    }
-//
-//    public int getPieceCounter() {
-//        return pieceCounter;
-//    }
-//
-//    public boolean hasExecutedEnPassant() {
-//        return executedEnPassant;
-//    }
-//
-//    public void setExecutedEnPassant(boolean executedEnPassant) {
-//        this.executedEnPassant = executedEnPassant;
 //    }
 //
 //    public Player getPlayer() {
@@ -322,8 +314,25 @@ public class PawnPiece extends Piece implements Cloneable {
 //    }
 //
 //    @Override
+//    public void setPieceColor(PieceColor pieceColor) {
+//        this.pieceColor = pieceColor;
+//    }
+//
+//    public void setHasMoved(boolean moved) {
+//        hasMoved = moved;
+//    }
+//
+//    @Override
 //    public Stack<Tile> getHistoryMoves() {
 //        return historyMoves;
+//    }
+//
+//    public Tile getKingSideCastleTile() {
+//        return kingSideCastleTile;
+//    }
+//
+//    public Tile getQueenSideCastleTile() {
+//        return queenSideCastleTile;
 //    }
 //
 //    @Override
@@ -344,10 +353,6 @@ public class PawnPiece extends Piece implements Cloneable {
 //        currentTile.setPiece(this);
 //    }
 //
-//    public void setHasMoved(boolean moved) {
-//        hasMoved = moved;
-//    }
-//
 //    public String getImageName() {
 //        return imageName;
 //    }
@@ -360,12 +365,10 @@ public class PawnPiece extends Piece implements Cloneable {
 //    @Override
 //    public boolean isThreatenedAtTile(Tile tile) {
 //        if (pieceColor == PieceColor.WHITE) {
-//            if (tile.isThreatenedByBlack()) return true;
-//            else return false;
+//            return tile.isThreatenedByBlack();
 //        }
 //        if (pieceColor == PieceColor.BLACK) {
-//            if (tile.isThreatenedByWhite()) return true;
-//            else return false;
+//            return tile.isThreatenedByWhite();
 //        }
 //        return false;
 //    }
@@ -377,10 +380,6 @@ public class PawnPiece extends Piece implements Cloneable {
 //        } else return tile.getPiece().getPieceColor() != pieceColor;
 //    }
 //
-//    public Tile getEnPassantTile() {
-//        return enPassantTile;
-//    }
-//
 //    @Override
 //    public boolean canMove() {
 //        return possibleMoves.size() != 0;
@@ -388,7 +387,7 @@ public class PawnPiece extends Piece implements Cloneable {
 //
 //    @Override
 //    public boolean hasMoved() {
-//        return false;
+//        return hasMoved;
 //    }
 //
 //    @Override
@@ -406,7 +405,7 @@ public class PawnPiece extends Piece implements Cloneable {
 //    public boolean equals(Piece piece) {
 //        return currentTile.getRow() == piece.getCurrentTile().getRow() &&
 //                currentTile.getCol() == piece.getCurrentTile().getCol() &&
-//                (name + pieceCounter).equals(piece.getName() + pieceCounter);
+//                name.equals(piece.getName());
 //    }
 //
 //    @Override
@@ -442,6 +441,11 @@ public class PawnPiece extends Piece implements Cloneable {
 //    @Override
 //    public Set<Move> getMoves() {
 //        return moves;
+//    }
+//
+//    @Override
+//    public int getPieceCounter() {
+//        return -1;
 //    }
 //
 //    @Override

@@ -1,10 +1,10 @@
-package com.zivlazarov.chessengine.client.model.pieces;
+package com.zivlazarov.chessengine.model.pieces;
 
-import com.zivlazarov.chessengine.client.model.board.Board;
-import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.board.Tile;
-import com.zivlazarov.chessengine.client.model.move.Move;
-import com.zivlazarov.chessengine.client.model.player.Player;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.player.Player;
 
 import javax.persistence.Entity;
 
@@ -35,12 +35,6 @@ public class BishopPiece extends Piece implements Cloneable {
         this.player.addPieceToAlive(this);
         this.currentTile.setPiece(this);
         this.pieceType = PieceType.BISHOP;
-    }
-
-    @Override
-    public void refresh() {
-        reset();
-        generateMoves();
     }
 
     @Override
