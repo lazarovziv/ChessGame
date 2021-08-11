@@ -29,6 +29,8 @@ public class Move implements Serializable {
 
     private MoveLabel label;
 
+    private Move castlingMove;
+
     public Move() {}
 
     private Move(Board board, Player player, Piece movingPiece, Tile targetTile) {
@@ -78,10 +80,26 @@ public class Move implements Serializable {
                 movingPiece.setHasMoved(true);
             }
             isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
-            if (isSpecialMove) label = MoveLabel.KING_SIDE_CASTLE;
+            if (isSpecialMove) {
+                castlingMove = new Move.Builder()
+                        .board(board)
+                        .player(player)
+                        .movingPiece(player.getKingSideRookPiece())
+                        .targetTile(player.getKingSideRookPiece().getKingSideCastlingTile())
+                        .build();
+                label = MoveLabel.KING_SIDE_CASTLE;
+            }
             if (!isSpecialMove) {
                 isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
-                if (isSpecialMove) label = MoveLabel.QUEEN_SIDE_CASTLE;
+                if (isSpecialMove) {
+                    castlingMove = new Move.Builder()
+                            .board(board)
+                            .player(player)
+                            .movingPiece(player.getQueenSideRookPiece())
+                            .targetTile(player.getQueenSideRookPiece().getQueenSideCastlingTile())
+                            .build();
+                    label = MoveLabel.QUEEN_SIDE_CASTLE;
+                }
             }
         } else if (movingPiece instanceof RookPiece) {
             if (checkBoard && !movingPiece.hasMoved()) {
@@ -105,6 +123,8 @@ public class Move implements Serializable {
 
         player.getLastMove().put(movingPiece, new Pair<>(currentTile, targetTile));
 
+        if (castlingMove != null) castlingMove.makeMove(true);
+
         player.resetPlayerScore();
         player.getOpponentPlayer().resetPlayerScore();
         player.evaluatePlayerScore();
@@ -123,6 +143,13 @@ public class Move implements Serializable {
             case REGULAR -> {
                 player.clearPieceFromTile(targetTile);
                 movingPiece.setCurrentTile(sourceTile);
+
+                // if it was their first move, revert their hasMoved field to false
+                if (movingPiece.getHistoryMoves().size() <= 1) {
+                    if (movingPiece instanceof PawnPiece) movingPiece.setHasMoved(false);
+//            else if (movingPiece instanceof RookPiece) movingPiece.setHasMoved(false);
+//            else if (movingPiece instanceof KingPiece) movingPiece.setHasMoved(false);
+                }
             }
             case PAWN_PROMOTION -> {
                 player.clearPieceFromTile(targetTile);
@@ -150,24 +177,25 @@ public class Move implements Serializable {
             case KING_SIDE_CASTLE -> {
                 player.clearPieceFromTile(targetTile);
                 Piece kingSideRook = player.getKingSideRookPiece();
+                player.clearPieceFromTile(kingSideRook.getCurrentTile());
                 kingSideRook.setLastTile(kingSideRook.getCurrentTile());
                 kingSideRook.setCurrentTile(board.getBoard()[targetTile.getRow()][7]);
+                kingSideRook.setHasMoved(false);
+                movingPiece.setHasMoved(false);
+//                castlingMove.unmakeMove(true);
                 movingPiece.setCurrentTile(sourceTile);
             }
             case QUEEN_SIDE_CASTLE -> {
                 player.clearPieceFromTile(targetTile);
                 Piece queenSideRook = player.getQueenSideRookPiece();
+                player.clearPieceFromTile(queenSideRook.getCurrentTile());
                 queenSideRook.setLastTile(queenSideRook.getCurrentTile());
                 queenSideRook.setCurrentTile(board.getBoard()[targetTile.getRow()][0]);
+                queenSideRook.setHasMoved(false);
+                movingPiece.setHasMoved(false);
+//                castlingMove.unmakeMove(true);
                 movingPiece.setCurrentTile(sourceTile);
             }
-        }
-
-        // if it was their first move, revert their hasMoved field to false
-        if (movingPiece.getHistoryMoves().size() <= 1) {
-            if (movingPiece instanceof PawnPiece) movingPiece.setHasMoved(false);
-            else if (movingPiece instanceof RookPiece) movingPiece.setHasMoved(false);
-            else if (movingPiece instanceof KingPiece) movingPiece.setHasMoved(false);
         }
 
         // deleting last move made from logs
@@ -189,10 +217,6 @@ public class Move implements Serializable {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public Player getPlayer() {
         return player;
     }
@@ -210,7 +234,15 @@ public class Move implements Serializable {
     }
 
     public String toString() {
-      return movingPiece.getName() + ": " + movingPiece.getLastTile() + " -> " + targetTile;
+        if (label == MoveLabel.KING_SIDE_CASTLE) {
+            return "King Side Castle";
+        } else if (label == MoveLabel.QUEEN_SIDE_CASTLE) {
+            return "Queen Side Castle";
+        } else if (label == MoveLabel.PAWN_PROMOTION) {
+            return "Pawn Promotion: " + movingPiece.getName() + ": " + movingPiece.getLastTile() + " -> " + targetTile;
+        } else {
+            return movingPiece.getName() + ": " + movingPiece.getLastTile() + " -> " + targetTile;
+        }
     }
 
     public boolean equals(Move move) {
@@ -247,8 +279,11 @@ public class Move implements Serializable {
         }
 
         public Builder targetTile(Tile targetTile) {
-            this.targetTile = targetTile;
-            return this;
+            // add a condition if target tile is in piece's possible moves
+            if (movingPiece.getPossibleMoves().contains(targetTile)) {
+                this.targetTile = targetTile;
+                return this;
+            } else throw new IllegalMoveError();
         }
 
         public Move build() {
