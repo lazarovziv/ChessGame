@@ -70,6 +70,8 @@ public class KingPiece extends Piece implements Cloneable {
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (!targetTile.isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) {
                 if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
+                    // calling possible moves first because of the target tile check condition in Move.Builder class
+                    possibleMoves.add(targetTile);
                     Move move = new Move.Builder()
                             .board(board)
                             .player(player)
@@ -77,7 +79,6 @@ public class KingPiece extends Piece implements Cloneable {
                             .targetTile(targetTile)
                             .build();
                     moves.add(move);
-                    possibleMoves.add(targetTile);
                     if (!targetTile.isEmpty()) {
                         if (targetTile.getPiece().getPieceColor() != pieceColor) {
                             piecesUnderThreat.add(targetTile.getPiece());
@@ -92,6 +93,7 @@ public class KingPiece extends Piece implements Cloneable {
 
         if (y + 2 <= 7) {
             if (canKingSideCastle()) {
+                possibleMoves.add(board.getBoard()[x][y + 2]);
                 Move move = new Move.Builder()
                         .board(board)
                         .player(player)
@@ -99,12 +101,12 @@ public class KingPiece extends Piece implements Cloneable {
                         .targetTile(board.getBoard()[x][y+2])
                         .build();
                 moves.add(move);
-                possibleMoves.add(board.getBoard()[x][y + 2]);
             }
         }
 
         if (y - 2 >= 0) {
             if (canQueenSideCastle()) {
+                possibleMoves.add(board.getBoard()[x][y - 2]);
                 Move move = new Move.Builder()
                         .board(board)
                         .player(player)
@@ -112,7 +114,6 @@ public class KingPiece extends Piece implements Cloneable {
                         .targetTile(board.getBoard()[x][y-2])
                         .build();
                 moves.add(move);
-                possibleMoves.add(board.getBoard()[x][y - 2]);
             }
         }
 
@@ -142,10 +143,13 @@ public class KingPiece extends Piece implements Cloneable {
         int y = currentTile.getCol();
 
         for (int i = 1; y+i < 7; i++) {
-            if (board.getBoard()[x][7].getPiece() == null || hasMoved || isInDanger) return false;
-            if (!board.getBoard()[x][y+i].isEmpty() || board.getBoard()[x][7].getPiece().hasMoved()
-                    || board.getBoard()[x][y+i].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())
-                    || board.getBoard()[x][7].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) return false;
+            if (board.getBoard()[x][7].getPiece() == null || hasMoved || isInDanger
+                    || board.getBoard()[x][7].getPiece().hasMoved()
+                    || board.getBoard()[x][7].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())
+                    || player.isInCheck()) return false;
+
+            if (!board.getBoard()[x][y+i].isEmpty()
+                    || board.getBoard()[x][y+i].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) return false;
         }
         return true;
     }
@@ -156,10 +160,13 @@ public class KingPiece extends Piece implements Cloneable {
         int y = currentTile.getCol();
 
         for (int i = 1; y-i > 0; i++) {
-            if (board.getBoard()[x][0].getPiece() == null || hasMoved || isInDanger) return false;
-            if (!board.getBoard()[x][y-i].isEmpty() || board.getBoard()[x][0].getPiece().hasMoved()
-                    || board.getBoard()[x][y-i].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())
-                    || board.getBoard()[x][0].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) return false;
+            if (board.getBoard()[x][0].getPiece() == null || hasMoved || isInDanger
+                    || board.getBoard()[x][0].getPiece().hasMoved()
+                    || board.getBoard()[x][0].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())
+                    || player.isInCheck()) return false;
+
+            if (!board.getBoard()[x][y-i].isEmpty()
+                    || board.getBoard()[x][y-i].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) return false;
         }
         return true;
     }

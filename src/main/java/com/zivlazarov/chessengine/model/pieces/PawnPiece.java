@@ -8,8 +8,6 @@ import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Pair;
 
 import javax.persistence.Entity;
-import java.util.HashMap;
-import java.util.Map;
 
 @Entity
 public class PawnPiece extends Piece implements Cloneable {
@@ -17,6 +15,8 @@ public class PawnPiece extends Piece implements Cloneable {
     private boolean executedEnPassant = false;
 
     private Tile enPassantTile;
+
+    private static final int[] eatingDirections = new int[]{-1, 1};
 
     public PawnPiece(Player player, Board board, Tile initTile, int pieceCounter) {
         super();
@@ -47,10 +47,6 @@ public class PawnPiece extends Piece implements Cloneable {
     @Override
     public void generateMoves() {
         if (!isAlive) return;
-        Map<PieceColor, Integer> map = new HashMap<>();
-        map.put(PieceColor.WHITE, 1);
-        map.put(PieceColor.BLACK, -1);
-        int[] eatingDirections = new int[]{-1, 1};
 
         int x = currentTile.getRow();
         int y = currentTile.getCol();
@@ -66,9 +62,10 @@ public class PawnPiece extends Piece implements Cloneable {
         int direction = player.getPlayerDirection();
         int longDirection = direction * 2;
 
-        if (x + map.get(pieceColor) > board.getBoard().length - 1 || x + map.get(pieceColor) < 0) return;
+        if (x + player.getPlayerDirection() > board.getBoard().length - 1 || x + player.getPlayerDirection() < 0) return;
 
         if (board.getBoard()[x+direction][y].isEmpty()) {
+            possibleMoves.add(board.getBoard()[x + direction][y]);
             Move move = new Move.Builder()
                     .board(board)
                     .player(player)
@@ -76,10 +73,10 @@ public class PawnPiece extends Piece implements Cloneable {
                     .targetTile(board.getBoard()[x+direction][y])
                     .build();
             moves.add(move);
-            possibleMoves.add(board.getBoard()[x + direction][y]);
             if (canMoveFurther) {
                 if (x + longDirection < 0 || x + longDirection > board.getBoard().length - 1) return;
                 if (board.getBoard()[x+longDirection][y].isEmpty()) {
+                    possibleMoves.add(board.getBoard()[x+longDirection][y]);
                     Move move1 = new Move.Builder()
                             .board(board)
                             .player(player)
@@ -87,7 +84,6 @@ public class PawnPiece extends Piece implements Cloneable {
                             .targetTile(board.getBoard()[x+longDirection][y])
                             .build();
                     moves.add(move1);
-                    possibleMoves.add(board.getBoard()[x+longDirection][y]);
                 }
             }
         }
@@ -95,6 +91,8 @@ public class PawnPiece extends Piece implements Cloneable {
             if (y + d > board.getBoard().length - 1 || y + d < 0) continue;
             if (!board.getBoard()[x+direction][y+d].isEmpty() &&
                     board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
+                possibleMoves.add(board.getBoard()[x+direction][y+d]);
+                piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
                 Move move = new Move.Builder()
                         .board(board)
                         .player(player)
@@ -102,13 +100,12 @@ public class PawnPiece extends Piece implements Cloneable {
                         .targetTile(board.getBoard()[x+direction][y+d])
                         .build();
                 moves.add(move);
-                possibleMoves.add(board.getBoard()[x+direction][y+d]);
-                piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
             }
             // setting potential capturing tiles as threats
             board.getBoard()[x+direction][y+d].setThreatenedByColor(pieceColor, true);
             // insert en passant
             if (canEnPassant(d)) {
+                possibleMoves.add(enPassantTile);
                 Move move = new Move.Builder()
                         .board(board)
                         .player(player)
@@ -116,7 +113,6 @@ public class PawnPiece extends Piece implements Cloneable {
                         .targetTile(enPassantTile)
                         .build();
                 moves.add(move);
-                possibleMoves.add(enPassantTile);
                 // setting the adjacent pawn piece as under threat
                 // only move in chess where piece can be eaten without moving to it's tile
                 piecesUnderThreat.add(board.getBoard()[x][y+d].getPiece());

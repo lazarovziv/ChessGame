@@ -60,6 +60,7 @@ public class KnightPiece extends Piece implements Cloneable {
             if (x+r > board.getBoard().length - 1  || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
             Tile targetTile = board.getBoard()[x+r][y+c];
             if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
+                possibleMoves.add(targetTile);
                 Move move = new Move.Builder()
                         .board(board)
                         .player(player)
@@ -67,7 +68,6 @@ public class KnightPiece extends Piece implements Cloneable {
                         .targetTile(targetTile)
                         .build();
                 moves.add(move);
-                possibleMoves.add(targetTile);
                 if (!targetTile.isEmpty()) {
                     if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
                 }

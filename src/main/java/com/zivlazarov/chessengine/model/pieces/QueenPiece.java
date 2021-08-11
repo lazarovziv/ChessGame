@@ -65,15 +65,7 @@ public class QueenPiece extends Piece implements Cloneable {
                 if (x + i*r > board.getBoard().length - 1 || x+r*i < 0 || y+c*i > board.getBoard().length - 1 || y+c*i < 0) break;
                 Tile targetTile = board.getBoard()[x+r*i][y+c*i];
                 if (targetTile.isEmpty()) {
-                    Move move = new Move.Builder()
-                            .board(board)
-                            .player(player)
-                            .movingPiece(this)
-                            .targetTile(targetTile)
-                            .build();
-                    moves.add(move);
                     possibleMoves.add(targetTile);
-                } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
                     Move move = new Move.Builder()
                             .board(board)
                             .player(player)
@@ -81,8 +73,16 @@ public class QueenPiece extends Piece implements Cloneable {
                             .targetTile(targetTile)
                             .build();
                     moves.add(move);
+                } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
                     possibleMoves.add(targetTile);
                     piecesUnderThreat.add(targetTile.getPiece());
+                    Move move = new Move.Builder()
+                            .board(board)
+                            .player(player)
+                            .movingPiece(this)
+                            .targetTile(targetTile)
+                            .build();
+                    moves.add(move);
                     break;
                 } else {
                     // setting it as threatened in the case of the piece on the tile will be captured
