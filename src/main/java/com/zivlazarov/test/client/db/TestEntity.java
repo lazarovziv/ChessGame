@@ -3,28 +3,22 @@ package com.zivlazarov.test.client.db;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "test")
 public class TestEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "id")
     private int id;
 
-    @Column(name = "name")
+    @Column
     private String name;
 
-    @Column(name = "email")
+    @Column
     private String email;
 
     public TestEntity() {}
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

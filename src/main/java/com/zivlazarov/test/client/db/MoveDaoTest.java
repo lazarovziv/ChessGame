@@ -1,10 +1,10 @@
 package com.zivlazarov.test.client.db;
 
-import com.zivlazarov.chessengine.client.db.MoveDao;
-import com.zivlazarov.chessengine.client.model.board.Board;
-import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.move.Move;
-import com.zivlazarov.chessengine.client.model.player.Player;
+import com.zivlazarov.chessengine.db.dao.MoveDao;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class MoveDaoTest {
     @BeforeAll
     public static void setup() {
         moveDao = new MoveDao();
-        board = Board.getInstance();
+        board = new Board();
 
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);

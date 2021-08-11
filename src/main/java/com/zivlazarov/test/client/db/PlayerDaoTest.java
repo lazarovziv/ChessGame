@@ -1,9 +1,9 @@
 package com.zivlazarov.test.client.db;
 
-import com.zivlazarov.chessengine.client.db.PlayerDao;
-import com.zivlazarov.chessengine.client.model.board.Board;
-import com.zivlazarov.chessengine.client.model.board.PieceColor;
-import com.zivlazarov.chessengine.client.model.player.Player;
+import com.zivlazarov.chessengine.db.dao.PlayerDao;
+import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
+import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ public class PlayerDaoTest {
     @BeforeAll
     public static void setup() {
         playerDao = new PlayerDao();
-        board = Board.getInstance();
+        board = new Board();
 
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);

@@ -1,6 +1,6 @@
 package com.zivlazarov.test.client.db;
 
-import com.zivlazarov.chessengine.client.db.DatabaseUtils;
+import com.zivlazarov.chessengine.db.DatabaseUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
