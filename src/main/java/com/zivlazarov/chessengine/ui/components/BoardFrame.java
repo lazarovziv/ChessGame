@@ -207,9 +207,11 @@ public class BoardFrame {
 
                 move.makeMove(true);
 
+                System.out.println(board.evaluateBoard());
                 System.out.println(board.getGameSituation());
 
                 if (!board.canContinueGame()) {
+                    board.printBoard();
                         Thread.currentThread().interrupt();
                         ImageIcon icon = null;
                         try {
@@ -467,6 +469,8 @@ public class BoardFrame {
                                         System.out.println(move.getPlayer().getName() + " has executed a " + move.getLabel());
                                     }
                                 }
+
+                                System.out.println(board.evaluateBoard());
 
                                 sourceTile = null;
                                 playerPiece = null;

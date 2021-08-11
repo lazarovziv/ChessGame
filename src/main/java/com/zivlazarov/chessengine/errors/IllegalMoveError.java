@@ -10,6 +10,11 @@ public class IllegalMoveError extends Error {
         super.printStackTrace();
     }
 
+    public IllegalMoveError() {
+        super("Illegal Move!");
+        super.printStackTrace();
+    }
+
     public String getMessage() {
         return message;
     }
