@@ -149,13 +149,13 @@ public class Player implements MyObserver, Serializable {
 
         if (piece instanceof PawnPiece) {
             isSpecialMove = handleEnPassantMove(piece, targetTile);
-            ((PawnPiece) piece).setHasMoved(true);
+            piece.setHasMoved(true);
             piece = handlePawnPromotion(piece, targetTile);
         }
         if (piece instanceof KingPiece) {
             isSpecialMove = handleKingSideCastling(piece, targetTile);
             if (!isSpecialMove) isSpecialMove = handleQueenSideCastling(piece, targetTile);
-            ((KingPiece) piece).setHasMoved(true);
+            piece.setHasMoved(true);
         }
         // eat move
         if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != playerColor) {
@@ -225,16 +225,23 @@ public class Player implements MyObserver, Serializable {
     public boolean handleKingSideCastling(Piece piece, Tile tile) {
         if (/*!piece.hasMoved() && */tile.equals(((KingPiece) piece).getKingSideCastleTile())
                 && getKingSideRookPiece() != null
-                && !getKingSideRookPiece().hasMoved()) {
+                /* && !getKingSideRookPiece().hasMoved() */) {
             // logging rook move
             RookPiece kingSideRookPiece = getKingSideRookPiece();
-            kingSideRookPiece.getHistoryMoves().push(kingSideRookPiece.getKingSideCastlingTile());
-            // setting rook tile to it's king side castling tile
-            kingSideRookPiece.getCurrentTile().setPiece(null);
-            kingSideRookPiece.setCurrentTile(kingSideRookPiece.getKingSideCastlingTile());
-            kingSideRookPiece.setHasMoved(true);
-            // adding castling to game history moves
-            board.getGameHistoryMoves().push(new Pair<>(kingSideRookPiece, kingSideRookPiece.getLastMove()));
+            Move move = new Move.Builder()
+                    .board(board)
+                    .player(this)
+                    .movingPiece(kingSideRookPiece)
+                    .targetTile(kingSideRookPiece.getKingSideCastlingTile())
+                    .build();
+            move.makeMove(true);
+//            kingSideRookPiece.getHistoryMoves().push(kingSideRookPiece.getKingSideCastlingTile());
+//            // setting rook tile to it's king side castling tile
+//            kingSideRookPiece.getCurrentTile().setPiece(null);
+//            kingSideRookPiece.setCurrentTile(kingSideRookPiece.getKingSideCastlingTile());
+//            kingSideRookPiece.setHasMoved(true);
+//            // adding castling to game history moves
+//            board.getGameHistoryMoves().push(new Pair<>(kingSideRookPiece, kingSideRookPiece.getLastMove()));
             return true;
         }
         return false;
@@ -243,16 +250,23 @@ public class Player implements MyObserver, Serializable {
     public boolean handleQueenSideCastling(Piece piece, Tile tile) {
         if (/*!piece.hasMoved() && */tile.equals(((KingPiece) piece).getQueenSideCastleTile())
                 && getQueenSideRookPiece() != null
-                && !getQueenSideRookPiece().hasMoved()) {
+               /* && !getQueenSideRookPiece().hasMoved() */) {
             // logging rook move
             RookPiece queenSideRookPiece = getQueenSideRookPiece();
-            queenSideRookPiece.getHistoryMoves().push(queenSideRookPiece.getQueenSideCastlingTile());
-            // setting rook tile to it's queen side castling tile
-            queenSideRookPiece.getCurrentTile().setPiece(null);
-            queenSideRookPiece.setCurrentTile(queenSideRookPiece.getQueenSideCastlingTile());
-            queenSideRookPiece.setHasMoved(true);
-            // adding castling to game history moves
-            board.getGameHistoryMoves().push(new Pair<>(queenSideRookPiece, queenSideRookPiece.getLastMove()));
+            Move move = new Move.Builder()
+                    .board(board)
+                    .player(this)
+                    .movingPiece(queenSideRookPiece)
+                    .targetTile(queenSideRookPiece.getQueenSideCastlingTile())
+                    .build();
+            move.makeMove(true);
+//            queenSideRookPiece.getHistoryMoves().push(queenSideRookPiece.getQueenSideCastlingTile());
+//            // setting rook tile to it's queen side castling tile
+//            queenSideRookPiece.getCurrentTile().setPiece(null);
+//            queenSideRookPiece.setCurrentTile(queenSideRookPiece.getQueenSideCastlingTile());
+//            queenSideRookPiece.setHasMoved(true);
+//            // adding castling to game history moves
+//            board.getGameHistoryMoves().push(new Pair<>(queenSideRookPiece, queenSideRookPiece.getLastMove()));
 
             return true;
         }
@@ -261,22 +275,10 @@ public class Player implements MyObserver, Serializable {
 
     public RookPiece getKingSideRookPiece() {
         return board.getKingSideRooksMap().get(this);
-//        for (Piece piece : alivePieces) {
-//            if (piece instanceof RookPiece) {
-//                if (((RookPiece) piece).isKingSide()) return (RookPiece) piece;
-//            }
-//        }
-//        return null;
     }
 
     public RookPiece getQueenSideRookPiece() {
         return board.getQueenSideRooksMap().get(this);
-//        for (Piece piece : alivePieces) {
-//            if (piece instanceof RookPiece) {
-//                if (((RookPiece) piece).isQueenSide()) return (RookPiece) piece;
-//            }
-//        }
-//        return null;
     }
 
     public void addPieceToAlive(Piece piece) {
@@ -284,6 +286,7 @@ public class Player implements MyObserver, Serializable {
             alivePieces.add(piece);
             deadPieces.remove(piece);
             piece.setIsAlive(true);
+            piece.setIsInDanger(false);
 //            piece.setCurrentTile(piece.getCurrentTile());
         }
     }
@@ -390,6 +393,16 @@ public class Player implements MyObserver, Serializable {
             for (Piece threatenedPiece : piece.getPiecesUnderThreat()) {
                 playerScore += playerDirection * 12 * threatenedPiece.getValue();
             }
+
+            if (piece instanceof KingPiece) {
+                if (((KingPiece) piece).canKingSideCastle() || ((KingPiece) piece).canQueenSideCastle()) {
+                    playerScore += playerDirection * 500;
+                }
+            }
+        }
+        for (Piece piece : deadPieces) {
+            playerScore -= playerDirection * 100 * piece.getValue();
+            if (piece.isInDanger()) playerScore -= playerDirection * 12 * piece.getValue();
         }
         if (opponentPlayer.isInCheck()) playerScore += playerDirection * 75;
     }
