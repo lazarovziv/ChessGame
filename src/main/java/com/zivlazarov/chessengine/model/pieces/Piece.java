@@ -79,6 +79,8 @@ public abstract class Piece implements Cloneable, Serializable {
     @Transient
     protected final Stack<Piece> capturedPieces;
 
+    protected double[][] strongTiles;
+
     public Piece() {
         moves = new HashSet<>();
         possibleMoves = new ArrayList<>();
@@ -89,6 +91,8 @@ public abstract class Piece implements Cloneable, Serializable {
         isAlive = true;
         isInDanger = false;
         hasMoved = false;
+
+//        strongTiles = new double[8][8];
     }
 
     public void refresh() {
@@ -270,6 +274,10 @@ public abstract class Piece implements Cloneable, Serializable {
         return capturedPieces;
     }
 
+    public double[][] getStrongTiles() {
+        return strongTiles;
+    }
+
     public boolean isTileAvailable(Tile tile) {
         if (tile.isEmpty()) {
             return true;
@@ -290,6 +298,20 @@ public abstract class Piece implements Cloneable, Serializable {
         if (moves.size() != 0) {
             moves.clear();
         }
+    }
+
+    public double[][] revertStrongTiles(double[][] tiles) {
+        double[][] newTiles = new double[8][8];
+
+        int rowIndex = 0;
+
+        for (int r = tiles.length - 1; r >= 0; r--) {
+            for (int c = 0; c < tiles.length; c++) {
+                newTiles[rowIndex][c] = -1 * tiles[r][c];
+            }
+            rowIndex++;
+        }
+        return newTiles;
     }
 }
 

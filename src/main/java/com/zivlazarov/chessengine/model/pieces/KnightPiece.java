@@ -15,12 +15,12 @@ public class KnightPiece extends Piece implements Cloneable {
 
         this.player = player;
         this.board = board;
-        this.pieceColor = player.getPlayerColor();
+        this.pieceColor = player.getColor();
         this.currentTile = initTile;
         this.lastTile = currentTile;
         this.pieceCounter = pieceCounter;
 
-        this.value = 3;
+        this.value = 30;
 
         if (this.pieceColor == PieceColor.BLACK) {
             this.name = "bN";
@@ -34,6 +34,21 @@ public class KnightPiece extends Piece implements Cloneable {
         this.player.addPieceToAlive(this);
         this.currentTile.setPiece(this);
         this.pieceType = PieceType.KNIGHT;
+
+        strongTiles = new double[][] {
+                {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0},
+                {-4.0, -2.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0},
+                {-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0},
+                {-3.0, 0.5, 1.5, 2.0, 2.0, 1.5, 0.5, -3.0},
+                {-3.0, 0.0, 1.5, 2.0, 2.0, 1.5, 0.0, -3.0},
+                {-3.0, 0.5, 1.0, 1.5, 1.5, 1.0, 0.5, -3.0},
+                {-4.0, -2.0, 0.0, 0.5, 0.5, 0.0, -2.0, -4.0},
+                {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}
+        };
+
+        if (pieceColor == PieceColor.BLACK) {
+            strongTiles = revertStrongTiles(strongTiles);
+        }
     }
 
     @Override
@@ -69,7 +84,10 @@ public class KnightPiece extends Piece implements Cloneable {
                         .build();
                 moves.add(move);
                 if (!targetTile.isEmpty()) {
-                    if (targetTile.getPiece().getPieceColor() != pieceColor) piecesUnderThreat.add(targetTile.getPiece());
+                    if (targetTile.getPiece().getPieceColor() != pieceColor) {
+                        piecesUnderThreat.add(targetTile.getPiece());
+                        targetTile.getPiece().setIsInDanger(true);
+                    }
                 }
             }
         }

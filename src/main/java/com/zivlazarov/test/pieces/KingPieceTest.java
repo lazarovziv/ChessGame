@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.pieces;
+package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
@@ -29,8 +29,8 @@ public class KingPieceTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        opponent.setOpponentPlayer(player);
-        player.setOpponentPlayer(opponent);
+        opponent.setOpponent(player);
+        player.setOpponent(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
         board.setCurrentPlayer(player);

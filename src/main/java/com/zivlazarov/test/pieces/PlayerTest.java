@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.pieces;
+package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
@@ -8,6 +8,7 @@ import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -28,76 +29,51 @@ public class PlayerTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
-        opponent.setOpponentPlayer(player);
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+        player.setOpponent(opponent);
+        KingPiece kingPiece = new KingPiece(player, board, board.getBoard()[1][4]);
         pawnPiece = new PawnPiece(player, board, board.getBoard()[5][3], 0);
         bishopPiece = new BishopPiece(player, board, board.getBoard()[1][0], 0);
         opponentKingPiece = new KingPiece(opponent, board, board.getBoard()[7][4]);
         opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[6][2], 0);
+        board.setCurrentPlayer(player);
         board.checkBoard();
-    }
-
-    @Test
-    public void testMove() {
-        board.printBoard();
-        pawnPiece.refresh();
-        if (player.movePiece(pawnPiece, board.getBoard()[1][3])) board.printBoard();
-        bishopPiece.refresh();
-        if (player.movePiece(bishopPiece, board.getBoard()[7][6])) board.printBoard();
     }
 
     @Test
     public void testSaveAndLoadState() {
-        KingPiece kingPiece = new KingPiece(player, board, board.getBoard()[1][4]);
         System.out.println("Player pieces: ");
         for (Piece piece : player.getAlivePieces()) {
-            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+//            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+            piece.getMoves().forEach(System.out::println);
         }
         System.out.println("Opponent pieces: ");
-        for (Piece piece : opponent.getAlivePieces())
-            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+        for (Piece piece : opponent.getAlivePieces()) {
+//            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+            piece.getMoves().forEach(System.out::println);
+        }
 
         player.saveState();
-        player.getOpponentPlayer().saveState();
+        player.getOpponent().saveState();
 
-        player.movePiece(pawnPiece, board.getBoard()[1][3]);
+        Move move = (Move) player.getMoves().toArray()[0];
+        move.makeMove(true);
 
-        board.checkBoard();
+        System.out.println();
 
         Player loadedPlayer = player.loadState();
-        Player loadedOpponent = player.getOpponentPlayer().loadState();
+        Player loadedOpponent = player.getOpponent().loadState();
 
         System.out.println("Loaded player pieces: ");
         for (Piece piece : loadedPlayer.getAlivePieces()) {
-            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+//            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+            piece.getMoves().forEach(System.out::println);
         }
         System.out.println("Loaded opponent pieces: ");
         for (Piece piece : loadedOpponent.getAlivePieces()) {
-            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+//            System.out.println(piece.getName() + " - " + piece.getCurrentTile());
+            piece.getMoves().forEach(System.out::println);
         }
-    }
-
-    @Test
-    public void testUndoMove() {
-        board.printBoard();
-        pawnPiece.getPossibleMoves().forEach(System.out::println);
-        if (player.movePiece(pawnPiece, board.getBoard()[6][2])) {
-            board.checkBoard();
-            board.printBoard();
-//            player.undoLastMove();
-            board.printBoard();
-        }
-        opponentPawnPiece.getPossibleMoves().forEach(System.out::println);
-    }
-
-    @Test
-    public void testUnmakeMove() {
-        Iterator iterator = player.getMoves().iterator();
-        Move move = (Move) iterator.next();
-        System.out.println(move);
-        move.makeMove(true);
-        board.printBoard();
-        move.unmakeMove(true);
-        board.printBoard();
     }
 }

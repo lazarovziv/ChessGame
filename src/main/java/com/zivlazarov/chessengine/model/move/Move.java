@@ -88,8 +88,6 @@ public class Move implements Serializable {
                 }
             }
 
-//            isSpecialMove = player.handleEnPassantMove(movingPiece, targetTile);
-//            if (isSpecialMove) label = MoveLabel.EN_PASSANT;
             Piece opponentPiece = null;
             if (!targetTile.isEmpty()) {
                 opponentPiece = targetTile.getPiece();
@@ -107,7 +105,6 @@ public class Move implements Serializable {
                     movingPiece = new QueenPiece(player, board, targetTile);
                 }
             }
-//            movingPiece = player.handlePawnPromotion(movingPiece, targetTile);
 
             // if moved 2 rows forward, it's a long move, setting it as true
             if (Math.abs(targetTile.getRow() - movingPiece.getCurrentTile().getRow()) == 2)
@@ -142,17 +139,6 @@ public class Move implements Serializable {
                 isSpecialMove = true;
             }
 
-//            isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
-//            if (isSpecialMove) {
-//                castlingMove = new Move.Builder()
-//                        .board(board)
-//                        .player(player)
-//                        .movingPiece(player.getKingSideRookPiece())
-//                        .targetTile(player.getKingSideRookPiece().getKingSideCastlingTile())
-//                        .build();
-//                ((KingPiece) movingPiece).setExecutedKingSideCastle(true);
-//                label = MoveLabel.KING_SIDE_CASTLE;
-//            }
             // if not king side castling, maybe queen side so isSpecialMove has to be false
             if (!isSpecialMove) {
                 if (targetTile.equals(((KingPiece) movingPiece).getQueenSideCastleTile()) &&
@@ -171,19 +157,7 @@ public class Move implements Serializable {
                     isSpecialMove = true;
                 }
             }
-//            if (!isSpecialMove) {
-//                isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
-//                if (isSpecialMove) {
-//                    castlingMove = new Move.Builder()
-//                            .board(board)
-//                            .player(player)
-//                            .movingPiece(player.getQueenSideRookPiece())
-//                            .targetTile(player.getQueenSideRookPiece().getQueenSideCastlingTile())
-//                            .build();
-//                    ((KingPiece) movingPiece).setExecutedQueenSideCastle(true);
-//                    label = MoveLabel.QUEEN_SIDE_CASTLE;
-//                }
-//            }
+
         } else if (movingPiece instanceof RookPiece) {
             if (checkBoard && !movingPiece.hasMoved()) {
                 movingPiece.setHasMoved(true);
@@ -208,17 +182,13 @@ public class Move implements Serializable {
 
         if (castlingMove != null) castlingMove.makeMove(false);
 
-        player.resetPlayerScore();
-        player.getOpponent().resetPlayerScore();
-        player.evaluatePlayerScore();
-        player.getOpponent().evaluatePlayerScore();
-
         player.addTurn();
 
         board.setCurrentPlayer(player.getOpponent());
 
-        if (checkBoard)
+        if (checkBoard) {
             board.checkBoard();
+        }
 
         return true;
     }

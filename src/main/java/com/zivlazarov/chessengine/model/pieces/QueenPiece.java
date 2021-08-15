@@ -15,12 +15,12 @@ public class QueenPiece extends Piece implements Cloneable {
 
         this.player = player;
         this.board = board;
-        this.pieceColor = player.getPlayerColor();
+        this.pieceColor = player.getColor();
         this.currentTile = initTile;
         this.lastTile = currentTile;
         this.pieceCounter = -2;
 
-        this.value = 9;
+        this.value = 90;
 
         if (this.pieceColor == PieceColor.BLACK) {
             this.name = "bQ";
@@ -34,6 +34,21 @@ public class QueenPiece extends Piece implements Cloneable {
         this.player.addPieceToAlive(this);
         this.currentTile.setPiece(this);
         this.pieceType = PieceType.QUEEN;
+
+        strongTiles = new double[][] {
+                {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0},
+                {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
+                {-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0},
+                {-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5},
+                {0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5},
+                {-1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0},
+                {-1.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, -1.0},
+                {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}
+        };
+
+        if (pieceColor == PieceColor.BLACK) {
+            strongTiles = revertStrongTiles(strongTiles);
+        }
     }
 
     @Override
@@ -76,6 +91,7 @@ public class QueenPiece extends Piece implements Cloneable {
                 } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
                     possibleMoves.add(targetTile);
                     piecesUnderThreat.add(targetTile.getPiece());
+                    targetTile.getPiece().setIsInDanger(true);
                     Move move = new Move.Builder()
                             .board(board)
                             .player(player)

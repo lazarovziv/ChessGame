@@ -19,7 +19,7 @@ public class PlayerDao implements Dao {
         String name = player.getName();
         int playerDirection = player.getPlayerDirection();
         int playerScore = player.getPlayerScore();
-        PieceColor playerColor = player.getPlayerColor();
+        PieceColor playerColor = player.getColor();
         int color;
         if (playerColor == PieceColor.WHITE) color = 0;
         else color = 1;
@@ -117,7 +117,7 @@ public class PlayerDao implements Dao {
                 player.setPlayerDirection(resultSet.getInt(4));
                 player.setPlayerScore(resultSet.getInt(5));
                 PieceColor playerColor = resultSet.getInt(6) == 0 ? PieceColor.WHITE : PieceColor.BLACK;
-                player.setPlayerColor(playerColor);
+                player.setColor(playerColor);
             }
 
             System.out.println("Retrieve of player is complete.");

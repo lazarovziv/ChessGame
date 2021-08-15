@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 public class PawnPiece extends Piece implements Cloneable {
 
     private boolean executedEnPassant = false;
+    private boolean movedLong = false;
 
     private Tile enPassantTile;
 
@@ -23,12 +24,12 @@ public class PawnPiece extends Piece implements Cloneable {
 
         this.player = player;
         this.board = board;
-        this.pieceColor = player.getPlayerColor();
+        this.pieceColor = player.getColor();
         this.currentTile = initTile;
         this.lastTile = currentTile;
         this.pieceCounter = pieceCounter;
 
-        this.value = 1;
+        this.value = 10;
 
         if (this.pieceColor == PieceColor.BLACK) {
             this.name = "bP";
@@ -42,6 +43,21 @@ public class PawnPiece extends Piece implements Cloneable {
         this.player.addPieceToAlive(this);
         this.currentTile.setPiece(this);
         this.pieceType = PieceType.PAWN;
+
+        strongTiles = new double[][] {
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+                {1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0},
+                {0.5, 0.5, 1.0, 2.5, 2.5, 1.0, 0.5, 0.5},
+                {0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 0.0},
+                {0.5, -0.5, -1.0, 0.0, 0.0, -1.0, -0.5, 0.5},
+                {0.5, 1.0, 1.0, -2.0, -2.0, 1.0, 1.0, 0.5},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}
+        };
+
+        if (pieceColor == PieceColor.BLACK) {
+            strongTiles = revertStrongTiles(strongTiles);
+        }
     }
 
     @Override
@@ -93,6 +109,7 @@ public class PawnPiece extends Piece implements Cloneable {
                     board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
                 possibleMoves.add(board.getBoard()[x+direction][y+d]);
                 piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
+                board.getBoard()[x+direction][y+d].getPiece().setIsInDanger(true);
                 Move move = new Move.Builder()
                         .board(board)
                         .player(player)
@@ -103,7 +120,7 @@ public class PawnPiece extends Piece implements Cloneable {
             }
             // setting potential capturing tiles as threats
             board.getBoard()[x+direction][y+d].setThreatenedByColor(pieceColor, true);
-            // insert en passant
+            // en passant
             if (canEnPassant(d)) {
                 possibleMoves.add(enPassantTile);
                 Move move = new Move.Builder()
@@ -128,11 +145,12 @@ public class PawnPiece extends Piece implements Cloneable {
 
         // checking borders of board
         if (y + eatingDirection < 0 || y + eatingDirection > board.getBoard().length - 1
-        || x - 2 * player.getOpponentPlayer().getPlayerDirection() < 0) return false;
+        || x - 2 * player.getOpponent().getPlayerDirection() < 0) return false;
 
         // checking if piece next to pawn is of type pawn and is opponent's piece
         if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece pawn &&
-               pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant() && board.getGameHistoryMoves().size() > 1) {
+               pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant() &&
+                board.getGameHistoryMoves().size() > 1 && pawn.hasMovedLong()) {
             // checking to see if opponent's last move is pawn's move 2 tiles forward
             if (board.getGameHistoryMoves().lastElement()/*.getSecond()*/.equals(new Pair<>(
 //                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
@@ -161,6 +179,14 @@ public class PawnPiece extends Piece implements Cloneable {
 
     public void setEnPassantTile(Tile enPassantTile) {
         this.enPassantTile = enPassantTile;
+    }
+
+    public boolean hasMovedLong() {
+        return movedLong;
+    }
+
+    public void setMovedLong(boolean movedLong) {
+        this.movedLong = movedLong;
     }
 
     //

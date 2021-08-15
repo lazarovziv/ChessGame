@@ -13,17 +13,20 @@ public class KingPiece extends Piece implements Cloneable {
     private Tile kingSideCastleTile;
     private Tile queenSideCastleTile;
 
+    private boolean executedKingSideCastle = false;
+    private boolean executedQueenSideCastle = false;
+
     public KingPiece(Player player, Board board, Tile initTile) {
         super();
 
         this.player = player;
         this.board = board;
-        this.pieceColor = player.getPlayerColor();
+        this.pieceColor = player.getColor();
         this.currentTile = initTile;
         this.lastTile = currentTile;
         this.pieceCounter = -1;
 
-        this.value = 100;
+        this.value = 900;
 
         if (this.pieceColor == PieceColor.BLACK) {
             this.name = "bK";
@@ -44,6 +47,21 @@ public class KingPiece extends Piece implements Cloneable {
         }
 
         board.getKingsMap().put(player, this);
+
+        strongTiles = new double[][] {
+                {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+                {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+                {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+                {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+                {-2.0, -3.0, -3.0, -4.0 ,-4.0, -3.0, -3.0, -2.0},
+                {-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0},
+                {2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0},
+                {2.0, 3.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0}
+        };
+
+        if (pieceColor == PieceColor.BLACK) {
+            strongTiles = revertStrongTiles(strongTiles);
+        }
     }
 
     @Override
@@ -68,7 +86,7 @@ public class KingPiece extends Piece implements Cloneable {
             int c = direction[1];
             if (x+r > board.getBoard().length - 1 || x+r < 0 || y+c > board.getBoard().length - 1 || y+c < 0) continue;
             Tile targetTile = board.getBoard()[x+r][y+c];
-            if (!targetTile.isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) {
+            if (!targetTile.isThreatenedByColor(player.getOpponent().getColor())) {
                 if (targetTile.isEmpty() || targetTile.getPiece().getPieceColor() != pieceColor) {
                     // calling possible moves first because of the target tile check condition in Move.Builder class
                     possibleMoves.add(targetTile);
@@ -121,6 +139,7 @@ public class KingPiece extends Piece implements Cloneable {
             if (!tile.isEmpty()) {
                 if (tile.getPiece().getPieceColor() != pieceColor) {
                     piecesUnderThreat.add(tile.getPiece());
+                    tile.getPiece().setIsInDanger(true);
                 }
             }
         }
@@ -145,11 +164,11 @@ public class KingPiece extends Piece implements Cloneable {
         for (int i = 1; y+i < 7; i++) {
             if (board.getBoard()[x][7].getPiece() == null || hasMoved || isInDanger
                     || board.getBoard()[x][7].getPiece().hasMoved()
-                    || board.getBoard()[x][7].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())
+                    || board.getBoard()[x][7].isThreatenedByColor(player.getOpponent().getColor())
                     || player.isInCheck()) return false;
 
             if (!board.getBoard()[x][y+i].isEmpty()
-                    || board.getBoard()[x][y+i].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) return false;
+                    || board.getBoard()[x][y+i].isThreatenedByColor(player.getOpponent().getColor())) return false;
         }
         return true;
     }
@@ -162,11 +181,11 @@ public class KingPiece extends Piece implements Cloneable {
         for (int i = 1; y-i > 0; i++) {
             if (board.getBoard()[x][0].getPiece() == null || hasMoved || isInDanger
                     || board.getBoard()[x][0].getPiece().hasMoved()
-                    || board.getBoard()[x][0].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())
+                    || board.getBoard()[x][0].isThreatenedByColor(player.getOpponent().getColor())
                     || player.isInCheck()) return false;
 
             if (!board.getBoard()[x][y-i].isEmpty()
-                    || board.getBoard()[x][y-i].isThreatenedByColor(player.getOpponentPlayer().getPlayerColor())) return false;
+                    || board.getBoard()[x][y-i].isThreatenedByColor(player.getOpponent().getColor())) return false;
         }
         return true;
     }
@@ -177,6 +196,22 @@ public class KingPiece extends Piece implements Cloneable {
 
     public Tile getQueenSideCastleTile() {
         return queenSideCastleTile;
+    }
+
+    public boolean hasExecutedKingSideCastle() {
+        return executedKingSideCastle;
+    }
+
+    public void setExecutedKingSideCastle(boolean executedKingSideCastle) {
+        this.executedKingSideCastle = executedKingSideCastle;
+    }
+
+    public boolean hasExecutedQueenSideCastle() {
+        return executedQueenSideCastle;
+    }
+
+    public void setExecutedQueenSideCastle(boolean executedQueenSideCastle) {
+        this.executedQueenSideCastle = executedQueenSideCastle;
     }
 
     //

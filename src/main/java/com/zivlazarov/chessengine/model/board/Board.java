@@ -202,6 +202,7 @@ public class Board implements MyObservable, Serializable {
                                     playerPiecesInTheWay.add(playerPiece);
                                 } else {
                                     currentPlayer.getKing().getMoves().removeIf(move -> move.getTargetTile().equals(tile));
+                                    currentPlayer.getLegalMoves().removeIf(t -> t.equals(tile));
                                     currentPlayer.getKing().getPossibleMoves().removeIf(t -> t.equals(tile));
                                     currentPlayer.getMoves().removeIf(move -> move.getMovingPiece().equals(currentPlayer.getKing())
                                     && move.getTargetTile().equals(tile));
@@ -213,6 +214,7 @@ public class Board implements MyObservable, Serializable {
                             Piece playerPiece = playerPiecesInTheWay.get(0);
 
                             currentPlayer.getMoves().removeIf(move -> move.getMovingPiece().equals(playerPiece));
+                            currentPlayer.getLegalMoves().removeIf(tile -> playerPiece.getPossibleMoves().contains(tile));
                             if (directionsOfDanger.get(opponentPiece).size() > 1) {
                                 playerPiece.getPossibleMoves().removeIf(t -> !directionsOfDanger.get(opponentPiece).contains(t));
                                 playerPiece.getMoves().removeIf(move -> !directionsOfDanger.get(opponentPiece).contains(
@@ -329,6 +331,62 @@ public class Board implements MyObservable, Serializable {
         }
 
         return allDirections;
+    }
+
+    public void searchForPotentialThreats(Player player) {
+        KingPiece kingPiece = player.getKing();
+
+        // can have multiple of the same piece
+        Set<Piece> canInterferePieces = new HashSet<>();
+
+        int startIndex = 0;
+
+        for (Tile tile : player.getOpponent().getLegalMoves()) {
+            if (tile.equals(kingPiece.getCurrentTile())) {
+                player.setIsInCheck(true);
+            }
+
+            boolean containsOneOfOpponentTiles = player.getLegalMoves().stream().anyMatch(t -> t.equals(tile));
+
+            if (containsOneOfOpponentTiles) {
+                canInterferePieces.addAll(player.getAlivePieces().stream().filter
+                        (piece -> piece.getPossibleMoves().contains(tile)).toList());
+
+                for (int i = startIndex; i < canInterferePieces.size(); i++) {
+                    Board board = new Board();
+                    board.setWhitePlayer(whitePlayer);
+                    board.setBlackPlayer(blackPlayer);
+                    board.setCurrentPlayer(player);
+
+                    // setting each piece's tile on simulated board
+                    // TODO: revert back each piece's tile to original board
+                    for (Piece p : board.getWhitePlayer().getAlivePieces()) {
+                        p.setCurrentTile(board.getBoard()[p.getRow()][p.getCol()]);
+                    }
+
+                    for (Piece p : board.getBlackPlayer().getAlivePieces()) {
+                        p.setCurrentTile(board.getBoard()[p.getRow()][p.getCol()]);
+                    }
+
+                    Move move = new Move.Builder()
+                            .board(board)
+                            .player(player)
+                            .movingPiece((Piece) canInterferePieces.toArray()[i])
+                            .targetTile(tile)
+                            .build();
+                    move.makeMove(false);
+
+                    // if player is still in check
+                    if (player.isInCheck()) {
+                        move.unmakeMove(false);
+                        // remove all moves that don't prevent the check
+                        player.getMoves().removeIf(m -> m.getTargetTile().equals(tile));
+                        player.getAlivePieces().forEach(p -> p.getPossibleMoves().removeIf(t -> t.equals(tile)));
+                    }
+                    startIndex++;
+                }
+            }
+        }
     }
 
     public GameSituation generateMovesWhenInCheck(Player player) {
@@ -569,7 +627,7 @@ public class Board implements MyObservable, Serializable {
         return tile.getRow() * 8 + tile.getCol();
     }
 
-    public int evaluateBoard() {
+    public double evaluateBoard() {
         whitePlayer.resetPlayerScore();
 //        whitePlayer.evaluatePlayerScore();
         blackPlayer.resetPlayerScore();
@@ -669,6 +727,9 @@ public class Board implements MyObservable, Serializable {
 
     @Override
     public void updateObservers() {
+        for (Piece piece : whitePlayer.getAlivePieces()) piece.setIsInDanger(false);
+        for (Piece piece : blackPlayer.getAlivePieces()) piece.setIsInDanger(false);
+
         currentPlayer.getOpponent().update();
         currentPlayer.update();
 

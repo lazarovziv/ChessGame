@@ -3,83 +3,67 @@ package com.zivlazarov.chessengine.model.ai;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.move.MoveGenerator;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
+import com.zivlazarov.chessengine.model.pieces.PieceType;
 import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.List;
 
 public class Minimax {
 
-    public Move calculate(Board board, int depth, Player player) {
+    public double search(Board board, int depth,double alpha, double beta, boolean isMaximizing) {
+        if (depth == 0 || !board.canContinueGame()) return -board.evaluateBoard();
+
+        List<Move> moves = board.getCurrentPlayer().getMoves().stream().toList();
+
+        // white
+        double bestValue;
+        if (isMaximizing) {
+            bestValue = Integer.MIN_VALUE;
+            for (Move move : moves) {
+                System.out.println(move);
+                move.makeMove(true);
+                bestValue = Math.max(bestValue, search(board, depth - 1,alpha, beta, false));
+                move.unmakeMove(false);
+                // pruning
+                if (bestValue >= beta) break;
+                alpha = Math.max(alpha, bestValue);
+            }
+            // black
+        } else {
+            bestValue = Integer.MAX_VALUE;
+            for (Move move : moves) {
+                System.out.println(move);
+                move.makeMove(true);
+                bestValue = Math.min(bestValue, search(board, depth - 1, alpha, beta, true));
+                move.unmakeMove(false);
+                // pruning
+                if (bestValue <= alpha) break;
+                beta = Math.min(beta, bestValue);
+            }
+        }
+        return bestValue;
+    }
+
+    public Move findBestMove(Board board, int depth, Player player) {
         Move bestMove = null;
 
-        int value;
-        int playerScore = player.getPlayerScore();
+        List<Move> moves = player.getMoves().stream().toList();
 
-        boolean isWhitePlayer = player.getPlayerColor() == PieceColor.WHITE;
+        double bestValue = player.getColor() == PieceColor.WHITE ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        List<Move> playerMoves = player.getMoves().stream().toList();
+        for (Move move : moves) {
+            move.makeMove(true);
+            double boardValue = -board.evaluateBoard();
+            move.unmakeMove(false);
 
-        if (isWhitePlayer) {
-            value = Integer.MIN_VALUE;
-
-            for (Move move : playerMoves) {
-                move.makeMove(true);
-
-                value = Math.max(value, search(board, depth - 1, player.getOpponentPlayer()));
-
-                if (value >= playerScore) bestMove = move;
-
-                move.unmakeMove(true);
-            }
-        } else {
-            value = Integer.MAX_VALUE;
-
-            for (Move move : playerMoves) {
-                move.makeMove(true);
-
-                value = Math.min(value, search(board, depth - 1, player.getOpponentPlayer()));
-
-                if (value <= playerScore) bestMove = move;
-
-                move.unmakeMove(true);
+            if (boardValue > bestValue) {
+                bestValue = boardValue;
+                bestMove = move;
             }
         }
 
         return bestMove;
-    }
-
-    public int search(Board board, int depth, Player player) {
-        if (depth == 0 || board.isCheckmate() || !player.getKing().isAlive()) {
-            System.out.println(board.evaluateBoard());
-            return board.evaluateBoard();
-        }
-
-        int value;
-
-        boolean isWhitePlayer = player.getPlayerColor() == PieceColor.WHITE;
-
-        List<Move> playerMoves = player.getMoves().stream().toList();
-
-        if (isWhitePlayer) {
-            value = Integer.MIN_VALUE;
-            for (Move move : playerMoves) {
-                move.makeMove(true);
-
-                value = Math.max(value, search(board, depth - 1, player.getOpponentPlayer()));
-
-                move.unmakeMove(true);
-            }
-        } else {
-            value = Integer.MAX_VALUE;
-            for (Move move : playerMoves) {
-                move.makeMove(true);
-
-                value = Math.max(value, search(board, depth - 1, player.getOpponentPlayer()));
-
-                move.unmakeMove(true);
-            }
-        }
-
-        return value;
     }
 }

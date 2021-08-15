@@ -72,6 +72,8 @@ public class Player implements MyObserver, Serializable {
     @Transient
     private transient MyObservable observable;
 
+    private boolean isInCheck = false;
+
     public Player(PieceColor pieceColor) {
         playerColor = pieceColor;
         alivePieces = new ArrayList<>();
@@ -183,8 +185,8 @@ public class Player implements MyObserver, Serializable {
         if (piece.getPieceColor() == playerColor) {
             deadPieces.add(piece);
             alivePieces.remove(piece);
-            clearPieceFromTile(piece.getCurrentTile());
             piece.setLastTile(piece.getCurrentTile());
+            clearPieceFromTile(piece.getCurrentTile());
             piece.setCurrentTile(null);
             piece.setIsAlive(false);
         }
@@ -286,29 +288,32 @@ public class Player implements MyObserver, Serializable {
         return turnsPlayed;
     }
 
-    public int evaluatePlayerScore() {
+    public double evaluatePlayerScore() {
         for (Piece piece : alivePieces) {
-            playerScore += playerDirection * 100 * piece.getValue();
+            playerScore += playerDirection * piece.getValue();
             for (Piece threatenedPiece : piece.getPiecesUnderThreat()) {
-                playerScore += playerDirection * 12 * threatenedPiece.getValue();
+                playerScore += playerDirection * 0.12 * threatenedPiece.getValue();
             }
+
+            // adding
+            playerScore += playerDirection * piece.getStrongTiles()[piece.getRow()][piece.getCol()];
 
             if (piece instanceof KingPiece) {
                 if (((KingPiece) piece).canKingSideCastle() || ((KingPiece) piece).canQueenSideCastle()) {
-                    playerScore += playerDirection * 400;
+                    playerScore += playerDirection * 30;
                 }
                 if (((KingPiece) piece).hasExecutedKingSideCastle()) {
-                    playerScore += playerDirection * 700;
+                    playerScore += playerDirection * 70;
                 } else if (((KingPiece) piece).hasExecutedQueenSideCastle()) {
-                    playerScore += playerDirection * 600;
+                    playerScore += playerDirection * 60;
                 }
             }
         }
         for (Piece piece : deadPieces) {
-            playerScore -= playerDirection * 100 * piece.getValue();
-            if (piece.isInDanger()) playerScore -= playerDirection * 12 * piece.getValue();
+            playerScore -= playerDirection * piece.getValue();
+            if (piece.isInDanger()) playerScore -= playerDirection * 0.12 * piece.getValue();
         }
-        if (opponent.isInCheck()) playerScore += playerDirection * 75;
+        if (opponent.isInCheck()) playerScore += playerDirection * 35;
 
         return playerScore;
     }
@@ -344,8 +349,13 @@ public class Player implements MyObserver, Serializable {
         this.playerDirection = playerDirection;
     }
 
+    public void setIsInCheck(boolean isInCheck) {
+        this.isInCheck = isInCheck;
+    }
+
     public boolean isInCheck() {
-        return getKing().isInDanger();
+        return isInCheck;
+//        return getKing().isInDanger();
 //        for (Piece piece : opponent.getAlivePieces()) {
 //            if (piece.getPiecesUnderThreat().contains(getKing())) {
 //                return true;

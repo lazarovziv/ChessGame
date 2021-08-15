@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.db;
+package com.zivlazarov.test.db;
 
 import com.zivlazarov.chessengine.db.dao.PlayerDao;
 import com.zivlazarov.chessengine.model.board.Board;
@@ -23,7 +23,7 @@ public class PlayerDaoTest {
 
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
+        player.setOpponent(opponent);
 
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
@@ -53,7 +53,7 @@ public class PlayerDaoTest {
             sqlException.printStackTrace();
         }
         if (player != null)
-            System.out.println(player.getPlayerColor());
+            System.out.println(player.getColor());
     }
 
 

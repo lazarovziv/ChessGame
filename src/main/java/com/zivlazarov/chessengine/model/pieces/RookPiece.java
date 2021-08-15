@@ -21,12 +21,12 @@ public class RookPiece extends Piece implements Cloneable {
 
         this.player = player;
         this.board = board;
-        this.pieceColor = player.getPlayerColor();
+        this.pieceColor = player.getColor();
         this.currentTile = initTile;
         this.lastTile = currentTile;
         this.pieceCounter = pieceCounter;
 
-        this.value = 5;
+        this.value = 50;
 
         if (this.pieceColor == PieceColor.BLACK) {
             this.name = "bR";
@@ -41,15 +41,30 @@ public class RookPiece extends Piece implements Cloneable {
         this.currentTile.setPiece(this);
         this.pieceType = PieceType.ROOK;
 
-        isKingSide = currentTile.getCol() == 7;
+        isKingSide = initTile.getCol() == 7;
         isQueenSide = !isKingSide;
 
         if (isKingSide) {
-            kingSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() - 2];
+            kingSideCastlingTile = board.getBoard()[currentTile.getRow()][5];
             board.getKingSideRooksMap().put(player, this);
         } else {
-            queenSideCastlingTile = board.getBoard()[currentTile.getRow()][currentTile.getCol() + 3];
+            queenSideCastlingTile = board.getBoard()[currentTile.getRow()][3];
             board.getQueenSideRooksMap().put(player, this);
+        }
+
+        strongTiles = new double[][] {
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0}
+        };
+
+        if (pieceColor == PieceColor.BLACK) {
+            strongTiles = revertStrongTiles(strongTiles);
         }
     }
 
@@ -87,6 +102,7 @@ public class RookPiece extends Piece implements Cloneable {
                 } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
                     possibleMoves.add(targetTile);
                     piecesUnderThreat.add(targetTile.getPiece());
+                    targetTile.getPiece().setIsInDanger(true);
                     Move move = new Move.Builder()
                             .board(board)
                             .player(player)

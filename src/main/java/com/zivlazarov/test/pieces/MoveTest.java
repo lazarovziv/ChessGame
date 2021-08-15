@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.pieces;
+package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
@@ -6,9 +6,12 @@ import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.Piece;
+import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 public class MoveTest {
 
@@ -25,7 +28,7 @@ public class MoveTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
+        player.setOpponent(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
 
@@ -54,7 +57,7 @@ public class MoveTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
+        player.setOpponent(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
 
@@ -101,7 +104,7 @@ public class MoveTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
+        player.setOpponent(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
 
@@ -160,7 +163,7 @@ public class MoveTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
+        player.setOpponent(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
 
@@ -214,11 +217,62 @@ public class MoveTest {
     }
 
     @Test
+    public void testUnmakeCastling() {
+        board = new Board();
+        player = new Player(board, PieceColor.WHITE);
+        opponent = new Player(board, PieceColor.BLACK);
+        player.setOpponent(opponent);
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+
+        board.setCurrentPlayer(player);
+        Piece king = new KingPiece(player, board, board.getBoard()[0][4]);
+        Piece oKing = new KingPiece(opponent, board, board.getBoard()[7][5]);
+        Piece kingSide = new RookPiece(player, board, board.getBoard()[0][7], 0);
+        Piece queenSide = new RookPiece(player, board, board.getBoard()[0][0], 0);
+
+        board.checkBoard();
+        board.printBoard();
+
+        kingSide.getMoves().forEach(System.out::println);
+
+        Move kingSideCastle = new Move.Builder()
+                .board(board)
+                .player(player)
+                .movingPiece(king)
+                .targetTile(board.getBoard()[0][6])
+                .build();
+        kingSideCastle.makeMove(true);
+        board.printBoard();
+
+        kingSideCastle.unmakeMove(true);
+        board.printBoard();
+
+        Assertions.assertTrue(king.getCurrentTile().equals(board.getBoard()[0][4])
+                && kingSide.getCurrentTile().equals(board.getBoard()[0][7]));
+
+        Move queenSideCastle = new Move.Builder()
+                .board(board)
+                .player(player)
+                .movingPiece(king)
+                .targetTile(board.getBoard()[0][2])
+                .build();
+        queenSideCastle.makeMove(true);
+        board.printBoard();
+
+        queenSideCastle.unmakeMove(true);
+        board.printBoard();
+
+        Assertions.assertTrue(king.getCurrentTile().equals(board.getBoard()[0][4])
+                && queenSide.getCurrentTile().equals(board.getBoard()[0][0]));
+    }
+
+    @Test
     public void testMoveEquals() {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
+        player.setOpponent(opponent);
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);
 
@@ -245,5 +299,37 @@ public class MoveTest {
                 .build();
 
         Assertions.assertTrue(move.equals(move1));
+    }
+
+    @Test
+    public void testMovesGenerated(int depth) {
+        System.out.println(generatedMove(3));
+    }
+
+    public int generatedMove(int depth) {
+        Board board = new Board();
+        Player player = new Player(board, PieceColor.WHITE);
+        Player opponent = new Player(board, PieceColor.BLACK);
+        player.setOpponent(opponent);
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+
+        board.setCurrentPlayer(player);
+
+        board.initBoard();
+        board.checkBoard();
+
+        if (depth == 0) return 1;
+
+        List<Move> moves = board.getCurrentPlayer().getMoves().stream().toList();
+        int numOfPositions = 0;
+
+        for (Move move : moves) {
+            move.makeMove(true);
+            numOfPositions += generatedMove(depth - 1);
+            move.unmakeMove(true);
+        }
+
+        return numOfPositions;
     }
 }

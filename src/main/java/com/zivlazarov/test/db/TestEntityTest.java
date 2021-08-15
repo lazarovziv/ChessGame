@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.db;
+package com.zivlazarov.test.db;
 
 import com.zivlazarov.chessengine.db.DatabaseUtils;
 import org.hibernate.HibernateException;

@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.pieces;
+package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.pieces.RookPiece;

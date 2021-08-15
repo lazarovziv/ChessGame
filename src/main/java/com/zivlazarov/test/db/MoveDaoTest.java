@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.db;
+package com.zivlazarov.test.db;
 
 import com.zivlazarov.chessengine.db.dao.MoveDao;
 import com.zivlazarov.chessengine.model.board.Board;
@@ -25,7 +25,7 @@ public class MoveDaoTest {
 
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
+        player.setOpponent(opponent);
 
         board.setWhitePlayer(player);
         board.setBlackPlayer(opponent);

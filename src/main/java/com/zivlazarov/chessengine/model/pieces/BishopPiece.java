@@ -16,12 +16,12 @@ public class BishopPiece extends Piece implements Cloneable {
 
         this.player = player;
         this.board = board;
-        this.pieceColor = player.getPlayerColor();
+        this.pieceColor = player.getColor();
         this.currentTile = initTile;
         this.lastTile = currentTile;
         this.pieceCounter = pieceCounter;
 
-        this.value = 3;
+        this.value = 30;
 
         if (this.pieceColor == PieceColor.BLACK) {
             this.name = "bB";
@@ -35,6 +35,22 @@ public class BishopPiece extends Piece implements Cloneable {
         this.player.addPieceToAlive(this);
         this.currentTile.setPiece(this);
         this.pieceType = PieceType.BISHOP;
+
+        // for white and black because white maximizes and black minimizes
+        strongTiles = new double[][] {
+                {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0},
+                {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
+                {-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0, -1.0},
+                {-1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0},
+                {-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.0},
+                {-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0},
+                {-1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, -1.0},
+                {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}
+        };
+
+        if (pieceColor == PieceColor.BLACK) {
+            strongTiles = revertStrongTiles(strongTiles);
+        }
     }
 
     @Override
@@ -71,6 +87,14 @@ public class BishopPiece extends Piece implements Cloneable {
                 } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
                     possibleMoves.add(targetTile);
                     piecesUnderThreat.add(targetTile.getPiece());
+//                    Move simpleMove = new Move.Builder()
+//                            .player(player)
+//                            .movingPiece(this)
+//                            .targetRow(x+r*i)
+//                            .targetCol(x+c*i)
+//                            .build();
+//                    moves.add(simpleMove);
+//                    break;
                     Move move = new Move.Builder()
                             .board(board)
                             .player(player)

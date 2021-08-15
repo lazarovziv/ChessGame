@@ -1,10 +1,12 @@
 package com.zivlazarov.chessengine.ui.game;
 
+import com.zivlazarov.chessengine.model.ai.Minimax;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.GameSituation;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.chessengine.model.pieces.*;
+import com.zivlazarov.chessengine.model.move.Move;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.HashMap;
@@ -18,6 +20,8 @@ public class CommandLineGame {
     private static Player whitePlayer;
     private static Player blackPlayer;
 
+    private static Minimax minimax;
+
     private static GameSituation gameSituation;
 
     public static void main(String[] args) {
@@ -27,10 +31,12 @@ public class CommandLineGame {
         whitePlayer = new Player(board, PieceColor.WHITE);
         blackPlayer = new Player(board, PieceColor.BLACK);
 
+        minimax = new Minimax();
+
         whitePlayer.setName("Ziv");
         blackPlayer.setName("Guy");
 
-        whitePlayer.setAI(true);
+        whitePlayer.setAI(false);
         blackPlayer.setAI(true);
 
         Map<GameSituation, String> gameSituationsMap = new HashMap<>();
@@ -41,7 +47,7 @@ public class CommandLineGame {
         gameSituationsMap.put(GameSituation.BLACK_CHECKMATED, "Checkmate! " + blackPlayer.getName() + " lost!");
         gameSituationsMap.put(GameSituation.DRAW, "It's a draw!");
 
-        whitePlayer.setOpponentPlayer(blackPlayer);
+        whitePlayer.setOpponent(blackPlayer);
 
         board.setWhitePlayer(whitePlayer);
         board.setBlackPlayer(blackPlayer);
@@ -95,47 +101,46 @@ public class CommandLineGame {
                 board.printBoardUpsideDown();
             } else board.printBoard();
 
-            // checking the board to see what situation the current player is in
-            board.checkBoard();
-
             // showing current board situation and exiting program if it's checkmate
             if (board.getGameSituation() != GameSituation.NORMAL) {
                 System.out.println(gameSituationsMap.get(board.getGameSituation()));
                 if (board.getGameSituation() == GameSituation.WHITE_CHECKMATED) System.exit(1);
                 if (board.getGameSituation() == GameSituation.BLACK_CHECKMATED) System.exit(1);
                 if (board.getGameSituation() == GameSituation.DRAW) System.exit(1);
+                if (board.getGameSituation() == GameSituation.STALEMATE) System.exit(1);
             }
 
-            // choosing a piece to move with
-            int pieceRowChosen;
-            int pieceColChosen;
-            Tile pieceTile;
+            if (!board.getCurrentPlayer().isAI()) {
+                // choosing a piece to move with
+                int pieceRowChosen;
+                int pieceColChosen;
+                Tile pieceTile;
 
-            System.out.println("Choose a piece: (row/column)");
+                System.out.println("Choose a piece: (row/column)");
 
-            do {
-                System.out.print("Row: ");
-                pieceRowChosen = scanner.nextInt();
-
-                while (pieceRowChosen < 1 || pieceRowChosen > 8) {
-                    System.out.print("Please enter a valid number: ");
+                do {
+                    System.out.print("Row: ");
                     pieceRowChosen = scanner.nextInt();
-                }
 
-                System.out.print("Column: ");
-                pieceColChosen = scanner.nextInt();
+                    while (pieceRowChosen < 1 || pieceRowChosen > 8) {
+                        System.out.print("Please enter a valid number: ");
+                        pieceRowChosen = scanner.nextInt();
+                    }
 
-                while (pieceColChosen < 1 || pieceColChosen > 8) {
-                    System.out.print("Please enter a valid number: ");
+                    System.out.print("Column: ");
                     pieceColChosen = scanner.nextInt();
-                }
 
-                pieceTile = board.getBoard()[pieceRowChosen-1][pieceColChosen-1];
+                    while (pieceColChosen < 1 || pieceColChosen > 8) {
+                        System.out.print("Please enter a valid number: ");
+                        pieceColChosen = scanner.nextInt();
+                    }
 
-                if (pieceTile.isEmpty()) System.out.println("This tile is empty!");
-                else if (!pieceTile.getPiece().canMove()) System.out.println("This piece can't move!");
-                else if (pieceTile.getPiece().getPieceColor() != currentPlayer.getPlayerColor())
-                    System.out.println("Please choose a " + currentPlayer.getPlayerColor() + " piece.");
+                    pieceTile = board.getBoard()[pieceRowChosen-1][pieceColChosen-1];
+
+                    if (pieceTile.isEmpty()) System.out.println("This tile is empty!");
+                    else if (!pieceTile.getPiece().canMove()) System.out.println("This piece can't move!");
+                    else if (pieceTile.getPiece().getPieceColor() != currentPlayer.getColor())
+                        System.out.println("Please choose a " + currentPlayer.getColor() + " piece.");
 //                else if (currentPlayer.isInCheck()) {
 //                    Player finalCurrentPlayer = currentPlayer;
 //                    if (!pieceTile.getPiece().getPossibleMoves().stream().anyMatch(tile -> finalCurrentPlayer.getLegalMoves().contains(tile))) {
@@ -143,78 +148,80 @@ public class CommandLineGame {
 //                    }
 //                }
 
-            } while (pieceRowChosen < 1 || pieceRowChosen > 8 || pieceColChosen < 1 || pieceColChosen > 8
-                    || pieceTile.isEmpty() || !pieceTile.getPiece().canMove()
-                    || pieceTile.getPiece().getPieceColor() != currentPlayer.getPlayerColor());
+                } while (pieceRowChosen < 1 || pieceRowChosen > 8 || pieceColChosen < 1 || pieceColChosen > 8
+                        || pieceTile.isEmpty() || !pieceTile.getPiece().canMove()
+                        || pieceTile.getPiece().getPieceColor() != currentPlayer.getColor());
 
-            Piece pieceChosen = pieceTile.getPiece();
+                Piece pieceChosen = pieceTile.getPiece();
 
-            System.out.println();
+                System.out.println();
 
-            if (printForWhite) {
-                board.printBoardUpsideDown();
-            } else board.printBoard();
+                if (printForWhite) {
+                    board.printBoardUpsideDown();
+                } else board.printBoard();
 
-            // showing possible moves to make
-            System.out.println("Possible moves: ");
-            for (int i = 0; i < pieceChosen.getPossibleMoves().size(); i++) {
-                if (i != pieceChosen.getPossibleMoves().size() - 1) {
-                    System.out.print(pieceChosen.getPossibleMoves().get(i) + ", ");
-                } else System.out.print(pieceChosen.getPossibleMoves().get(i));
+                // showing possible moves to make
+                System.out.println("Possible moves: ");
+                for (int i = 0; i < pieceChosen.getPossibleMoves().size(); i++) {
+                    if (i != pieceChosen.getPossibleMoves().size() - 1) {
+                        System.out.print(pieceChosen.getPossibleMoves().get(i) + ", ");
+                    } else System.out.print(pieceChosen.getPossibleMoves().get(i));
+                }
+
+                System.out.println();
+                System.out.println();
+
+                // getting a move input
+                int targetTileRow;
+                int targetTileCol;
+                Tile targetTile;
+
+                System.out.println("Please choose a move: (row/column)");
+                do {
+                    System.out.print("Row: ");
+                    targetTileRow = scanner.nextInt();
+
+                    while (targetTileRow < 1 || targetTileRow > 8) {
+                        System.out.print("Please choose a valid number: ");
+                        targetTileRow = scanner.nextInt();
+                    }
+
+                    System.out.print("Column: ");
+                    targetTileCol = scanner.nextInt();
+
+                    while (targetTileCol < 1 || targetTileCol > 8) {
+                        System.out.print("Please choose a valid number: ");
+                        targetTileCol = scanner.nextInt();
+                    }
+
+                    targetTile = board.getBoard()[targetTileRow-1][targetTileCol-1];
+
+                    if (!pieceChosen.getPossibleMoves().contains(targetTile)) {
+                        System.out.println("This piece can't move there!");
+                    }
+                } while (targetTileRow < 1 || targetTileRow > 8 || targetTileCol < 1 || targetTileCol > 8
+                        || !pieceChosen.getPossibleMoves().contains(targetTile) /* insert check situation ?*/);
+
+//                currentPlayer.movePiece(pieceChosen, targetTile);
+
+                Move move = new Move.Builder()
+                        .board(board)
+                        .player(currentPlayer)
+                        .movingPiece(pieceChosen)
+                        .targetTile(targetTile)
+                        .build();
+
+                move.makeMove(true);
+
+                // incrementing the turn
+                turn++;
+
+                System.out.println();
+            } else {
+//                Move move = minimax.calculateBestMove(board, 3, false);
+//                move.makeMove(true);
             }
 
-            System.out.println();
-            System.out.println();
-
-            // getting a move input
-            int targetTileRow;
-            int targetTileCol;
-            Tile targetTile;
-
-            System.out.println("Please choose a move: (row/column)");
-            do {
-                System.out.print("Row: ");
-                targetTileRow = scanner.nextInt();
-
-                while (targetTileRow < 1 || targetTileRow > 8) {
-                    System.out.print("Please choose a valid number: ");
-                    targetTileRow = scanner.nextInt();
-                }
-
-                System.out.print("Column: ");
-                targetTileCol = scanner.nextInt();
-
-                while (targetTileCol < 1 || targetTileCol > 8) {
-                    System.out.print("Please choose a valid number: ");
-                    targetTileCol = scanner.nextInt();
-                }
-
-                targetTile = board.getBoard()[targetTileRow-1][targetTileCol-1];
-
-                if (!pieceChosen.getPossibleMoves().contains(targetTile)) {
-                    System.out.println("This piece can't move there!");
-                }
-            } while (targetTileRow < 1 || targetTileRow > 8 || targetTileCol < 1 || targetTileCol > 8
-            || !pieceChosen.getPossibleMoves().contains(targetTile) /* insert check situation ?*/);
-
-            currentPlayer.movePiece(pieceChosen, targetTile);
-
-//            Move move = new Move.Builder()
-//                    .board(board)
-//                    .player(currentPlayer)
-//                    .movingPiece(pieceChosen)
-//                    .targetTile(targetTile)
-//                    .build();
-//
-//            move.makeMove();
-
-            // incrementing the turn
-            turn++;
-            System.out.println();
-            System.out.println(
-                    board.getGameHistoryMoves().lastElement().getFirst().getName()
-                            + " -> " + board.getGameHistoryMoves().lastElement().getSecond());
-            System.out.println();
         }
     }
 }

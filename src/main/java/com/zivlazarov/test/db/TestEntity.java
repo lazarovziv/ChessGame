@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.db;
+package com.zivlazarov.test.db;
 
 import javax.persistence.*;
 

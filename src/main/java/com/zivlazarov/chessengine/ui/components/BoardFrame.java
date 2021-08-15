@@ -4,11 +4,11 @@ import com.zivlazarov.chessengine.db.dao.MoveDao;
 import com.zivlazarov.chessengine.db.dao.PieceDao;
 import com.zivlazarov.chessengine.db.dao.PlayerDao;
 import com.zivlazarov.chessengine.db.dao.TileDao;
+import com.zivlazarov.chessengine.model.ai.Minimax;
 import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.move.MoveLabel;
 import com.zivlazarov.chessengine.model.pieces.Piece;
-import com.zivlazarov.chessengine.model.pieces.RookPiece;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.ui.utils.Utilities;
 import javafx.scene.control.Alert;
@@ -55,6 +55,8 @@ public class BoardFrame {
 
     private static Player whitePlayer;
     private static Player blackPlayer;
+
+    private static Minimax minimax;
 
     private static Tile sourceTile;
     private static Tile destinationTile;
@@ -167,11 +169,14 @@ public class BoardFrame {
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
 
 //        playRandomly(100);
+//        playMinimax();
     }
 
     public static void initGame() {
         whitePlayer = new Player(PieceColor.WHITE);
         blackPlayer = new Player(PieceColor.BLACK);
+
+        minimax = new Minimax();
 
         whitePlayer.setName("Ziv");
         blackPlayer.setName("Guy");
@@ -179,7 +184,9 @@ public class BoardFrame {
         whitePlayer.setAI(false);
         blackPlayer.setAI(false);
 
-        whitePlayer.setOpponentPlayer(blackPlayer);
+        minimax = new Minimax();
+
+        whitePlayer.setOpponent(blackPlayer);
 
         board = new Board();
 
@@ -195,12 +202,25 @@ public class BoardFrame {
         board.checkBoard();
     }
 
+    public void playMinimax() {
+        while (board.canContinueGame()) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            boolean isMax = board.getCurrentPlayer().getColor() == PieceColor.WHITE;
+            Move move = minimax.findBestMove(board, 3, blackPlayer);
+            move.makeMove(true);
+
+            SwingUtilities.invokeLater(() -> boardPanel.drawBoard(false));
+        }
+    }
+
     public void playRandomly(long milliseconds) {
         while (board.canContinueGame()) {
             try {
                 Thread.sleep(milliseconds);
-
-                int number = new Random().nextInt(board.getCurrentPlayer().getMoves().size());
 
                 Iterator<Move> iterator = board.getCurrentPlayer().getMoves().iterator();
                 Move move = iterator.next();
@@ -225,9 +245,7 @@ public class BoardFrame {
                         int answer = JOptionPane.showOptionDialog(gameFrame, "Checkmate! Restart game? ", "End Game",
                                 JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, icon, options, options[1]);
                         if (answer == 1) {
-                            gameFrame.dispose();
-//                            board.resetBoard();
-                            new BoardFrame();
+                            restartGame();
                         } else System.exit(1);
                     break;
                 };
@@ -419,14 +437,13 @@ public class BoardFrame {
                         if (sourceTile == null) {
                             sourceTile = tile;
                             if (!sourceTile.isEmpty()) {
-                                if (sourceTile.getPiece().getPieceColor() == board.getCurrentPlayer().getPlayerColor()) {
+                                if (sourceTile.getPiece().getPieceColor() == board.getCurrentPlayer().getColor()) {
                                     if (!sourceTile.getPiece().canMove()) {
                                         System.out.println(sourceTile.getPiece().getName() + " can't move!");
                                         sourceTile = null;
                                         return;
                                     }
                                     playerPiece = sourceTile.getPiece();
-                                    if (playerPiece instanceof RookPiece) System.out.println(playerPiece.hasMoved());
 //                                    System.out.println("Possible Moves: ");
                                     for (Tile possibleMove : playerPiece.getPossibleMoves()) {
 //                                        System.out.println(possibleMove);

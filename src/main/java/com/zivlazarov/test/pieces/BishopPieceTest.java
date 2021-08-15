@@ -1,10 +1,12 @@
-package com.zivlazarov.test.client.pieces;
+package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.pieces.BishopPiece;
+import com.zivlazarov.chessengine.model.pieces.KingPiece;
 import com.zivlazarov.chessengine.model.pieces.PawnPiece;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
+import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,17 +23,6 @@ public class BishopPieceTest {
     private static Board board;
     private static Player player;
     private static Player opponent;
-
-    @BeforeAll
-    public static void setup() {
-        board = new Board();
-        player = new Player(board, PieceColor.WHITE);
-        opponent = new Player(board, PieceColor.BLACK);
-        bishopPiece = new BishopPiece(player, board, board.getBoard()[0][2], 0);
-        pawnPiece = new PawnPiece(player, board, board.getBoard()[1][3], 0);
-        opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[1][1], 0);
-        board.checkBoard();
-    }
 
     @Test
     public void testWhatTilesAreBeingGeneratedWhenAPieceInterferes() {
@@ -103,5 +94,38 @@ public class BishopPieceTest {
         board.printBoard();
 
         for (Tile tile : tilesGenerated) System.out.println(tile);
+    }
+
+    @Test
+    public void testStrongTiles() {
+        Board board = new Board();
+        Player player = new Player(board, PieceColor.WHITE);
+        Player opponent = new Player(board, PieceColor.BLACK);
+        opponent.setOpponent(player);
+        player.setOpponent(opponent);
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+        board.setCurrentPlayer(player);
+//        opponentPawnPiece = new PawnPiece(board, PieceColor.BLACK, board.getBoard()[3][4], 0);
+        Piece kingPiece = new KingPiece(player, board, board.getBoard()[0][4]);
+        Piece opponentKingPiece = new KingPiece(opponent, board, board.getBoard()[7][4]);
+        Piece bishop = new BishopPiece(player, board, board.getBoard()[0][5], 0);
+        Piece oBishop = new BishopPiece(opponent, board, board.getBoard()[7][5], 0);
+
+        for (int r = 0; r < 8; r++) {
+            System.out.println();
+            for (int c = 0; c < 8; c++) {
+                System.out.print(bishop.getStrongTiles()[r][c] + ", ");
+            }
+        }
+
+        System.out.println();
+
+        for (int r = 0; r < 8; r++) {
+            System.out.println();
+            for (int c = 0; c < 8; c++) {
+                System.out.print(oBishop.getStrongTiles()[r][c] + ", ");
+            }
+        }
     }
 }

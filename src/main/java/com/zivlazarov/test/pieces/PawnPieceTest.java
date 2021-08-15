@@ -1,4 +1,4 @@
-package com.zivlazarov.test.client.pieces;
+package com.zivlazarov.test.pieces;
 
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
@@ -27,8 +27,8 @@ public class PawnPieceTest {
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponentPlayer(opponent);
-        opponent.setOpponentPlayer(player);
+        player.setOpponent(opponent);
+        opponent.setOpponent(player);
         KingPiece kingPiece = new KingPiece(player, board, board.getBoard()[7][4]);
         pawnPiece = new PawnPiece(player, board, board.getBoard()[1][0], 0);
         knightPiece = new KnightPiece(player, board, board.getBoard()[3][0], 0);
@@ -89,23 +89,6 @@ public class PawnPieceTest {
         board.checkBoard();
 
         pawn.getPossibleMoves().forEach(tile -> System.out.print(tile + ","));
-    }
-
-    @Test
-    public void testPromotion() {
-        ChessPiece pawn = new ChessPiece(player, board, PieceType.PAWN, PieceColor.WHITE, board.getBoard()[6][3]);
-        board.printBoard();
-        board.checkBoard();
-
-        Move move = new Move.Builder()
-                .board(board)
-                .player(player)
-                .movingPiece(pawn)
-                .targetTile(board.getBoard()[7][3])
-                .build();
-
-        move.makeMove(true);
-        board.printBoard();
     }
 
     @Test

@@ -31,16 +31,11 @@ public class Tile implements Serializable {
 
 	private boolean isThreatenedByWhite;
 
+	@Transient
 	private Piece piece;
 
-	@Transient
-	private transient ImageView tileImageView;
-	@Transient
-	private transient ImageView pieceImageView;
-	@Transient
-	private transient JLabel label;
-	@Transient
-	private transient JButton button;
+	private int tileNumber;
+
 	@Transient
 	private static final char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 
@@ -53,7 +48,7 @@ public class Tile implements Serializable {
 		isEmpty = true; // if piece is not initialized tile is empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
-		id = this.row + this.col;
+		tileNumber = row * 8 + col;
 	}
 
 	public Tile(int row, int col, TileColor tc, Piece p) {
@@ -64,7 +59,7 @@ public class Tile implements Serializable {
 		isEmpty = piece == null; // if piece is initialized (as NOT null) tile is not empty
 		isThreatenedByWhite = false;
 		isThreatenedByBlack = false;
-		id = this.row + this.col;
+		tileNumber = row * 8 + col;
 	}
 
 	public int getId() {
@@ -111,14 +106,6 @@ public class Tile implements Serializable {
 		}
 	}
 
-	public void setRow(int row) {
-		this.row = row;
-	}
-
-	public void setCol(int col) {
-		this.col = col;
-	}
-
 	public void setPiece(Piece p) {
 		piece = p;
 		isEmpty = piece == null; /*|| piece.isAlive();*/
@@ -144,20 +131,19 @@ public class Tile implements Serializable {
 		}
 	}
 
-	public ImageView getTileImageView() {
-		return tileImageView;
+	public int getTileNumber() {
+		return tileNumber;
 	}
 
-	public void setTileImageView(ImageView tileImageView) {
-		this.tileImageView = tileImageView;
+	public void setTileNumber(int tileNumber) {
+		this.tileNumber = tileNumber;
 	}
 
-	public ImageView getPieceImageView() {
-		return pieceImageView;
-	}
+	public static Tile fromNumber(Board board, int number) {
+		int r = number / 8;
+		int c = number - (r * 8);
 
-	public void setPieceImageView(ImageView pieceImageView) {
-		this.pieceImageView = pieceImageView;
+		return board.getBoard()[r][c];
 	}
 
 	public boolean equals(Tile tile) {
@@ -167,21 +153,5 @@ public class Tile implements Serializable {
 	@Override
 	public String toString() {
 		return "[" + letters[row] /*+ ", " */+ (col+1) + "]";
-	}
-
-	public JLabel getLabel() {
-		return label;
-	}
-
-	public void setLabel(JLabel label) {
-		this.label = label;
-	}
-
-	public JButton getButton() {
-		return button;
-	}
-
-	public void setButton(JButton button) {
-		this.button = button;
 	}
 }
