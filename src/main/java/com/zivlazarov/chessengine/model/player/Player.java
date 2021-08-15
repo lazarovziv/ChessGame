@@ -9,6 +9,7 @@ import com.zivlazarov.chessengine.model.utils.Memento;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
+import javafx.collections.*;
 
 import javax.persistence.*;
 import java.io.*;
@@ -51,6 +52,8 @@ public class Player implements MyObserver, Serializable {
     @OneToMany(targetEntity = Piece.class, mappedBy = "player")
     private final List<Piece> deadPieces;
 
+    private int turnsPlayed = 0;
+
     @Transient
     private final Set<Move> moves;
 
@@ -63,8 +66,8 @@ public class Player implements MyObserver, Serializable {
     @Transient
     private transient Board board;
 
-    @EmbeddedId
-    private transient Player opponentPlayer;
+    @OneToOne
+    private transient Player opponent;
 
     @Transient
     private transient MyObservable observable;
@@ -77,6 +80,16 @@ public class Player implements MyObserver, Serializable {
         lastMove = new HashMap<>();
 
         moves = new HashSet<>();
+
+        ObservableSet<Move> oMoves = FXCollections.observableSet(moves);
+        ObservableList<Piece> oAlivePieces = FXCollections.observableList(alivePieces);
+        ObservableList<Piece> oCapturedPieces = FXCollections.observableList(deadPieces);
+        ObservableMap<Piece, Pair<Tile, Tile>> oLastMove = FXCollections.observableMap(lastMove);
+        ObservableList<Tile> oLegalMoves = FXCollections.observableList(legalMoves);
+
+        oMoves.addListener((SetChangeListener<Move>) change -> {
+
+        });
 
         // setting player direction, white goes up the board, black goes down (specifically to pawn pieces and for checking pawn promotion)
         if (playerColor == PieceColor.WHITE) {
@@ -116,81 +129,20 @@ public class Player implements MyObserver, Serializable {
         if (moves.size() != 0) moves.clear();
 
         for (Piece piece : alivePieces) {
-            piece.setIsInDanger(false);
+//            piece.setIsInDanger(false);
             piece.refresh();
         }
     }
 
     public void updatePieceAsDead(Piece piece) {
         piece.setIsAlive(false);
-        opponentPlayer.addPieceToDead(piece);
+        opponent.addPieceToDead(piece);
     }
 
     public void updatePieceAsAlive(Piece piece) {
         piece.setIsAlive(true);
+        piece.setIsInDanger(false);
         addPieceToAlive(piece);
-    }
-
-    public boolean movePiece(Piece piece, Tile targetTile) {
-        if (!piece.getPossibleMoves().contains(targetTile)) return false;
-        if (!legalMoves.contains(targetTile)) return false;
-//        if (!piece.isAlive()) return false;
-
-        // clearing lastMove
-        lastMove.clear();
-
-        Tile pieceTile = piece.getCurrentTile();
-        if (pieceTile != null) {
-            clearPieceFromTile(pieceTile);
-        }
-
-        // checking if an en passant or castling has been made to know if can continue to the rest of method's statements
-        boolean isSpecialMove = false;
-
-        if (piece instanceof PawnPiece) {
-            isSpecialMove = handleEnPassantMove(piece, targetTile);
-            piece.setHasMoved(true);
-            piece = handlePawnPromotion(piece, targetTile);
-        }
-        if (piece instanceof KingPiece) {
-            isSpecialMove = handleKingSideCastling(piece, targetTile);
-            if (!isSpecialMove) isSpecialMove = handleQueenSideCastling(piece, targetTile);
-            piece.setHasMoved(true);
-        }
-        // eat move
-        if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != playerColor) {
-            piece.getCapturedPieces().push(targetTile.getPiece());
-            opponentPlayer.addPieceToDead(targetTile.getPiece());
-        }
-
-        // placing piece in target tile
-        piece.setLastTile(pieceTile);
-        piece.setCurrentTile(targetTile);
-
-        // pushing move to log
-        piece.getHistoryMoves().push(targetTile);
-        board.getGameHistoryMoves().push(new Pair<>(piece, targetTile));
-
-        lastMove.put(piece, new Pair<>(pieceTile, targetTile));
-
-//        board.checkBoard(opponentPlayer);
-
-        resetPlayerScore();
-        evaluatePlayerScore();
-        opponentPlayer.resetPlayerScore();
-        opponentPlayer.evaluatePlayerScore();
-
-//        board.setCurrentPlayer(opponentPlayer);
-//
-//        board.checkBoard(board.getCurrentPlayer());
-//        board.setCurrentPlayer(opponentPlayer);
-//        board.checkBoard(board.getCurrentPlayer());
-        // set board's current node the node the player made
-//        for (BoardNode node : board.getCurrentNode().getChildren()) {
-//            if (node.getBoard().isSameBoard(board)) board.setCurrentNode(node);
-//        }
-
-        return true;
     }
 
     public Piece handlePawnPromotion(Piece piece, Tile tile) {
@@ -206,71 +158,6 @@ public class Player implements MyObserver, Serializable {
             }
         }
         return piece;
-    }
-
-    public boolean handleEnPassantMove(Piece piece, Tile tile) {
-        if (((PawnPiece) piece).getEnPassantTile() != null) {
-            if (tile.equals(((PawnPiece) piece).getEnPassantTile())) {
-                opponentPlayer.addPieceToDead(
-                        board.getBoard()[((PawnPiece)piece).getEnPassantTile().getRow()-playerDirection]
-                                [((PawnPiece)piece).getEnPassantTile().getCol()]
-                                .getPiece());
-                ((PawnPiece) piece).setExecutedEnPassant(true);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean handleKingSideCastling(Piece piece, Tile tile) {
-        if (/*!piece.hasMoved() && */tile.equals(((KingPiece) piece).getKingSideCastleTile())
-                && getKingSideRookPiece() != null
-                /* && !getKingSideRookPiece().hasMoved() */) {
-            // logging rook move
-            RookPiece kingSideRookPiece = getKingSideRookPiece();
-            Move move = new Move.Builder()
-                    .board(board)
-                    .player(this)
-                    .movingPiece(kingSideRookPiece)
-                    .targetTile(kingSideRookPiece.getKingSideCastlingTile())
-                    .build();
-            move.makeMove(true);
-//            kingSideRookPiece.getHistoryMoves().push(kingSideRookPiece.getKingSideCastlingTile());
-//            // setting rook tile to it's king side castling tile
-//            kingSideRookPiece.getCurrentTile().setPiece(null);
-//            kingSideRookPiece.setCurrentTile(kingSideRookPiece.getKingSideCastlingTile());
-//            kingSideRookPiece.setHasMoved(true);
-//            // adding castling to game history moves
-//            board.getGameHistoryMoves().push(new Pair<>(kingSideRookPiece, kingSideRookPiece.getLastMove()));
-            return true;
-        }
-        return false;
-    }
-
-    public boolean handleQueenSideCastling(Piece piece, Tile tile) {
-        if (/*!piece.hasMoved() && */tile.equals(((KingPiece) piece).getQueenSideCastleTile())
-                && getQueenSideRookPiece() != null
-               /* && !getQueenSideRookPiece().hasMoved() */) {
-            // logging rook move
-            RookPiece queenSideRookPiece = getQueenSideRookPiece();
-            Move move = new Move.Builder()
-                    .board(board)
-                    .player(this)
-                    .movingPiece(queenSideRookPiece)
-                    .targetTile(queenSideRookPiece.getQueenSideCastlingTile())
-                    .build();
-            move.makeMove(true);
-//            queenSideRookPiece.getHistoryMoves().push(queenSideRookPiece.getQueenSideCastlingTile());
-//            // setting rook tile to it's queen side castling tile
-//            queenSideRookPiece.getCurrentTile().setPiece(null);
-//            queenSideRookPiece.setCurrentTile(queenSideRookPiece.getQueenSideCastlingTile());
-//            queenSideRookPiece.setHasMoved(true);
-//            // adding castling to game history moves
-//            board.getGameHistoryMoves().push(new Pair<>(queenSideRookPiece, queenSideRookPiece.getLastMove()));
-
-            return true;
-        }
-        return false;
     }
 
     public RookPiece getKingSideRookPiece() {
@@ -319,7 +206,11 @@ public class Player implements MyObserver, Serializable {
         return board.getKingsMap().get(this);
     }
 
-    public PieceColor getPlayerColor() {
+    public ChessPiece getChessKing() {
+        return board.getKingsChessMap().get(this);
+    }
+
+    public PieceColor getColor() {
         return playerColor;
     }
 
@@ -335,18 +226,18 @@ public class Player implements MyObserver, Serializable {
         return name;
     }
 
-    public Player getOpponentPlayer() {
-        return opponentPlayer;
+    public Player getOpponent() {
+        return opponent;
     }
 
-    public void setOpponentPlayer(Player opponent) {
-        opponentPlayer = opponent;
-        if (opponentPlayer.getOpponentPlayer() == null) {
-            opponentPlayer.setOpponentPlayer(this);
+    public void setOpponent(Player opponent) {
+        this.opponent = opponent;
+        if (this.opponent.getOpponent() == null) {
+            this.opponent.setOpponent(this);
         }
     }
 
-    public void setPlayerColor(PieceColor playerColor) {
+    public void setColor(PieceColor playerColor) {
         this.playerColor = playerColor;
     }
 
@@ -363,7 +254,7 @@ public class Player implements MyObserver, Serializable {
     }
 
     public boolean equals(Player other) {
-        return playerColor == other.getPlayerColor();
+        return playerColor == other.getColor();
     }
 
     public Set<Move> getMoves() {
@@ -387,7 +278,15 @@ public class Player implements MyObserver, Serializable {
         return legalMoves;
     }
 
-    public void evaluatePlayerScore() {
+    public void addTurn() {
+        turnsPlayed++;
+    }
+
+    public int getTurnsPlayed() {
+        return turnsPlayed;
+    }
+
+    public int evaluatePlayerScore() {
         for (Piece piece : alivePieces) {
             playerScore += playerDirection * 100 * piece.getValue();
             for (Piece threatenedPiece : piece.getPiecesUnderThreat()) {
@@ -396,7 +295,12 @@ public class Player implements MyObserver, Serializable {
 
             if (piece instanceof KingPiece) {
                 if (((KingPiece) piece).canKingSideCastle() || ((KingPiece) piece).canQueenSideCastle()) {
-                    playerScore += playerDirection * 500;
+                    playerScore += playerDirection * 400;
+                }
+                if (((KingPiece) piece).hasExecutedKingSideCastle()) {
+                    playerScore += playerDirection * 700;
+                } else if (((KingPiece) piece).hasExecutedQueenSideCastle()) {
+                    playerScore += playerDirection * 600;
                 }
             }
         }
@@ -404,7 +308,9 @@ public class Player implements MyObserver, Serializable {
             playerScore -= playerDirection * 100 * piece.getValue();
             if (piece.isInDanger()) playerScore -= playerDirection * 12 * piece.getValue();
         }
-        if (opponentPlayer.isInCheck()) playerScore += playerDirection * 75;
+        if (opponent.isInCheck()) playerScore += playerDirection * 75;
+
+        return playerScore;
     }
 
     public void resetPlayerScore() {
@@ -439,12 +345,13 @@ public class Player implements MyObserver, Serializable {
     }
 
     public boolean isInCheck() {
-        for (Piece piece : opponentPlayer.getAlivePieces()) {
-            if (piece.getPiecesUnderThreat().contains(getKing())) {
-                return true;
-            }
-        }
-        return false;
+        return getKing().isInDanger();
+//        for (Piece piece : opponent.getAlivePieces()) {
+//            if (piece.getPiecesUnderThreat().contains(getKing())) {
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
     public void saveState() {
