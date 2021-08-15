@@ -2,6 +2,7 @@ package com.zivlazarov.chessengine.model.move;
 
 import com.zivlazarov.chessengine.errors.IllegalMoveError;
 import com.zivlazarov.chessengine.model.board.Board;
+import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.player.Player;
@@ -22,6 +23,8 @@ public class Move implements Serializable {
     private Piece movingPiece;
 
     private Tile sourceTile;
+    private int sourceRow;
+    private int sourceCol;
 
     private Tile targetTile;
 
@@ -42,9 +45,19 @@ public class Move implements Serializable {
         label = MoveLabel.REGULAR;
     }
 
+    private Move(Player player, Piece movingPiece, int targetRow, int targetCol) {
+        this.board = new Board();
+        this.player = player;
+        this.movingPiece = movingPiece;
+        this.sourceTile = movingPiece.getCurrentTile();
+        this.sourceRow = movingPiece.getRow();
+        this.sourceCol = movingPiece.getCol();
+        this.targetTile = board.getBoard()[targetRow][targetCol];
+    }
+
     public boolean makeMove(boolean checkBoard) throws IllegalMoveError {
 //        if (player.getMoves().size() == 0) return false; /*throw new IllegalMoveError("No Moves Available!");*/
-        if (player.getMoves().stream().noneMatch(move -> move.equals(this))) return false; /*throw new IllegalMoveError("Illegal Move!");*/
+//        if (player.getMoves().stream().noneMatch(move -> move.equals(this))) return false; /*throw new IllegalMoveError("Illegal Move!");*/
 //        if (!movingPiece.getPossibleMoves().contains(targetTile)) return false;
 //        if (!player.getLegalMoves().contains(targetTile)) return false;
 //        if (!player.getMoves().contains(this)) return false;
@@ -60,18 +73,50 @@ public class Move implements Serializable {
             if (checkBoard && !movingPiece.hasMoved()) {
                 movingPiece.setHasMoved(true);
             }
-            isSpecialMove = player.handleEnPassantMove(movingPiece, targetTile);
-            if (isSpecialMove) label = MoveLabel.EN_PASSANT;
+            // if already moved long, setting to false because can't do that again
+            if (((PawnPiece) movingPiece).hasMovedLong()) ((PawnPiece) movingPiece).setMovedLong(false);
+
+            // handling en passant
+            if (((PawnPiece) movingPiece).getEnPassantTile() != null) {
+                if (targetTile.equals(((PawnPiece) movingPiece).getEnPassantTile())) {
+                    player.getOpponent().addPieceToDead(
+                            board.getBoard()[((PawnPiece) movingPiece).getEnPassantTile().getRow() - player.getPlayerDirection()]
+                                    [((PawnPiece) movingPiece).getEnPassantTile().getCol()].getPiece());
+                    ((PawnPiece) movingPiece).setExecutedEnPassant(true);
+                    isSpecialMove = true;
+                    label = MoveLabel.EN_PASSANT;
+                }
+            }
+
+//            isSpecialMove = player.handleEnPassantMove(movingPiece, targetTile);
+//            if (isSpecialMove) label = MoveLabel.EN_PASSANT;
             Piece opponentPiece = null;
             if (!targetTile.isEmpty()) {
                 opponentPiece = targetTile.getPiece();
             }
-            movingPiece = player.handlePawnPromotion(movingPiece, targetTile);
-            if (movingPiece instanceof QueenPiece) {
+
+            // pawn promotion
+            if (movingPiece.getPieceColor() == PieceColor.WHITE) {
+                if (targetTile.getRow() == 7) {
+                    player.addPieceToDead(movingPiece);
+                    movingPiece = new QueenPiece(player, board, targetTile);
+                }
+            } else {
+                if (targetTile.getRow() == 0) {
+                    player.addPieceToDead(movingPiece);
+                    movingPiece = new QueenPiece(player, board, targetTile);
+                }
+            }
+//            movingPiece = player.handlePawnPromotion(movingPiece, targetTile);
+
+            // if moved 2 rows forward, it's a long move, setting it as true
+            if (Math.abs(targetTile.getRow() - movingPiece.getCurrentTile().getRow()) == 2)
+                ((PawnPiece) movingPiece).setMovedLong(true);
+            if (movingPiece.getPieceType() == PieceType.QUEEN) {
                 label = MoveLabel.PAWN_PROMOTION;
                 // promoted with a capture
                 movingPiece.getCapturedPieces().push(opponentPiece);
-                player.getOpponentPlayer().addPieceToDead(opponentPiece);
+                player.getOpponent().addPieceToDead(opponentPiece);
 
                 isSpecialMove = true;
             }
@@ -79,41 +124,79 @@ public class Move implements Serializable {
             if (checkBoard && !movingPiece.hasMoved()) {
                 movingPiece.setHasMoved(true);
             }
-            isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
-            if (isSpecialMove) {
-                castlingMove = new Move.Builder()
+
+            // king side castle
+            if (targetTile.equals(((KingPiece) movingPiece).getKingSideCastleTile()) &&
+            player.getKingSideRookPiece() != null) {
+                RookPiece kingSideRook = player.getKingSideRookPiece();
+
+                castlingMove = new Builder()
                         .board(board)
                         .player(player)
-                        .movingPiece(player.getKingSideRookPiece())
-                        .targetTile(player.getKingSideRookPiece().getKingSideCastlingTile())
+                        .movingPiece(kingSideRook)
+                        .targetTile(kingSideRook.getKingSideCastlingTile())
                         .build();
+                ((KingPiece) movingPiece).setExecutedKingSideCastle(true);
+
                 label = MoveLabel.KING_SIDE_CASTLE;
+                isSpecialMove = true;
             }
+
+//            isSpecialMove = player.handleKingSideCastling(movingPiece, targetTile);
+//            if (isSpecialMove) {
+//                castlingMove = new Move.Builder()
+//                        .board(board)
+//                        .player(player)
+//                        .movingPiece(player.getKingSideRookPiece())
+//                        .targetTile(player.getKingSideRookPiece().getKingSideCastlingTile())
+//                        .build();
+//                ((KingPiece) movingPiece).setExecutedKingSideCastle(true);
+//                label = MoveLabel.KING_SIDE_CASTLE;
+//            }
+            // if not king side castling, maybe queen side so isSpecialMove has to be false
             if (!isSpecialMove) {
-                isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
-                if (isSpecialMove) {
-                    castlingMove = new Move.Builder()
+                if (targetTile.equals(((KingPiece) movingPiece).getQueenSideCastleTile()) &&
+                player.getQueenSideRookPiece() != null) {
+                    RookPiece queenSideRook = player.getQueenSideRookPiece();
+
+                    castlingMove = new Builder()
                             .board(board)
                             .player(player)
-                            .movingPiece(player.getQueenSideRookPiece())
-                            .targetTile(player.getQueenSideRookPiece().getQueenSideCastlingTile())
+                            .movingPiece(queenSideRook)
+                            .targetTile(queenSideRook.getQueenSideCastlingTile())
                             .build();
+                    ((KingPiece) movingPiece).setExecutedQueenSideCastle(true);
+
                     label = MoveLabel.QUEEN_SIDE_CASTLE;
+                    isSpecialMove = true;
                 }
             }
+//            if (!isSpecialMove) {
+//                isSpecialMove = player.handleQueenSideCastling(movingPiece, targetTile);
+//                if (isSpecialMove) {
+//                    castlingMove = new Move.Builder()
+//                            .board(board)
+//                            .player(player)
+//                            .movingPiece(player.getQueenSideRookPiece())
+//                            .targetTile(player.getQueenSideRookPiece().getQueenSideCastlingTile())
+//                            .build();
+//                    ((KingPiece) movingPiece).setExecutedQueenSideCastle(true);
+//                    label = MoveLabel.QUEEN_SIDE_CASTLE;
+//                }
+//            }
         } else if (movingPiece instanceof RookPiece) {
             if (checkBoard && !movingPiece.hasMoved()) {
                 movingPiece.setHasMoved(true);
             }
         }
 
-        if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != player.getPlayerColor()) {
+        if (!isSpecialMove && !targetTile.isEmpty() && targetTile.getPiece().getPieceColor() != player.getColor()) {
             movingPiece.getCapturedPieces().push(targetTile.getPiece());
-            player.getOpponentPlayer().addPieceToDead(targetTile.getPiece());
+            player.getOpponent().addPieceToDead(targetTile.getPiece());
             label = MoveLabel.CAPTURE;
         }
 
-        movingPiece.setLastTile(currentTile);
+        movingPiece.setLastTile(sourceTile);
         movingPiece.setCurrentTile(targetTile);
 
         // adding the move to piece's and game log
@@ -123,14 +206,16 @@ public class Move implements Serializable {
 
         player.getLastMove().put(movingPiece, new Pair<>(currentTile, targetTile));
 
-        if (castlingMove != null) castlingMove.makeMove(true);
+        if (castlingMove != null) castlingMove.makeMove(false);
 
         player.resetPlayerScore();
-        player.getOpponentPlayer().resetPlayerScore();
+        player.getOpponent().resetPlayerScore();
         player.evaluatePlayerScore();
-        player.getOpponentPlayer().evaluatePlayerScore();
+        player.getOpponent().evaluatePlayerScore();
 
-        board.setCurrentPlayer(player.getOpponentPlayer());
+        player.addTurn();
+
+        board.setCurrentPlayer(player.getOpponent());
 
         if (checkBoard)
             board.checkBoard();
@@ -160,19 +245,23 @@ public class Move implements Serializable {
             }
             case EN_PASSANT -> {
                 player.clearPieceFromTile(targetTile);
-                Piece opponentPiece = player.getOpponentPlayer().getDeadPieces().get(player.getOpponentPlayer().getDeadPieces().size() - 1);
-                movingPiece.getCapturedPieces().remove(opponentPiece);
-                player.getOpponentPlayer().addPieceToAlive(opponentPiece);
-                opponentPiece.setCurrentTile(board.getBoard()[targetTile.getRow() - player.getPlayerDirection()][targetTile.getCol()]);
-                movingPiece.setCurrentTile(sourceTile);
+                if (player.getOpponent().getDeadPieces().size() > 0) {
+                    Piece opponentPiece = player.getOpponent().getDeadPieces().get(player.getOpponent().getDeadPieces().size() - 1);
+                    movingPiece.getCapturedPieces().remove(opponentPiece);
+                    player.getOpponent().addPieceToAlive(opponentPiece);
+                    opponentPiece.setCurrentTile(board.getBoard()[targetTile.getRow() - player.getPlayerDirection()][targetTile.getCol()]);
+                    movingPiece.setCurrentTile(sourceTile);
+                }
             }
             case CAPTURE -> {
                 player.clearPieceFromTile(targetTile);
-                movingPiece.setCurrentTile(sourceTile);
-                Piece opponentPiece = player.getOpponentPlayer().getDeadPieces().get(player.getOpponentPlayer().getDeadPieces().size() - 1);
-                movingPiece.getCapturedPieces().remove(opponentPiece);
-                player.getOpponentPlayer().addPieceToAlive(opponentPiece);
-                opponentPiece.setCurrentTile(targetTile);
+                if (player.getOpponent().getDeadPieces().size() > 0) {
+                    movingPiece.setCurrentTile(sourceTile);
+                    Piece opponentPiece = player.getOpponent().getDeadPieces().get(player.getOpponent().getDeadPieces().size() - 1);
+                    movingPiece.getCapturedPieces().remove(opponentPiece);
+                    player.getOpponent().addPieceToAlive(opponentPiece);
+                    opponentPiece.setCurrentTile(targetTile);
+                }
             }
             case KING_SIDE_CASTLE -> {
                 player.clearPieceFromTile(targetTile);
@@ -246,7 +335,7 @@ public class Move implements Serializable {
     }
 
     public boolean equals(Move move) {
-        return move.player.getPlayerColor() == player.getPlayerColor() &&
+        return move.player.getColor() == player.getColor() &&
                 move.movingPiece.getCurrentTile().equals(movingPiece.getCurrentTile()) &&
                 move.targetTile.equals(targetTile);
     }
@@ -260,8 +349,10 @@ public class Move implements Serializable {
         private Piece movingPiece;
         private Tile targetTile;
 
-        public Builder() {
-        }
+        private int targetRow;
+        private int targetCol;
+
+        public Builder() {}
 
         public Builder board(Board board) {
             this.board = board;
@@ -280,76 +371,28 @@ public class Move implements Serializable {
 
         public Builder targetTile(Tile targetTile) {
             // add a condition if target tile is in piece's possible moves
-            if (movingPiece.getPossibleMoves().contains(targetTile)) {
-                this.targetTile = targetTile;
-                return this;
-            } else throw new IllegalMoveError();
+//            if (movingPiece.getPossibleMoves().contains(targetTile)) {
+//                this.targetTile = targetTile;
+//                return this;
+//            } else throw new IllegalMoveError();
+            this.targetTile = targetTile;
+            return this;
+        }
+
+        public Builder targetRow(int targetRow) {
+            this.targetRow = targetRow;
+            return this;
+        }
+
+        public Builder targetCol(int targetCol) {
+            this.targetCol = targetCol;
+            return this;
         }
 
         public Move build() {
-            return new Move(board, player, movingPiece, targetTile);
+            if (board != null)
+                return new Move(board, player, movingPiece, targetTile);
+            else return new Move(player, movingPiece, targetRow, targetCol);
         }
     }
 }
-
-/*
-* public void unmakeMove(int check) {
-        Tile previousTile = sourceTile;
-        Tile currentTile = targetTile;
-
-        if (currentTile == null) return;
-
-        Piece capturedPiece;
-
-        // getting last captured piece
-        if (movingPiece.getCapturedPieces().size() > 0) {
-            capturedPiece = movingPiece.getLastCapturedPiece();
-
-            // if CAPTURED piece's last tile is the last move's previous tile, return the CAPTURED piece to the game
-            // and place CAPTURED piece in that tile while clearing the CAPTURING piece from there
-            if (currentTile.equals(capturedPiece.getLastTile())) {
-                // order of things:
-                // 1. set capturing piece back to previous tile
-                // 2. remove captured piece from deadPieces and add it to alivePieces
-                // 3. set captured piece in it's previous tile
-
-                // clearing CAPTURING piece from it's tile
-                player.clearTileFromPiece(currentTile);
-                // setting CAPTURING piece to it's previous tile
-                movingPiece.setCurrentTile(previousTile);
-                // removing the CAPTURED piece from capturing piece's capturedPieces list
-                movingPiece.getCapturedPieces().remove(movingPiece.getCapturedPieces().size() - 1);
-                // adding the CAPTURED piece to the game
-                player.getOpponentPlayer().addPieceToAlive(capturedPiece);
-                // setting CAPTURED piece's tile
-                capturedPiece.setCurrentTile(currentTile);
-            }
-            // no capturing involved in last move
-        } else {
-            // if last tile is not empty then clear it and set piece to it's previous tile
-//            if (currentTile != null) {}
-            if (!currentTile.isEmpty()) player.clearTileFromPiece(currentTile);
-            movingPiece.setCurrentTile(previousTile);
-        }
-
-        // if it was their first move, revert their hasMoved field to false
-        if (movingPiece.getHistoryMoves().size() <= 1) {
-            if (movingPiece instanceof PawnPiece) movingPiece.setHasMoved(false);
-            else if (movingPiece instanceof RookPiece) movingPiece.setHasMoved(false);
-            else if (movingPiece instanceof KingPiece) movingPiece.setHasMoved(false);
-        }
-
-        // deleting last move made from logs
-        if (movingPiece.getHistoryMoves().size() > 0)
-            movingPiece.getHistoryMoves().removeElementAt(movingPiece.getHistoryMoves().size() - 1);
-        if (board.getGameHistoryMoves().size() > 0)
-            board.getGameHistoryMoves().removeElementAt(board.getGameHistoryMoves().size() - 1);
-        player.getLastMove().remove(movingPiece);
-        if (board.getMatchPlays().size() > 0)
-            board.getMatchPlays().removeElementAt(board.getMatchPlays().size() - 1);
-
-        board.setCurrentPlayer(player);
-
-        if (check == 1)
-            board.checkBoard();
-    }*/
