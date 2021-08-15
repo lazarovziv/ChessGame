@@ -5,6 +5,9 @@ import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
 import javax.persistence.*;
 import java.io.Serial;
@@ -46,10 +49,16 @@ public abstract class Piece implements Cloneable, Serializable {
     @JoinColumn(name = "current_tile_id", referencedColumnName = "id")
     protected Tile currentTile;
 
+    protected int currentRow;
+    protected int currentCol;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "last_tile_id", referencedColumnName = "id")
     @Transient
     protected Tile lastTile;
+
+    protected int lastRow;
+    protected int lastCol;
 
     protected String imageName;
 
@@ -161,6 +170,24 @@ public abstract class Piece implements Cloneable, Serializable {
         this.currentTile = currentTile;
         if (currentTile == null) return;
         currentTile.setPiece(this);
+        currentRow = currentTile.getRow();
+        currentCol = currentTile.getCol();
+    }
+
+    public int getCurrentRow() {
+        return currentRow;
+    }
+
+    public void setCurrentRow(int currentRow) {
+        this.currentRow = currentRow;
+    }
+
+    public int getCurrentCol() {
+        return currentCol;
+    }
+
+    public void setCurrentCol(int currentCol) {
+        this.currentCol = currentCol;
     }
 
     public Tile getLastTile() {
@@ -169,6 +196,22 @@ public abstract class Piece implements Cloneable, Serializable {
 
     public void setLastTile(Tile lastTile) {
         this.lastTile = lastTile;
+    }
+
+    public int getLastRow() {
+        return lastRow;
+    }
+
+    public void setLastRow(int lastRow) {
+        this.lastRow = lastRow;
+    }
+
+    public int getLastCol() {
+        return lastCol;
+    }
+
+    public void setLastCol(int lastCol) {
+        this.lastCol = lastCol;
     }
 
     public String getImageName() {
@@ -193,6 +236,14 @@ public abstract class Piece implements Cloneable, Serializable {
 
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
+    }
+
+    public int getRow() {
+        return currentRow;
+    }
+
+    public int getCol() {
+        return currentCol;
     }
 
     public Set<Move> getMoves() {
