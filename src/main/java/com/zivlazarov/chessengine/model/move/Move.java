@@ -23,8 +23,6 @@ public class Move implements Serializable {
     private Piece movingPiece;
 
     private Tile sourceTile;
-    private int sourceRow;
-    private int sourceCol;
 
     private Tile targetTile;
 
@@ -50,8 +48,6 @@ public class Move implements Serializable {
         this.player = player;
         this.movingPiece = movingPiece;
         this.sourceTile = movingPiece.getCurrentTile();
-        this.sourceRow = movingPiece.getRow();
-        this.sourceCol = movingPiece.getCol();
         this.targetTile = board.getBoard()[targetRow][targetCol];
     }
 
