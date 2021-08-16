@@ -175,7 +175,7 @@ public class BoardFrame {
 
             depth 5: 4865609  */
 
-        System.out.println(ChessGame.generatedMove(board, 4));
+//        System.out.println(ChessGame.generatedMove(board, 4));
 
 //        playRandomly(100);
 //        playMinimax();
