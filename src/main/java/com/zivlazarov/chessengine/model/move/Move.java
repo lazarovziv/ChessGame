@@ -55,7 +55,7 @@ public class Move implements Serializable {
         this.targetTile = board.getBoard()[targetRow][targetCol];
     }
 
-    public boolean makeMove(boolean checkBoard) throws IllegalMoveError {
+    public boolean makeMove(boolean checkBoard, boolean addToHistory) throws IllegalMoveError {
 //        if (player.getMoves().size() == 0) return false; /*throw new IllegalMoveError("No Moves Available!");*/
 //        if (player.getMoves().stream().noneMatch(move -> move.equals(this))) return false; /*throw new IllegalMoveError("Illegal Move!");*/
 //        if (!movingPiece.getPossibleMoves().contains(targetTile)) return false;
@@ -124,7 +124,7 @@ public class Move implements Serializable {
 
             // king side castle
             if (targetTile.equals(((KingPiece) movingPiece).getKingSideCastleTile()) &&
-            player.getKingSideRookPiece() != null) {
+            player.getKingSideRookPiece() != null && !((KingPiece) movingPiece).hasExecutedKingSideCastle()) {
                 RookPiece kingSideRook = player.getKingSideRookPiece();
 
                 castlingMove = new Builder()
@@ -142,7 +142,7 @@ public class Move implements Serializable {
             // if not king side castling, maybe queen side so isSpecialMove has to be false
             if (!isSpecialMove) {
                 if (targetTile.equals(((KingPiece) movingPiece).getQueenSideCastleTile()) &&
-                player.getQueenSideRookPiece() != null) {
+                player.getQueenSideRookPiece() != null && !((KingPiece) movingPiece).hasExecutedQueenSideCastle()) {
                     RookPiece queenSideRook = player.getQueenSideRookPiece();
 
                     castlingMove = new Builder()
@@ -175,12 +175,14 @@ public class Move implements Serializable {
 
         // adding the move to piece's and game log
         movingPiece.getHistoryMoves().push(targetTile);
-        board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
-        board.pushMoveToMatchPlays(this);
+        if (addToHistory) {
+            board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
+            board.pushMoveToMatchPlays(this);
+        }
 
         player.getLastMove().put(movingPiece, new Pair<>(currentTile, targetTile));
 
-        if (castlingMove != null) castlingMove.makeMove(false);
+        if (castlingMove != null) castlingMove.makeMove(false, false);
 
         player.addTurn();
 
