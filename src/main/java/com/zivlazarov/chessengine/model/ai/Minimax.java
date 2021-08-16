@@ -23,7 +23,7 @@ public class Minimax {
             bestValue = Integer.MIN_VALUE;
             for (Move move : moves) {
                 System.out.println(move);
-                move.makeMove(true);
+                move.makeMove(true, true);
                 bestValue = Math.max(bestValue, search(board, depth - 1,alpha, beta, false));
                 move.unmakeMove(false);
                 // pruning
@@ -35,7 +35,7 @@ public class Minimax {
             bestValue = Integer.MAX_VALUE;
             for (Move move : moves) {
                 System.out.println(move);
-                move.makeMove(true);
+                move.makeMove(true, true);
                 bestValue = Math.min(bestValue, search(board, depth - 1, alpha, beta, true));
                 move.unmakeMove(false);
                 // pruning
@@ -54,7 +54,7 @@ public class Minimax {
         double bestValue = player.getColor() == PieceColor.WHITE ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         for (Move move : moves) {
-            move.makeMove(true);
+            move.makeMove(true, true);
             double boardValue = -board.evaluateBoard();
             move.unmakeMove(false);
 

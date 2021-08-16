@@ -71,7 +71,7 @@ public class MinimaxTest {
 
         Move move = minimax.findBestMove(board, 6, player);
         System.out.println(move);
-        move.makeMove(true);
+        move.makeMove(true, true);
         Move oMove = minimax.findBestMove(board, 3, opponent);
         System.out.println(oMove);
     }

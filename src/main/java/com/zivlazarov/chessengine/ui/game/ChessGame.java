@@ -58,7 +58,7 @@ public class ChessGame {
                     System.out.println(move);
                 }
             }
-            move.makeMove(true);
+            move.makeMove(true, true);
             numOfPositions += generatedMove(board, depth - 1);
             move.unmakeMove(true);
         }

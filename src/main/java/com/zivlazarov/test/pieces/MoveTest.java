@@ -48,7 +48,7 @@ public class MoveTest {
                 .build();
 
         board.printBoard();
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
     }
 
@@ -77,7 +77,7 @@ public class MoveTest {
                 .build();
 
         board.printBoard();
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
         move.unmakeMove(true);
         board.printBoard();
@@ -91,7 +91,7 @@ public class MoveTest {
                 .targetTile(board.getBoard()[4][4])
                 .build();
 
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
         move.unmakeMove(true);
         board.printBoard();
@@ -126,7 +126,7 @@ public class MoveTest {
                 .targetTile(board.getBoard()[4][2])
                 .build();
 
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
 
         Move oMove = new Move.Builder()
@@ -136,7 +136,7 @@ public class MoveTest {
                 .targetTile(board.getBoard()[4][3])
                 .build();
 
-        oMove.makeMove(true);
+        oMove.makeMove(true, true);
         board.printBoard();
 
         pawnPiece.getMoves().forEach(System.out::println);
@@ -148,7 +148,7 @@ public class MoveTest {
                 .targetTile(((PawnPiece) pawnPiece).getEnPassantTile())
                 .build();
 
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
 
         move.unmakeMove(true);
@@ -183,7 +183,7 @@ public class MoveTest {
                 .build();
 
         board.printBoard();
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
 
         move = new Move.Builder()
@@ -193,7 +193,7 @@ public class MoveTest {
                 .targetTile(board.getBoard()[pawnPiece.getCurrentTile().getRow() + 1][pawnPiece.getCurrentTile().getCol()])
                 .build();
 
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
 
         player.getAlivePieces().forEach(System.out::println);
@@ -205,7 +205,7 @@ public class MoveTest {
                 .targetTile(board.getBoard()[pawnPiece.getCurrentTile().getRow() + 1][pawnPiece.getCurrentTile().getCol()])
                 .build();
 
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
 
 //        Assertions.assertTrue(pawnPiece instanceof QueenPiece);
@@ -242,7 +242,7 @@ public class MoveTest {
                 .movingPiece(king)
                 .targetTile(board.getBoard()[0][6])
                 .build();
-        kingSideCastle.makeMove(true);
+        kingSideCastle.makeMove(true, true);
         board.printBoard();
 
         kingSideCastle.unmakeMove(true);
@@ -257,7 +257,7 @@ public class MoveTest {
                 .movingPiece(king)
                 .targetTile(board.getBoard()[0][2])
                 .build();
-        queenSideCastle.makeMove(true);
+        queenSideCastle.makeMove(true, true);
         board.printBoard();
 
         queenSideCastle.unmakeMove(true);
@@ -325,7 +325,7 @@ public class MoveTest {
         int numOfPositions = 0;
 
         for (Move move : moves) {
-            move.makeMove(true);
+            move.makeMove(true, true);
             numOfPositions += generatedMove(depth - 1);
             move.unmakeMove(true);
         }

@@ -369,7 +369,7 @@ public class Board implements MyObservable, Serializable {
                             .movingPiece((Piece) canInterferePieces.toArray()[i])
                             .targetTile(tile)
                             .build();
-                    move.makeMove(false);
+                    move.makeMove(false, true);
 
                     // if player is still in check
                     if (player.isInCheck()) {
@@ -389,7 +389,7 @@ public class Board implements MyObservable, Serializable {
 
         for (Move move : new ArrayList<>(player.getMoves())) {
             // setting checkBoard argument as false to prevent a StackOverflow error
-            boolean successfulMove = move.makeMove(false);
+            boolean successfulMove = move.makeMove(false, true);
             // if the move wasn't successful, try the next move
             if (!successfulMove) continue;
             // if it did, make all pieces generate moves according to current board state

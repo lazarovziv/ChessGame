@@ -167,10 +167,10 @@ public class KingPieceTest {
         board.checkBoard();
 
         Move move = (Move) player.getMoves().toArray()[2];
-        move.makeMove(true);
+        move.makeMove(true, true);
 
         board.printBoard();
         Move opponentMove = (Move) opponent.getMoves().toArray()[0];
-        opponentMove.makeMove(true);
+        opponentMove.makeMove(true, true);
     }
 }

@@ -104,7 +104,7 @@ public class PawnPieceTest {
                 .targetTile(board.getBoard()[7][3])
                 .build();
 
-        move.makeMove(true);
+        move.makeMove(true, true);
 
 //        player.addPieceToDead(pawn);
 //

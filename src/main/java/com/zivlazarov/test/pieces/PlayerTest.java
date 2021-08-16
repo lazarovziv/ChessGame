@@ -58,7 +58,7 @@ public class PlayerTest {
         player.getOpponent().saveState();
 
         Move move = (Move) player.getMoves().toArray()[0];
-        move.makeMove(true);
+        move.makeMove(true, true);
 
         System.out.println();
 

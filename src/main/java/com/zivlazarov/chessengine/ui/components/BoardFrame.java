@@ -175,7 +175,7 @@ public class BoardFrame {
 
             depth 5: 4865609  */
 
-//        System.out.println(ChessGame.generatedMove(board, 4));
+        System.out.println(ChessGame.generatedMove(board, 4));
 
 //        playRandomly(100);
 //        playMinimax();
@@ -218,9 +218,9 @@ public class BoardFrame {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            boolean isMax = board.getCurrentPlayer().getColor() == PieceColor.WHITE;
+
             Move move = minimax.findBestMove(board, 3, blackPlayer);
-            move.makeMove(true);
+            move.makeMove(true, true);
 
             SwingUtilities.invokeLater(() -> boardPanel.drawBoard(false));
         }
@@ -234,7 +234,7 @@ public class BoardFrame {
                 Iterator<Move> iterator = board.getCurrentPlayer().getMoves().iterator();
                 Move move = iterator.next();
 
-                move.makeMove(true);
+                move.makeMove(true, true);
 
                 System.out.println(board.evaluateBoard());
                 System.out.println(board.getGameSituation());
@@ -485,7 +485,7 @@ public class BoardFrame {
                                             .targetTile(destinationTile)
                                             .build();
 
-                                    move.makeMove(true);
+                                    move.makeMove(true, true);
 
                                     if (move.getLabel() == MoveLabel.REGULAR) {
                                         System.out.println(move.getPlayer().getName() + " has executed a regular move");

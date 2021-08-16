@@ -109,7 +109,7 @@ public class BoardTest {
         Board copy = (Board) PipedDeepCopy.copy(board);
 
         Move move = (Move) copy.getCurrentPlayer().getMoves().toArray()[0];
-        move.makeMove(true);
+        move.makeMove(true, true);
 
         board.printBoard();
         copy.printBoard();
@@ -254,11 +254,11 @@ public class BoardTest {
                 .targetTile(board.getBoard()[pawn.getCurrentTile().getRow() + 2* player.getPlayerDirection()][pawn.getCurrentTile().getCol()])
                 .build();
 
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
 
         Move oMove = (Move) board.getCurrentPlayer().getMoves().toArray()[0];
-        oMove.makeMove(true);
+        oMove.makeMove(true, true);
         board.printBoard();
 
         System.out.println(Converter.convertBoardToFENString(board));
@@ -323,7 +323,7 @@ public class BoardTest {
 
         List<Move> wPawn = whitePawn.getMoves().stream().toList();
         System.out.println(wPawn.get(0));
-        wPawn.get(0).makeMove(true);
+        wPawn.get(0).makeMove(true, true);
         board.printBoard();
 
         List<Move> oPawnMoves = blackPawn.getMoves().stream().filter(move -> move.getTargetTile().equals(
@@ -331,11 +331,11 @@ public class BoardTest {
         )).toList();
         Move blackPawnLongMove = oPawnMoves.get(0);
         System.out.println(blackPawnLongMove);
-        blackPawnLongMove.makeMove(true);
+        blackPawnLongMove.makeMove(true, true);
         board.printBoard();
 
         Move nextMove = (Move) whitePawn.getMoves().toArray()[1];
-        nextMove.makeMove(true);
+        nextMove.makeMove(true, true);
         board.printBoard();
 
         whitePawn.getMoves().forEach(System.out::println);
@@ -360,12 +360,12 @@ public class BoardTest {
 
         Move move = (Move) board.getCurrentPlayer().getMoves().toArray()[0];
 
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
 
         move = (Move) board.getCurrentPlayer().getMoves().toArray()[0];
 
-        move.makeMove(true);
+        move.makeMove(true, true);
         board.printBoard();
 
         Tile[][] boardTiles = board.getBoardStates().firstElement();
@@ -448,7 +448,7 @@ public class BoardTest {
                     System.out.println(move);
                 }
             }
-            move.makeMove(true);
+            move.makeMove(true, true);
             numOfPositions += generatedMove(board, depth - 1);
             move.unmakeMove(false);
         }

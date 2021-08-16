@@ -211,7 +211,7 @@ public class CommandLineGame {
                         .targetTile(targetTile)
                         .build();
 
-                move.makeMove(true);
+                move.makeMove(true, true);
 
                 // incrementing the turn
                 turn++;

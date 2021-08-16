@@ -154,16 +154,22 @@ public class PawnPiece extends Piece implements Cloneable {
         if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece pawn &&
                pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant() &&
                 board.getGameHistoryMoves().size() > 1 && pawn.hasMovedLong()) {
+
             // checking to see if opponent's last move is pawn's move 2 tiles forward
-            if (board.getGameHistoryMoves().lastElement()/*.getSecond()*/.equals(new Pair<>(
-//                    board.getBoard()[x - 2 * pawn.getPlayer().getPlayerDirection()][y+eatingDirection],
-                    pawn,
-                    pawn.getCurrentTile()))) {
-                if (board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection].isEmpty()) {
-                    enPassantTile = board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection];
+            if (player.getOpponent().getLastMove().get(pawn) != null) {
+                if (pawn.hasMovedLong()) {
+                    enPassantTile = board.getBoard()[x+ player.getPlayerDirection()][y+eatingDirection];
                     return true;
                 }
             }
+//            if (board.getGameHistoryMoves().lastElement().equals(new Pair<>(
+//                    pawn,
+//                    pawn.getCurrentTile()))) {
+//                if (board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection].isEmpty()) {
+//                    enPassantTile = board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection];
+//                    return true;
+//                }
+//            }
         }
         return false;
     }
