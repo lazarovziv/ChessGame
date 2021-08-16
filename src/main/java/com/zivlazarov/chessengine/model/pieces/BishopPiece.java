@@ -11,6 +11,13 @@ import javax.persistence.Entity;
 @Entity
 public class BishopPiece extends Piece implements Cloneable {
 
+    private int[][] directions = {
+            {1, 1},
+            {1, -1},
+            {-1, -1},
+            {-1, 1}
+    };
+
     public BishopPiece(Player player, Board board, Tile initTile, int pieceCounter) {
         super();
 
@@ -56,12 +63,6 @@ public class BishopPiece extends Piece implements Cloneable {
     @Override
     public void generateMoves() {
         if (!isAlive) return;
-        int[][] directions = {
-                {1, 1},
-                {1, -1},
-                {-1, -1},
-                {-1, 1}
-        };
 
         int x = currentTile.getRow();
         int y = currentTile.getCol();
@@ -103,8 +104,7 @@ public class BishopPiece extends Piece implements Cloneable {
                             .build();
                     moves.add(move);
                     break;
-                }
-                if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) {
+                } else if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) {
                     // setting it as threatened in the case of the piece on the tile will be captured
                     targetTile.setThreatenedByColor(pieceColor, true);
                     break;

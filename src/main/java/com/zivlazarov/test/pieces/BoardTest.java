@@ -485,4 +485,54 @@ public class BoardTest {
 
 //        board.checkBoard();
     }
+
+    @Test
+    public void testMoveOnNewBoard() {
+        Board board = new Board();
+        Player player = new Player(board, PieceColor.WHITE);
+        Player opponent = new Player(board, PieceColor.BLACK);
+        player.setOpponent(opponent);
+
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+
+        player.setBoard(board);
+        opponent.setBoard(board);
+
+        board.setCurrentPlayer(player);
+
+        board.initBoard();
+        board.checkBoard();
+
+        board.printBoard();
+
+        Board newBoard = new Board();
+        newBoard.setWhitePlayer(player);
+        newBoard.setBlackPlayer(opponent);
+        newBoard.setCurrentPlayer(player);
+
+        player.setBoard(newBoard);
+        opponent.setBoard(newBoard);
+
+        for (Piece piece : player.getAlivePieces()) {
+            int row = piece.getRow();
+            int col = piece.getCol();
+
+            newBoard.getBoard()[row][col].setPiece(piece);
+        }
+
+        for (Piece piece : opponent.getAlivePieces()) {
+            int row = piece.getRow();
+            int col = piece.getCol();
+
+            newBoard.getBoard()[row][col].setPiece(piece);
+        }
+
+        System.out.println();
+
+        newBoard.printBoard();
+
+        Piece piece = player.getAlivePieces().get(2);
+
+    }
 }

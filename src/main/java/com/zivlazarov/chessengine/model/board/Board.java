@@ -39,10 +39,6 @@ public class Board implements MyObservable, Serializable {
     private final Map<Player, RookPiece> kingSideRooksMap;
     private final Map<Player, RookPiece> queenSideRooksMap;
 
-    private final Map<Player, ChessPiece> kingsChessMap;
-    private final Map<Player, ChessPiece> kingSideChessRooksMap;
-    private final Map<Player, ChessPiece> queenSideChessRooksMap;
-
     private GameSituation gameSituation;
     private boolean canContinueGame;
 
@@ -76,10 +72,6 @@ public class Board implements MyObservable, Serializable {
         kingsMap = new HashMap<>();
         kingSideRooksMap = new HashMap<>();
         queenSideRooksMap = new HashMap<>();
-
-        kingsChessMap = new HashMap<>();
-        kingSideChessRooksMap = new HashMap<>();
-        queenSideChessRooksMap = new HashMap<>();
 
         checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
         checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
@@ -177,7 +169,7 @@ public class Board implements MyObservable, Serializable {
             // reset all legal moves before proceeding to generation of legal moves in check situation
             gameSituation = checkSituations.get(currentPlayer.getColor());
             gameSituation = generateMovesWhenInCheck(currentPlayer);
-            evaluateBoard();
+            double evaluation = checkmateSituations.containsKey(gameSituation) ? 0 : evaluateBoard();
             return;
 
         } else if (!currentPlayer.isInCheck() && currentPlayer.getMoves().size() == 0) {
@@ -237,7 +229,7 @@ public class Board implements MyObservable, Serializable {
             }
         }
         gameSituation = GameSituation.NORMAL;
-        evaluateBoard();
+//        evaluateBoard();
     }
 
     public Map<Piece, List<Tile>> calculatePotentialDangerForKing(Player player) {
@@ -288,6 +280,9 @@ public class Board implements MyObservable, Serializable {
                 if (!currentTile.isEmpty()) {
                     if (currentTile.getPiece().getPieceColor() != player.getColor()) {
                         Piece opponentPiece = currentTile.getPiece();
+                        if (opponentPiece instanceof PawnPiece) {
+                            // add logic for en passant situations
+                        }
                         if (opponentPiece instanceof QueenPiece || opponentPiece instanceof RookPiece) {
                             // if opponent contains queen or rook, all tiles in this row/column with player's pieces in between king and
                             // queen/rook shouldn't be able to move so the next tiles can't affect, so break
@@ -675,18 +670,6 @@ public class Board implements MyObservable, Serializable {
 
     public Map<Player, RookPiece> getQueenSideRooksMap() {
         return queenSideRooksMap;
-    }
-
-    public Map<Player, ChessPiece> getKingsChessMap() {
-        return kingsChessMap;
-    }
-
-    public Map<Player, ChessPiece> getKingSideChessRooksMap() {
-        return kingSideChessRooksMap;
-    }
-
-    public Map<Player, ChessPiece> getQueenSideChessRooksMap() {
-        return queenSideChessRooksMap;
     }
 
     public Stack<Tile[][]> getBoardStates() {

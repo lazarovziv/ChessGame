@@ -186,6 +186,10 @@ public class Move implements Serializable {
 
         board.setCurrentPlayer(player.getOpponent());
 
+        board.evaluateBoard();
+        player.addToScore(
+                player.getPlayerDirection() * movingPiece.getStrongTiles()[targetTile.getRow()][targetTile.getCol()]);
+
         if (checkBoard) {
             board.checkBoard();
         }

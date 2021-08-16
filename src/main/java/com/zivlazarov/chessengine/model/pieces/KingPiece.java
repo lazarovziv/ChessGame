@@ -16,6 +16,17 @@ public class KingPiece extends Piece implements Cloneable {
     private boolean executedKingSideCastle = false;
     private boolean executedQueenSideCastle = false;
 
+    private int[][] directions = {
+            {1,0},
+            {1,1},
+            {1,-1},
+            {0,1},
+            {0,-1},
+            {-1,0},
+            {-1,1},
+            {-1,-1}
+    };
+
     public KingPiece(Player player, Board board, Tile initTile) {
         super();
 
@@ -67,16 +78,6 @@ public class KingPiece extends Piece implements Cloneable {
     @Override
     public void generateMoves() {
         if (!isAlive) return;
-        int[][] directions = {
-                {1,0},
-                {1,1},
-                {1,-1},
-                {0,1},
-                {0,-1},
-                {-1,0},
-                {-1,1},
-                {-1,-1}
-        };
 
         int x = currentTile.getRow();
         int y = currentTile.getCol();
@@ -100,12 +101,9 @@ public class KingPiece extends Piece implements Cloneable {
                     if (!targetTile.isEmpty()) {
                         if (targetTile.getPiece().getPieceColor() != pieceColor) {
                             piecesUnderThreat.add(targetTile.getPiece());
-                        }
+                        } else targetTile.setThreatenedByColor(pieceColor, true);
                     }
                 }
-            }
-            if (!targetTile.isEmpty()) {
-                if (targetTile.getPiece().getPieceColor() == pieceColor) targetTile.setThreatenedByColor(pieceColor, true);
             }
         }
 

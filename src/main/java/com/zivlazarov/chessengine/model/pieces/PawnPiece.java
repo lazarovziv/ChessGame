@@ -107,9 +107,11 @@ public class PawnPiece extends Piece implements Cloneable {
             if (y + d > board.getBoard().length - 1 || y + d < 0) continue;
             if (!board.getBoard()[x+direction][y+d].isEmpty() &&
                     board.getBoard()[x+direction][y+d].getPiece().getPieceColor() != pieceColor) {
+
                 possibleMoves.add(board.getBoard()[x+direction][y+d]);
                 piecesUnderThreat.add(board.getBoard()[x+direction][y+d].getPiece());
                 board.getBoard()[x+direction][y+d].getPiece().setIsInDanger(true);
+
                 Move move = new Move.Builder()
                         .board(board)
                         .player(player)
@@ -133,6 +135,7 @@ public class PawnPiece extends Piece implements Cloneable {
                 // setting the adjacent pawn piece as under threat
                 // only move in chess where piece can be eaten without moving to it's tile
                 piecesUnderThreat.add(board.getBoard()[x][y+d].getPiece());
+                enPassantTile.setThreatenedByColor(pieceColor, true);
             }
         }
         player.getLegalMoves().addAll(possibleMoves);

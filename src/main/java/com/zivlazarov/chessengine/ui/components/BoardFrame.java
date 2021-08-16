@@ -10,6 +10,7 @@ import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.move.MoveLabel;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
+import com.zivlazarov.chessengine.ui.game.ChessGame;
 import com.zivlazarov.chessengine.ui.utils.Utilities;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -167,6 +168,14 @@ public class BoardFrame {
         // setting window in center
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
+
+        /*  depth 3: 8902
+
+            depth 4: 197281
+
+            depth 5: 4865609  */
+
+//        System.out.println(ChessGame.generatedMove(board, 4));
 
 //        playRandomly(100);
 //        playMinimax();

@@ -13,6 +13,23 @@ import java.util.List;
 public class ChessGame {
 
     public static void main(String[] args) {
+//        Board board = new Board();
+//        Player player = new Player(board, PieceColor.WHITE);
+//        Player opponent = new Player(board, PieceColor.BLACK);
+//        player.setOpponent(opponent);
+//
+//        board.setWhitePlayer(player);
+//        board.setBlackPlayer(opponent);
+//
+//        player.setBoard(board);
+//        opponent.setBoard(board);
+//
+//        board.setCurrentPlayer(player);
+//
+//        board.initBoard();
+//        board.checkBoard();
+//
+//        System.out.println(generatedMove(board, 4));
         new BoardFrame();
     }
 
@@ -43,7 +60,7 @@ public class ChessGame {
             }
             move.makeMove(true);
             numOfPositions += generatedMove(board, depth - 1);
-            move.unmakeMove(false);
+            move.unmakeMove(true);
         }
 
         return numOfPositions;

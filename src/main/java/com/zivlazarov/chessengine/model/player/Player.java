@@ -208,10 +208,6 @@ public class Player implements MyObserver, Serializable {
         return board.getKingsMap().get(this);
     }
 
-    public ChessPiece getChessKing() {
-        return board.getKingsChessMap().get(this);
-    }
-
     public PieceColor getColor() {
         return playerColor;
     }
@@ -354,8 +350,8 @@ public class Player implements MyObserver, Serializable {
     }
 
     public boolean isInCheck() {
-        return isInCheck;
-//        return getKing().isInDanger();
+//        return isInCheck;
+        return getKing().isInDanger();
 //        for (Piece piece : opponent.getAlivePieces()) {
 //            if (piece.getPiecesUnderThreat().contains(getKing())) {
 //                return true;
@@ -420,5 +416,9 @@ public class Player implements MyObserver, Serializable {
     public void setBoard(Board board) {
         this.board = board;
         board.addObserver(this);
+    }
+
+    public void addToScore(double addition) {
+        playerScore += addition;
     }
 }

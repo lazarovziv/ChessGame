@@ -10,6 +10,17 @@ import javax.persistence.Entity;
 @Entity
 public class QueenPiece extends Piece implements Cloneable {
 
+    int[][] directions = {
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1},
+            {1, 1},
+            {1, -1},
+            {-1, -1},
+            {-1, 1}
+    };
+
     public QueenPiece(Player player, Board board, Tile initTile) {
         super();
 
@@ -54,16 +65,6 @@ public class QueenPiece extends Piece implements Cloneable {
     @Override
     public void generateMoves() {
         if (!isAlive) return;
-        int[][] directions = {
-                {1, 0},
-                {-1, 0},
-                {0, 1},
-                {0, -1},
-                {1, 1},
-                {1, -1},
-                {-1, -1},
-                {-1, 1}
-        };
 
         if (currentTile == null) return;
 
@@ -100,7 +101,7 @@ public class QueenPiece extends Piece implements Cloneable {
                             .build();
                     moves.add(move);
                     break;
-                } else {
+                } else if (!targetTile.isEmpty() && targetTile.getPiece().getPieceColor() == pieceColor) {
                     // setting it as threatened in the case of the piece on the tile will be captured
                     targetTile.setThreatenedByColor(pieceColor, true);
                     break;
