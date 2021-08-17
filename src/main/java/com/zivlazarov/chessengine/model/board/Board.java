@@ -1,5 +1,6 @@
 package com.zivlazarov.chessengine.model.board;
 
+import com.zivlazarov.chessengine.errors.IllegalMoveError;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.player.Player;
@@ -137,9 +138,7 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void checkBoard() {
-        if (!whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive()) {
-            throw new RuntimeException("Kings can't be captured!");
-        }
+//        if (!whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive()) throw new IllegalMoveError("Kings can't be captured!");
         // resetting tiles threatened state before every board check
         resetThreatsOnTiles();
         // update all observers
