@@ -28,8 +28,11 @@ public class PawnPieceTest {
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
         player.setOpponent(opponent);
-        opponent.setOpponent(player);
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+        board.setCurrentPlayer(player);
         KingPiece kingPiece = new KingPiece(player, board, board.getBoard()[7][4]);
+        KingPiece opponentKing = new KingPiece(opponent, board, board.getBoard()[0][4]);
         pawnPiece = new PawnPiece(player, board, board.getBoard()[1][0], 0);
         knightPiece = new KnightPiece(player, board, board.getBoard()[3][0], 0);
         opponentPawnPiece = new PawnPiece(opponent, board, board.getBoard()[2][1], 0);
@@ -63,32 +66,38 @@ public class PawnPieceTest {
 
     @Test
     public void testEnPassant() {
-        board = new Board();
-        player = new Player(board, PieceColor.WHITE);
-        opponent = new Player(board, PieceColor.BLACK);
-
-        PawnPiece pawn = new PawnPiece(player, board, board.getBoard()[1][3], 0);
+        PawnPiece pawn = new PawnPiece(player, board, board.getBoard()[3][4], 0);
         PawnPiece opponentPawn = new PawnPiece(opponent, board, board.getBoard()[6][3], 0);
-//        KingPiece whiteKing = new KingPiece(player, board, PieceColor.WHITE, board.getBoard()[0][0]);
-//        KingPiece blackKing = new KingPiece(opponent, board, PieceColor.BLACK, board.getBoard()[7][7]);
 
-        board.checkBoard();
-//        PlayerController controller = new PlayerController();
-//        controller.setPlayer(player);
-//        controller.setOpponentPlayer(opponent);
-//        controller.addPieceToAlive(pawn);
-//        controller.movePiece(pawn, board.getBoard()[3][3]);
-        board.checkBoard();
-        board.printBoard();
-//        controller.setPlayer(opponent);
-//        controller.addPieceToAlive(opponentPawn);
-//        controller.movePiece(opponentPawn, board.getBoard()[4][3]);
-        board.checkBoard();
-        board.printBoard();
-//        controller.setPlayer(player);
-        board.checkBoard();
+        Move move = new Move.Builder()
+                .board(board)
+                .player(player)
+                .movingPiece(pawn)
+                .targetTile(board.getBoard()[4][4])
+                .build();
+        move.makeMove(true, true);
 
-        pawn.getPossibleMoves().forEach(tile -> System.out.print(tile + ","));
+        Move oMove = new Move.Builder()
+                .board(board)
+                .player(opponent)
+                .movingPiece(opponentPawn)
+                .targetTile(board.getBoard()[4][3])
+                .build();
+        oMove.makeMove(true, true);
+
+        Move knightMove = new Move.Builder()
+                .board(board).player(player).movingPiece(knightPiece).targetTile(board.getBoard()[1][1]).build();
+        knightMove.makeMove(true, true);
+
+        Move opponentPawnPieceMove = new Move.Builder()
+                .board(board).player(opponent).movingPiece(opponentPawnPiece).targetTile(board.getBoard()[1][0]).build();
+        opponentPawnPieceMove.makeMove(true, true);
+
+        Move enPassant = new Move.Builder()
+                .board(board).player(player).movingPiece(pawn).targetTile(board.getBoard()[5][3]).build();
+        enPassant.makeMove(true, true);
+
+        board.printBoard();
     }
 
     @Test

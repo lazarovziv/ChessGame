@@ -153,8 +153,7 @@ public class PawnPiece extends Piece implements Cloneable {
 
         // checking if piece next to pawn is of type pawn and is opponent's piece
         if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece pawn &&
-               pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant() &&
-                board.getGameHistoryMoves().size() > 1) {
+               pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant()) {
 
             // checking to see if opponent's last move is pawn's move 2 tiles forward
             if (player.getOpponent().getLastMove().get(pawn) != null) {
