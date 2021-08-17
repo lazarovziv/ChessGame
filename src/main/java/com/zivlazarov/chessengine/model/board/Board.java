@@ -137,8 +137,9 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void checkBoard() {
-        if (!whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive())
+        if (!whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive()) {
             throw new RuntimeException("Kings can't be captured!");
+        }
         // resetting tiles threatened state before every board check
         resetThreatsOnTiles();
         // update all observers
@@ -158,6 +159,7 @@ public class Board implements MyObservable, Serializable {
                 return;
             }
 
+            // two kings left (allegedly)
         } else if (currentPlayer.getAlivePieces().size() == 1 && currentPlayer.getOpponent().getAlivePieces().size() == 1) {
             gameSituation = GameSituation.DRAW;
             canContinueGame = false;
@@ -169,9 +171,10 @@ public class Board implements MyObservable, Serializable {
             // reset all legal moves before proceeding to generation of legal moves in check situation
             gameSituation = checkSituations.get(currentPlayer.getColor());
             gameSituation = generateMovesWhenInCheck(currentPlayer);
-            double evaluation = checkmateSituations.containsKey(gameSituation) ? 0 : evaluateBoard();
+            double evaluation = checkmateSituations.containsValue(gameSituation) ? 0 : evaluateBoard();
             return;
 
+            // not in check but can't move is a stalemate (/draw)
         } else if (!currentPlayer.isInCheck() && currentPlayer.getMoves().size() == 0) {
             gameSituation = GameSituation.STALEMATE;
             canContinueGame = false;
@@ -180,17 +183,16 @@ public class Board implements MyObservable, Serializable {
 
         } else {
             if (gameSituation == GameSituation.NORMAL) {
-                Map<Piece, List<Tile>> directionsOfDanger = calculatePotentialDangerForKing(currentPlayer);
+                Map<Piece, List<Tile>> directionsOfThreats = calculatePotentialThreatsForKing(currentPlayer);
 
-                for (Piece opponentPiece : directionsOfDanger.keySet()) {
+                for (Piece opponentPiece : directionsOfThreats.keySet()) {
                     if (opponentPiece != null) {
                         // in each direction of threat, count how many pieces are in between king and threatening piece
                         List<Piece> playerPiecesInTheWay = new ArrayList<>();
-                        for (Tile tile : directionsOfDanger.get(opponentPiece)) {
+                        for (Tile tile : directionsOfThreats.get(opponentPiece)) {
                             if (!tile.isEmpty()) {
                                 if (tile.getPiece().getPieceColor() == currentPlayer.getColor()) {
                                     Piece playerPiece = tile.getPiece();
-
                                     playerPiecesInTheWay.add(playerPiece);
                                 } else {
                                     currentPlayer.getKing().getMoves().removeIf(move -> move.getTargetTile().equals(tile));
@@ -205,22 +207,25 @@ public class Board implements MyObservable, Serializable {
                         if (playerPiecesInTheWay.size() == 1) {
                             Piece playerPiece = playerPiecesInTheWay.get(0);
 
+                            // removes all player's moves involving playerPiece
                             currentPlayer.getMoves().removeIf(move -> move.getMovingPiece().equals(playerPiece));
                             currentPlayer.getLegalMoves().removeIf(tile -> playerPiece.getPossibleMoves().contains(tile));
-                            if (directionsOfDanger.get(opponentPiece).size() > 1) {
-                                playerPiece.getPossibleMoves().removeIf(t -> !directionsOfDanger.get(opponentPiece).contains(t));
-                                playerPiece.getMoves().removeIf(move -> !directionsOfDanger.get(opponentPiece).contains(
+                            if (directionsOfThreats.get(opponentPiece).size() > 1) {
+                                playerPiece.getPossibleMoves().removeIf(t -> !directionsOfThreats.get(opponentPiece).contains(t));
+                                playerPiece.getMoves().removeIf(move -> !directionsOfThreats.get(opponentPiece).contains(
                                         move.getTargetTile()
                                 ));
                             } else {
                                 playerPiece.getPossibleMoves().removeIf(t -> !t.equals(opponentPiece.getCurrentTile()));
                                 playerPiece.getMoves().removeIf(move -> !move.getTargetTile().equals(opponentPiece.getCurrentTile()));
                             }
+                            // add all playerPiece's moves after filtering them according to current boar situation
                             currentPlayer.getMoves().addAll(playerPiece.getMoves());
                         }
                     }
                 }
 
+                // if game situation is normal but still player has no legal moves, it's a stalemate
                 if (currentPlayer.getMoves().size() == 0) {
                     gameSituation = GameSituation.STALEMATE;
                     evaluateBoard();
@@ -229,10 +234,10 @@ public class Board implements MyObservable, Serializable {
             }
         }
         gameSituation = GameSituation.NORMAL;
-//        evaluateBoard();
+        evaluateBoard();
     }
 
-    public Map<Piece, List<Tile>> calculatePotentialDangerForKing(Player player) {
+    public Map<Piece, List<Tile>> calculatePotentialThreatsForKing(Player player) {
         // setting potential threatening piece as key of threatened row/column/diagonal
         Map<Piece, List<Tile>> allDirections = new HashMap<>();
 
@@ -243,7 +248,7 @@ public class Board implements MyObservable, Serializable {
                 {-1, 1}
         };
 
-        // horizontal and vertical directions
+        // horizontal and vertical general directions
         int[][] hwDirections = {
                 {1, 0},
                 {-1, 0},
@@ -270,6 +275,7 @@ public class Board implements MyObservable, Serializable {
 
             List<Tile> currentTiles = new ArrayList<>();
 
+            // looping through the actual directions
             for (int i = 1; i < board.length; i++) {
                 if (kingTileRow + row*i > board.length - 1 || kingTileRow + row*i < 0 ||
                 kingTileCol + col*i > board.length - 1 || kingTileCol + col*i < 0) continue;
@@ -282,6 +288,19 @@ public class Board implements MyObservable, Serializable {
                         Piece opponentPiece = currentTile.getPiece();
                         if (opponentPiece instanceof PawnPiece) {
                             // add logic for en passant situations
+                            for (int c : new int[] {1, -1}) {
+                                if (opponentPiece.getCol() + c < 0 || opponentPiece.getCol() >= board.length) continue;
+                                if (!board[opponentPiece.getRow()][opponentPiece.getCol() + c].isEmpty() &&
+                                        board[opponentPiece.getRow()][opponentPiece.getCol() + c].getPiece().getPieceColor() == player.getColor() &&
+                                        board[opponentPiece.getRow()][opponentPiece.getCol() + c].getPiece() instanceof PawnPiece pawn) {
+                                    if (pawn.canEnPassant(-c)) {
+                                        pawn.getMoves().removeIf(move -> move.getTargetTile().equals(pawn.getEnPassantTile()));
+                                        pawn.getPossibleMoves().removeIf(tile -> tile.equals(pawn.getEnPassantTile()));
+                                        player.getMoves().removeIf(move -> move.getTargetTile().equals(pawn.getEnPassantTile()));
+                                        player.getLegalMoves().removeIf(tile -> tile.equals(pawn.getEnPassantTile()));
+                                    }
+                                }
+                            }
                         }
                         if (opponentPiece instanceof QueenPiece || opponentPiece instanceof RookPiece) {
                             // if opponent contains queen or rook, all tiles in this row/column with player's pieces in between king and
@@ -476,6 +495,25 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void printBoard() {
+        for (int r = 0; r < board.length; r++) {
+            System.out.println();
+            for (int c = 0; c < board.length; c++) {
+                if (c == 0) /*System.out.print(letters[r] + " ");*/ System.out.print(letters[r] + " ");
+                if (board[r][c].getPiece() != null) {
+                    System.out.print(board[r][c].getPiece().getName() + " ");
+                } else System.out.print("-- ");
+            }
+        }
+        System.out.println();
+        for (int i = 0; i < board.length; i++) {
+            if (i == 0) System.out.print("  ");
+            System.out.print(nums[i] + "  ");
+        }
+        System.out.println();
+        System.out.println();
+    }
+
+    public void printBoard(Tile[][] board) {
         for (int r = 0; r < board.length; r++) {
             System.out.println();
             for (int c = 0; c < board.length; c++) {
