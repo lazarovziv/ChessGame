@@ -118,14 +118,9 @@ public class Move implements Serializable {
             if (targetTile.equals(((KingPiece) movingPiece).getKingSideCastleTile()) &&
             player.getKingSideRookPiece() != null && !((KingPiece) movingPiece).hasExecutedKingSideCastle()) {
                 RookPiece kingSideRook = player.getKingSideRookPiece();
-
-                castlingMove = new Builder()
-                        .board(board)
-                        .player(player)
-                        .movingPiece(kingSideRook)
-                        .targetTile(kingSideRook.getKingSideCastlingTile())
-                        .build();
-//                castlingMove.makeMove(false, false);
+                kingSideRook.setLastTile(kingSideRook.getCurrentTile());
+                kingSideRook.setCurrentTile(kingSideRook.getKingSideCastlingTile());
+                kingSideRook.setHasMoved(true);
                 ((KingPiece) movingPiece).setExecutedKingSideCastle(true);
 
                 label = MoveLabel.KING_SIDE_CASTLE;
@@ -137,14 +132,9 @@ public class Move implements Serializable {
                 if (targetTile.equals(((KingPiece) movingPiece).getQueenSideCastleTile()) &&
                 player.getQueenSideRookPiece() != null && !((KingPiece) movingPiece).hasExecutedQueenSideCastle()) {
                     RookPiece queenSideRook = player.getQueenSideRookPiece();
-
-                    castlingMove = new Builder()
-                            .board(board)
-                            .player(player)
-                            .movingPiece(queenSideRook)
-                            .targetTile(queenSideRook.getQueenSideCastlingTile())
-                            .build();
-//                    castlingMove.makeMove(false, false);
+                    queenSideRook.setLastTile(queenSideRook.getCurrentTile());
+                    queenSideRook.setCurrentTile(queenSideRook.getQueenSideCastlingTile());
+                    queenSideRook.setHasMoved(true);
                     ((KingPiece) movingPiece).setExecutedQueenSideCastle(true);
 
                     label = MoveLabel.QUEEN_SIDE_CASTLE;
@@ -175,8 +165,6 @@ public class Move implements Serializable {
         }
 
         player.getLastMove().put(movingPiece, new Pair<>(currentTile, targetTile));
-
-        if (castlingMove != null) castlingMove.makeMove(false, false);
 
         player.incrementTurn();
 
