@@ -22,11 +22,6 @@ public class Minimax {
         if (isMaximizing) {
             bestValue = Integer.MIN_VALUE;
             for (Move move : moves) {
-                if (!move.getTargetTile().isEmpty()) {
-                    if (move.getTargetTile().getPiece() instanceof KingPiece kingPiece) {
-                        board.printBoard();
-                    }
-                }
                 move.makeMove(true, false);
                 board.updateObservers();
                 bestValue = Math.max(bestValue, search(board, depth - 1, alpha, beta, false));
@@ -40,11 +35,6 @@ public class Minimax {
         } else {
             bestValue = Integer.MAX_VALUE;
             for (Move move : moves) {
-                if (!move.getTargetTile().isEmpty()) {
-                    if (move.getTargetTile().getPiece() instanceof KingPiece kingPiece) {
-                        board.printBoard();
-                    }
-                }
                 move.makeMove(false, false);
                 board.updateObservers();
                 bestValue = Math.min(bestValue, search(board, depth - 1, alpha, beta, true));
@@ -66,11 +56,6 @@ public class Minimax {
         double bestValue = player.getColor() == PieceColor.WHITE ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         for (Move move : moves) {
-            if (!move.getTargetTile().isEmpty()) {
-                if (move.getTargetTile().getPiece() instanceof KingPiece kingPiece) {
-                    board.printBoard();
-                }
-            }
             move.makeMove(false, false);
             board.updateObservers();
             double boardValue = -search(board, depth - 1, Integer.MIN_VALUE, Integer.MIN_VALUE, player.getColor() == PieceColor.WHITE);
