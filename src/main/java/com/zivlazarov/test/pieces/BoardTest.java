@@ -472,7 +472,6 @@ public class BoardTest {
         List<Move> moves = new ArrayList<>(board.getCurrentPlayer().getMoves());
 
         for (Move move : moves) {
-            System.out.println(move.getMovingPiece().hashCode());
             if (!move.getTargetTile().isEmpty()) {
                 if (move.getTargetTile().getPiece() instanceof KingPiece) {
                     System.out.println(move);
