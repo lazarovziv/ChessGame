@@ -289,7 +289,7 @@ public class Board implements MyObservable, Serializable {
                         if (opponentPiece instanceof PawnPiece) {
                             // add logic for en passant situations
                             for (int c : new int[] {1, -1}) {
-                                if (opponentPiece.getCol() + c < 0 || opponentPiece.getCol() >= board.length) continue;
+                                if (opponentPiece.getCol() + c < 0 || opponentPiece.getCol() + c >= board.length) continue;
                                 if (!board[opponentPiece.getRow()][opponentPiece.getCol() + c].isEmpty() &&
                                         board[opponentPiece.getRow()][opponentPiece.getCol() + c].getPiece().getPieceColor() == player.getColor() &&
                                         board[opponentPiece.getRow()][opponentPiece.getCol() + c].getPiece() instanceof PawnPiece pawn) {
@@ -661,13 +661,6 @@ public class Board implements MyObservable, Serializable {
     }
 
     public double evaluateBoard() {
-        whitePlayer.resetPlayerScore();
-//        whitePlayer.evaluatePlayerScore();
-        blackPlayer.resetPlayerScore();
-//        blackPlayer.evaluatePlayerScore();
-
-        int perspective = currentPlayer.getColor() == PieceColor.WHITE ? 1 : -1;
-
         return blackPlayer.evaluatePlayerScore() + whitePlayer.evaluatePlayerScore();
 //        return perspective * (currentPlayer.getPlayerScore() - currentPlayer.getOpponentPlayer().getPlayerScore());
     }
