@@ -194,7 +194,7 @@ public class BoardFrame {
         blackPlayer.setName("Guy");
 
         whitePlayer.setAI(false);
-        blackPlayer.setAI(false);
+        blackPlayer.setAI(true);
 
         minimax = new Minimax();
 
