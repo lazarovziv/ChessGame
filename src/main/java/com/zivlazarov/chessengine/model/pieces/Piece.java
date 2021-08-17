@@ -81,6 +81,8 @@ public abstract class Piece implements Cloneable, Serializable {
 
     protected double[][] strongTiles;
 
+    protected int pieceIndex;
+
     public Piece() {
         moves = new HashSet<>();
         possibleMoves = new ArrayList<>();
@@ -101,6 +103,8 @@ public abstract class Piece implements Cloneable, Serializable {
     }
 
     public abstract void generateMoves();
+
+    public abstract Piece clone(Board newBoard, Player player);
 
     public int getId() {
         return id;
@@ -200,6 +204,8 @@ public abstract class Piece implements Cloneable, Serializable {
 
     public void setLastTile(Tile lastTile) {
         this.lastTile = lastTile;
+        lastRow = lastTile.getRow();
+        lastCol = lastTile.getCol();
     }
 
     public int getLastRow() {
@@ -278,10 +284,22 @@ public abstract class Piece implements Cloneable, Serializable {
         return strongTiles;
     }
 
+    public int getPieceIndex() {
+        return pieceIndex;
+    }
+
+    public void setPieceIndex(int pieceIndex) {
+        this.pieceIndex = pieceIndex;
+    }
+
     public boolean isTileAvailable(Tile tile) {
         if (tile.isEmpty()) {
             return true;
         } else return tile.getPiece().getPieceColor() != pieceColor;
+    }
+
+    public void setBoard(Board newBoard) {
+        this.board = newBoard;
     }
 
     public boolean canMove() {
@@ -314,56 +332,3 @@ public abstract class Piece implements Cloneable, Serializable {
         return newTiles;
     }
 }
-
-//    public abstract int getId();
-//    public abstract void setId(int id);
-//
-//    public abstract String getName();
-//    public abstract boolean isAlive();
-//    public abstract boolean getIsInDanger();
-//    public abstract List<Tile> getPossibleMoves();
-//    public abstract PieceColor getPieceColor();
-//    public abstract Tile getCurrentTile();
-//    public abstract Stack<Tile> getHistoryMoves();
-//    public abstract Tile getLastMove();
-//    public abstract List<Piece> getPiecesUnderThreat();
-//    public abstract String getImageName();
-//    public abstract int getPieceCounter();
-//
-//    public abstract Tile getLastTile();
-//
-//    public abstract Set<Move> getMoves();
-//
-//    public abstract boolean canMove();
-//
-//    public abstract void setName(String name);
-//    public abstract void setIsAlive(boolean isAlive);
-//    public abstract void setIsInDanger(boolean isInDanger);
-//    public abstract void setPieceColor(PieceColor pieceColor);
-//    public abstract void setCurrentTile(Tile tile);
-//
-//    public abstract void setPieceType(PieceType pieceType);
-//    public abstract PieceType getPieceType();
-//
-//    public abstract void setLastTile(Tile tile);
-//
-//    public abstract Piece getLastPieceEaten();
-//
-//    public abstract Stack<Piece> getCapturedPieces();
-//
-//    public abstract void generateMoves();
-//
-//    public abstract boolean isThreatenedAtTile(Tile tile);
-//
-//    public abstract boolean isTileAvailable(Tile tile);
-//
-//    public abstract void refresh();
-//
-//    public abstract int getValue();
-//
-//    public abstract boolean hasMoved();
-//
-//    public abstract boolean equals(Piece piece);
-//
-//    public abstract void setPlayer(Player player);
-//    public abstract Player getPlayer();

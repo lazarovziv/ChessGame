@@ -392,6 +392,12 @@ public class Player implements MyObserver, Serializable {
         return loadedPlayer;
     }
 
+    public Player clone() {
+//        Player newPlayer = new Player(playerColor);
+//        newPlayer.setBoard(newBoard);
+        return new Player(playerColor);
+    }
+
     public Memento<Player> saveToMemento() {
         return new Memento<Player>(this);
     }
@@ -425,5 +431,13 @@ public class Player implements MyObserver, Serializable {
 
     public void addToScore(double addition) {
         playerScore += addition;
+    }
+
+    public Piece getPieceByIndex(int index) {
+        return alivePieces.stream().filter(piece -> piece.getPieceIndex() == index).toList().get(0);
+//        for (Piece piece : alivePieces) {
+//            if (piece.getPieceIndex() == index) return piece;
+//        }
+//        return null;
     }
 }
