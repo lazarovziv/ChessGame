@@ -276,7 +276,7 @@ public class Player implements MyObserver, Serializable {
         return legalMoves;
     }
 
-    public void addTurn() {
+    public void incrementTurn() {
         turnsPlayed++;
     }
 
@@ -285,6 +285,7 @@ public class Player implements MyObserver, Serializable {
     }
 
     public double evaluatePlayerScore() {
+        resetPlayerScore();
         for (Piece piece : alivePieces) {
             playerScore += playerDirection * piece.getValue();
             for (Piece threatenedPiece : piece.getPiecesUnderThreat()) {
@@ -293,6 +294,11 @@ public class Player implements MyObserver, Serializable {
 
             // adding
             playerScore += playerDirection * piece.getStrongTiles()[piece.getRow()][piece.getCol()];
+
+            if (piece.isInDanger()) {
+                if (piece instanceof KingPiece) continue;
+                playerScore -= playerDirection * 0.12 * piece.getValue();
+            }
 
             if (piece instanceof KingPiece) {
                 if (((KingPiece) piece).canKingSideCastle() || ((KingPiece) piece).canQueenSideCastle()) {
@@ -307,7 +313,6 @@ public class Player implements MyObserver, Serializable {
         }
         for (Piece piece : deadPieces) {
             playerScore -= playerDirection * piece.getValue();
-            if (piece.isInDanger()) playerScore -= playerDirection * 0.12 * piece.getValue();
         }
         if (opponent.isInCheck()) playerScore += playerDirection * 35;
 

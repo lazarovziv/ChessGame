@@ -41,6 +41,9 @@ public class BoardFrame {
     private final SidePanel movesSidePanel;
     private final SidePanel capturedPiecesPanel;
 
+    private Move minimaxMove;
+    private final int depth = 4;
+
     private final Map<Player, SidePanel> playerSidePanelMap;
 
     private static Board board;
@@ -443,6 +446,19 @@ public class BoardFrame {
                 public void mouseClicked(MouseEvent e) {
                     // first left mouse click
                     if (isLeftMouseButton(e)) {
+                        if (blackPlayer.isCurrentPlayer()) {
+                            minimaxMove = minimax.findBestMove(board, depth, blackPlayer);
+                            minimaxMove.makeMove(true, true);
+
+                            printMoveLabel(minimaxMove);
+                            System.out.println(board.evaluateBoard());
+
+                            SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
+                            SwingUtilities.invokeLater(movesSidePanel::drawMoves);
+                            SwingUtilities.invokeLater(capturedPiecesPanel::drawPiece);
+                            return;
+                        }
+
                         if (sourceTile == null) {
                             sourceTile = tile;
                             if (!sourceTile.isEmpty()) {
@@ -487,13 +503,7 @@ public class BoardFrame {
 
                                     move.makeMove(true, true);
 
-                                    if (move.getLabel() == MoveLabel.REGULAR) {
-                                        System.out.println(move.getPlayer().getName() + " has executed a regular move");
-                                    } else if (move.getLabel() == EN_PASSANT) {
-                                        System.out.println(move.getPlayer().getName() + " has executed an " + move.getLabel());
-                                    } else {
-                                        System.out.println(move.getPlayer().getName() + " has executed a " + move.getLabel());
-                                    }
+                                    printMoveLabel(move);
                                 }
 
                                 System.out.println(board.evaluateBoard());
@@ -627,6 +637,16 @@ public class BoardFrame {
 
             validate();
             repaint();
+        }
+
+        private static void printMoveLabel(Move move) {
+            if (move.getLabel() == MoveLabel.REGULAR) {
+                System.out.println(move.getPlayer().getName() + " has executed a regular move");
+            } else if (move.getLabel() == EN_PASSANT) {
+                System.out.println(move.getPlayer().getName() + " has executed an " + move.getLabel());
+            } else {
+                System.out.println(move.getPlayer().getName() + " has executed a " + move.getLabel());
+            }
         }
     }
 }

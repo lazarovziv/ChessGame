@@ -13,7 +13,7 @@ import java.util.List;
 public class Minimax {
 
     public double search(Board board, int depth,double alpha, double beta, boolean isMaximizing) {
-        if (depth == 0 || !board.canContinueGame()) return -board.evaluateBoard();
+        if (depth == 0 || !board.canContinueGame()) return board.evaluateBoard();
 
         List<Move> moves = board.getCurrentPlayer().getMoves().stream().toList();
 
@@ -22,10 +22,11 @@ public class Minimax {
         if (isMaximizing) {
             bestValue = Integer.MIN_VALUE;
             for (Move move : moves) {
-                System.out.println(move);
-                move.makeMove(true, true);
-                bestValue = Math.max(bestValue, search(board, depth - 1,alpha, beta, false));
+                move.makeMove(true, false);
+                board.updateObservers();
+                bestValue = Math.max(bestValue, search(board, depth - 1, alpha, beta, false));
                 move.unmakeMove(false);
+                board.updateObservers();
                 // pruning
                 if (bestValue >= beta) break;
                 alpha = Math.max(alpha, bestValue);
@@ -34,10 +35,11 @@ public class Minimax {
         } else {
             bestValue = Integer.MAX_VALUE;
             for (Move move : moves) {
-                System.out.println(move);
-                move.makeMove(true, true);
+                move.makeMove(false, false);
+                board.updateObservers();
                 bestValue = Math.min(bestValue, search(board, depth - 1, alpha, beta, true));
                 move.unmakeMove(false);
+                board.updateObservers();
                 // pruning
                 if (bestValue <= alpha) break;
                 beta = Math.min(beta, bestValue);
@@ -54,16 +56,24 @@ public class Minimax {
         double bestValue = player.getColor() == PieceColor.WHITE ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         for (Move move : moves) {
-            move.makeMove(true, true);
-            double boardValue = -board.evaluateBoard();
+            move.makeMove(false, false);
+            board.updateObservers();
+            double boardValue = -search(board, depth - 1, Integer.MIN_VALUE, Integer.MIN_VALUE, player.getColor() == PieceColor.WHITE);
             move.unmakeMove(false);
+            board.updateObservers();
 
-            if (boardValue > bestValue) {
-                bestValue = boardValue;
-                bestMove = move;
+            if (player.getColor() == PieceColor.WHITE) {
+                if (boardValue > bestValue) {
+                    bestValue = boardValue;
+                    bestMove = move;
+                }
+            } else {
+                if (boardValue < bestValue) {
+                    bestValue = boardValue;
+                    bestMove = move;
+                }
             }
         }
-
         return bestMove;
     }
 }
