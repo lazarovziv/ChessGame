@@ -86,15 +86,27 @@ public class PawnPieceTest {
         oMove.makeMove(true, true);
 
         Move knightMove = new Move.Builder()
-                .board(board).player(player).movingPiece(knightPiece).targetTile(board.getBoard()[1][1]).build();
+                .board(board)
+                .player(player)
+                .movingPiece(knightPiece)
+                .targetTile(board.getBoard()[1][1])
+                .build();
         knightMove.makeMove(true, true);
 
         Move opponentPawnPieceMove = new Move.Builder()
-                .board(board).player(opponent).movingPiece(opponentPawnPiece).targetTile(board.getBoard()[1][0]).build();
+                .board(board)
+                .player(opponent)
+                .movingPiece(opponentPawnPiece)
+                .targetTile(board.getBoard()[1][0])
+                .build();
         opponentPawnPieceMove.makeMove(true, true);
 
         Move enPassant = new Move.Builder()
-                .board(board).player(player).movingPiece(pawn).targetTile(board.getBoard()[5][3]).build();
+                .board(board)
+                .player(player)
+                .movingPiece(pawn)
+                .targetTile(board.getBoard()[5][3])
+                .build();
         enPassant.makeMove(true, true);
 
         board.printBoard();
