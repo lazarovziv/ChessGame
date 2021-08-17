@@ -103,8 +103,10 @@ public class Move implements Serializable {
             }
 
             // if moved 2 rows forward, it's a long move, setting it as true
-            if (Math.abs(targetTile.getRow() - movingPiece.getCurrentTile().getRow()) == 2)
+            if (Math.abs(targetTile.getRow() - movingPiece.getCurrentTile().getRow()) == 2) {
                 ((PawnPiece) movingPiece).setMovedLong(true);
+            }
+
             if (movingPiece.getPieceType() == PieceType.QUEEN) {
                 label = MoveLabel.PAWN_PROMOTION;
                 // promoted with a capture
@@ -129,6 +131,7 @@ public class Move implements Serializable {
                         .movingPiece(kingSideRook)
                         .targetTile(kingSideRook.getKingSideCastlingTile())
                         .build();
+//                castlingMove.makeMove(false, false);
                 ((KingPiece) movingPiece).setExecutedKingSideCastle(true);
 
                 label = MoveLabel.KING_SIDE_CASTLE;
@@ -147,6 +150,7 @@ public class Move implements Serializable {
                             .movingPiece(queenSideRook)
                             .targetTile(queenSideRook.getQueenSideCastlingTile())
                             .build();
+//                    castlingMove.makeMove(false, false);
                     ((KingPiece) movingPiece).setExecutedQueenSideCastle(true);
 
                     label = MoveLabel.QUEEN_SIDE_CASTLE;
@@ -180,7 +184,7 @@ public class Move implements Serializable {
 
         if (castlingMove != null) castlingMove.makeMove(false, false);
 
-        player.addTurn();
+        player.incrementTurn();
 
         board.setCurrentPlayer(player.getOpponent());
 

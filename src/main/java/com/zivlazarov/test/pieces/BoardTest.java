@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.toList;
-
 public class BoardTest {
 
     private static Board board;
@@ -88,7 +86,7 @@ public class BoardTest {
 //        board.canKingBeInDanger(player);
 //        if (board.canKingBeInDanger(player)) System.out.println("TRUE");
 
-        Map<Piece, List<Tile>> map = board.calculatePotentialDangerForKing(player);
+        Map<Piece, List<Tile>> map = board.calculatePotentialThreatsForKing(player);
         for (Piece piece : map.keySet()) {
             System.out.println(piece.getName() + ": ");
             map.get(piece).forEach(System.out::println);
@@ -334,11 +332,8 @@ public class BoardTest {
         blackPawnLongMove.makeMove(true, true);
         board.printBoard();
 
-        Move nextMove = (Move) whitePawn.getMoves().toArray()[1];
-        nextMove.makeMove(true, true);
-        board.printBoard();
-
         whitePawn.getMoves().forEach(System.out::println);
+        board.printBoard();
 
         // asserting one move because "there should be an en passant move" but the king prevents it
         Assertions.assertEquals(1, whitePawn.getMoves().size());
@@ -423,6 +418,40 @@ public class BoardTest {
 
         Assertions.assertEquals(8902, generatedMove(board, 3));
     }
+
+    @Test
+    public void testGenerateMovesDepth4() {
+        Board board = new Board();
+        Player player = new Player(board, PieceColor.WHITE);
+        Player opponent = new Player(board, PieceColor.BLACK);
+        player.setOpponent(opponent);
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+
+        board.setCurrentPlayer(player);
+
+        board.initBoard();
+        board.checkBoard();
+
+        Assertions.assertEquals(197281, generatedMove(board, 4));
+    }
+
+    @Test
+    public void testGenerateMovesDepth5() {
+        Board board = new Board();
+        Player player = new Player(board, PieceColor.WHITE);
+        Player opponent = new Player(board, PieceColor.BLACK);
+        player.setOpponent(opponent);
+        board.setWhitePlayer(player);
+        board.setBlackPlayer(opponent);
+
+        board.setCurrentPlayer(player);
+
+        board.initBoard();
+        board.checkBoard();
+
+        Assertions.assertEquals(4865609, generatedMove(board, 5));
+    }
     /*
     depth 1: 20
 
@@ -443,9 +472,19 @@ public class BoardTest {
         List<Move> moves = new ArrayList<>(board.getCurrentPlayer().getMoves());
 
         for (Move move : moves) {
+            System.out.println(move.getMovingPiece().hashCode());
             if (!move.getTargetTile().isEmpty()) {
                 if (move.getTargetTile().getPiece() instanceof KingPiece) {
                     System.out.println(move);
+                }
+            }
+            if (move.getMovingPiece() instanceof PawnPiece pawn) {
+                try {
+                    if (pawn.getCurrentTile() == null) {
+                        board.printBoard();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             move.makeMove(true, true);

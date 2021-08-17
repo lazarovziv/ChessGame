@@ -41,14 +41,12 @@ public class MinimaxTest {
 
         minimax = new Minimax();
 
-        double value = minimax.search(board, 6, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        double value = minimax.search(board, 4, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         System.out.println(value);
     }
 
     @Test
     public void testFindBestMove() {
-//        for (Move move : player.getMoves()) System.out.println(move)
-
         board = new Board();
         player = new Player(board, PieceColor.WHITE);
         opponent = new Player(board, PieceColor.BLACK);
@@ -69,10 +67,14 @@ public class MinimaxTest {
 
         minimax = new Minimax();
 
-        Move move = minimax.findBestMove(board, 6, player);
+        Move move = minimax.findBestMove(board, 4, player);
         System.out.println(move);
         move.makeMove(true, true);
-        Move oMove = minimax.findBestMove(board, 3, opponent);
+        board.printBoard();
+
+        Move oMove = minimax.findBestMove(board, 4, opponent);
         System.out.println(oMove);
+        oMove.makeMove(true, true);
+        board.printBoard();
     }
 }
