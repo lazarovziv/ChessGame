@@ -1,5 +1,6 @@
 package com.zivlazarov.chessengine.model.board;
 
+import com.google.gson.JsonArray;
 import com.zivlazarov.chessengine.errors.IllegalMoveError;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
@@ -27,6 +28,10 @@ public class Board implements MyObservable, Serializable {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
+    public static Map<PieceColor, Integer> firstPawnRow = Map.of(
+            PieceColor.WHITE, 1,
+            PieceColor.BLACK, 6
+    );
     private final Map<PieceColor, GameSituation> checkSituations = new HashMap<>();
     private final Map<PieceColor, GameSituation> checkmateSituations = new HashMap<>();
     private Tile[][] board;

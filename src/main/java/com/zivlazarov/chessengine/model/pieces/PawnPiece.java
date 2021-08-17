@@ -13,7 +13,6 @@ import javax.persistence.Entity;
 public class PawnPiece extends Piece implements Cloneable {
 
     private boolean executedEnPassant = false;
-    private boolean movedLong = false;
 
     private Tile enPassantTile;
 
@@ -155,11 +154,11 @@ public class PawnPiece extends Piece implements Cloneable {
         // checking if piece next to pawn is of type pawn and is opponent's piece
         if (board.getBoard()[x][y + eatingDirection].getPiece() instanceof PawnPiece pawn &&
                pawn.getPieceColor() != pieceColor && !pawn.hasExecutedEnPassant() &&
-                board.getGameHistoryMoves().size() > 1 && pawn.hasMovedLong()) {
+                board.getGameHistoryMoves().size() > 1) {
 
             // checking to see if opponent's last move is pawn's move 2 tiles forward
             if (player.getOpponent().getLastMove().get(pawn) != null) {
-                if (pawn.hasMovedLong()) {
+                if (Math.abs(pawn.getRow() - Board.firstPawnRow.get(pawn.getPieceColor())) == 2) {
                     enPassantTile = board.getBoard()[x+ player.getPlayerDirection()][y+eatingDirection];
                     return true;
                 }
@@ -184,19 +183,10 @@ public class PawnPiece extends Piece implements Cloneable {
         this.enPassantTile = enPassantTile;
     }
 
-    public boolean hasMovedLong() {
-        return movedLong;
-    }
-
-    public void setMovedLong(boolean movedLong) {
-        this.movedLong = movedLong;
-    }
-
     public Piece clone(Board newBoard, Player player) {
         PawnPiece newPawn = new PawnPiece(player, newBoard, newBoard.getBoard()[currentTile.getRow()][currentTile.getCol()], pieceCounter);
         newPawn.setLastTile(newBoard.getBoard()[lastRow][lastCol]);
         if (hasMoved) newPawn.setHasMoved(true);
-        else newPawn.setMovedLong(false);
 
         if (enPassantTile != null) {
             if (!executedEnPassant) {

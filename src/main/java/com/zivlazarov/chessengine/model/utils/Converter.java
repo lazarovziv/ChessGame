@@ -95,7 +95,7 @@ public class Converter {
         if (board.getMatchPlays().size() > 0) {
             Piece piece = board.getMatchPlays().peek().getMovingPiece();
             if (piece instanceof PawnPiece) {
-                if (((PawnPiece) piece).hasMovedLong()) {
+                if (Math.abs(piece.getRow() - Board.firstPawnRow.get(piece.getPieceColor())) == 2) {
                     Tile pieceTile = piece.getCurrentTile();
                     char row = letters[pieceTile.getRow() - piece.getPlayer().getPlayerDirection()];
                     int column = nums[pieceTile.getCol()];

@@ -451,6 +451,7 @@ public class BoardFrame {
                             minimaxMove.makeMove(true, true);
 
                             printMoveLabel(minimaxMove);
+                            System.out.println(minimaxMove);
                             System.out.println(board.evaluateBoard());
 
                             SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
@@ -504,6 +505,7 @@ public class BoardFrame {
                                     move.makeMove(true, true);
 
                                     printMoveLabel(move);
+                                    System.out.println(move);
                                 }
 
                                 System.out.println(board.evaluateBoard());

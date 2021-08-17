@@ -69,8 +69,6 @@ public class Move implements Serializable {
             if (checkBoard && !movingPiece.hasMoved()) {
                 movingPiece.setHasMoved(true);
             }
-            // if already moved long, setting to false because can't do that again
-            if (((PawnPiece) movingPiece).hasMovedLong()) ((PawnPiece) movingPiece).setMovedLong(false);
 
             // handling en passant
             if (((PawnPiece) movingPiece).getEnPassantTile() != null) {
@@ -102,11 +100,6 @@ public class Move implements Serializable {
                 }
             }
 
-            // if moved 2 rows forward, it's a long move, setting it as true
-            if (Math.abs(targetTile.getRow() - movingPiece.getCurrentTile().getRow()) == 2) {
-                ((PawnPiece) movingPiece).setMovedLong(true);
-            }
-
             if (movingPiece.getPieceType() == PieceType.QUEEN) {
                 label = MoveLabel.PAWN_PROMOTION;
                 // promoted with a capture
@@ -115,6 +108,7 @@ public class Move implements Serializable {
 
                 isSpecialMove = true;
             }
+            // handling king moves
         } else if (movingPiece instanceof KingPiece) {
             if (checkBoard && !movingPiece.hasMoved()) {
                 movingPiece.setHasMoved(true);
