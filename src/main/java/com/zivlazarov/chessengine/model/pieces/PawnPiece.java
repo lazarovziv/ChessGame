@@ -58,6 +58,8 @@ public class PawnPiece extends Piece implements Cloneable {
         if (pieceColor == PieceColor.BLACK) {
             strongTiles = revertStrongTiles(strongTiles);
         }
+
+        pieceIndex = player.getAlivePieces().size() - 1;
     }
 
     @Override
@@ -162,14 +164,6 @@ public class PawnPiece extends Piece implements Cloneable {
                     return true;
                 }
             }
-//            if (board.getGameHistoryMoves().lastElement().equals(new Pair<>(
-//                    pawn,
-//                    pawn.getCurrentTile()))) {
-//                if (board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection].isEmpty()) {
-//                    enPassantTile = board.getBoard()[x+player.getPlayerDirection()][y+eatingDirection];
-//                    return true;
-//                }
-//            }
         }
         return false;
     }
@@ -198,293 +192,19 @@ public class PawnPiece extends Piece implements Cloneable {
         this.movedLong = movedLong;
     }
 
-    //
-//    private Player player;
-//
-//    private ObjectProperty<Tile> currentTileProperty;
-//
-//    private PieceType pieceType;
-//
-//    private int id;
-//
-//    private final Set<Move> moves;
-//    private final List<Tile> possibleMoves;
-//    private final List<Piece> piecesUnderThreat;
-//    private final Stack<Tile> historyMoves;
-//    private Tile lastTile;
-//    private Stack<Piece> capturedPieces;
-//    private final Board board;
-//
-//    private String name;
-//
-//    private int pieceCounter;
-//
-//    private boolean isAlive = true;
-//    private boolean isInDanger = false;
-//    private Tile currentTile;
-//    private PieceColor pieceColor;
-//    private String imageName;
-//    private boolean hasMoved = false;
-//    private boolean executedEnPassant = false;
-//
-//    private Tile enPassantTile;
-//    private Icon imageIcon;
-//
-//    private int value = 1;
-//
-//    private final Object[] allFields;
-//
-//    public PawnPiece(Player player, Board board, PieceColor pc, Tile initTile, int pieceCounter) {
-//        this.player = player;
-//        this.board = board;
-//
-////        name = 'P';
-//        pieceColor = pc;
-//        possibleMoves = new ArrayList<Tile>();
-//        piecesUnderThreat = new ArrayList<>();
-//        historyMoves = new Stack<>();
-//        capturedPieces = new Stack<>();
-//        moves = new HashSet<>();
-//
-//        currentTile = initTile;
-//        lastTile = currentTile;
-//
-//        this.pieceCounter = pieceCounter;
-//
-//        if (pieceColor == PieceColor.BLACK) {
-//            name = "bP";
-//            imageName = "blackPawn.png";
-//        }
-//        if (pieceColor == PieceColor.WHITE) {
-//            name = "wP";
-//            imageName = "whitePawn.png";
-//        }
-//        player.addPieceToAlive(this);
-//
-//        currentTile.setPiece(this);
-//
-//        currentTileProperty = new SimpleObjectProperty<>(this, "currentTile", currentTile);
-////        generateTilesToMoveTo();
-//        allFields = new Object[] {player, pieceType, possibleMoves, piecesUnderThreat,
-//                historyMoves, lastTile, capturedPieces,
-//                name, pieceCounter, isAlive, isInDanger, currentTile,
-//                pieceColor, imageName, imageIcon};
-//
-//        pieceType = PieceType.PAWN;
-//
-//        id = 100 * value * player.getPlayerDirection() + player.getId() + pieceCounter;
-//    }
+    public Piece clone(Board newBoard, Player player) {
+        PawnPiece newPawn = new PawnPiece(player, newBoard, newBoard.getBoard()[currentTile.getRow()][currentTile.getCol()], pieceCounter);
+        newPawn.setLastTile(newBoard.getBoard()[lastRow][lastCol]);
+        if (hasMoved) newPawn.setHasMoved(true);
+        else newPawn.setMovedLong(false);
 
-    //
-//    @Override
-//    public int getId() {
-//        return id;
-//    }
-//
-//    @Override
-//    public void setId(int id) {
-//        this.id = id;
-//    }
-//
-//    @Override
-//    public String getName() {
-//        return name;
-//    }
-//
-//    @Override
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-//
-//    @Override
-//    public boolean isAlive() {
-//        return !isAlive;
-//    }
-//
-//    @Override
-//    public void setIsAlive(boolean isAlive) {
-//        this.isAlive = isAlive;
-//    }
-//
-//    @Override
-//    public boolean getIsInDanger() {
-//        return false;
-//    }
-//
-//    @Override
-//    public void setIsInDanger(boolean isInDanger) {
-//        this.isInDanger = isInDanger;
-//    }
-//
-//    @Override
-//    public List<Tile> getPossibleMoves() {
-//        return possibleMoves;
-//    }
-//
-//    @Override
-//    public PieceColor getPieceColor() {
-//        return pieceColor;
-//    }
-//
-//    @Override
-//    public void setPieceColor(PieceColor pieceColor) {
-//        this.pieceColor = pieceColor;
-//    }
-//
-//    @Override
-//    public Tile getCurrentTile() {
-//        return currentTile;
-//    }
-//
-//    public int getPieceCounter() {
-//        return pieceCounter;
-//    }
-//
-//    public boolean hasExecutedEnPassant() {
-//        return executedEnPassant;
-//    }
-//
-//    public void setExecutedEnPassant(boolean executedEnPassant) {
-//        this.executedEnPassant = executedEnPassant;
-//    }
-//
-//    public Player getPlayer() {
-//        return player;
-//    }
-//
-//    @Override
-//    public Stack<Tile> getHistoryMoves() {
-//        return historyMoves;
-//    }
-//
-//    @Override
-//    public Tile getLastMove() {
-//        if (historyMoves.size() == 0) return null;
-//        return historyMoves.peek();
-//    }
-//
-//    @Override
-//    public List<Piece> getPiecesUnderThreat() {
-//        return piecesUnderThreat;
-//    }
-//
-//    @Override
-//    public void setCurrentTile(Tile currentTile) {
-//        this.currentTile = currentTile;
-//        if (currentTile == null) return;
-//        currentTile.setPiece(this);
-//    }
-//
-//    public void setHasMoved(boolean moved) {
-//        hasMoved = moved;
-//    }
-//
-//    public String getImageName() {
-//        return imageName;
-//    }
-//
-//    @Override
-//    public int getValue() {
-//        return value;
-//    }
-//
-//    @Override
-//    public boolean isThreatenedAtTile(Tile tile) {
-//        if (pieceColor == PieceColor.WHITE) {
-//            if (tile.isThreatenedByBlack()) return true;
-//            else return false;
-//        }
-//        if (pieceColor == PieceColor.BLACK) {
-//            if (tile.isThreatenedByWhite()) return true;
-//            else return false;
-//        }
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isTileAvailable(Tile tile) {
-//        if (tile.isEmpty()) {
-//            return true;
-//        } else return tile.getPiece().getPieceColor() != pieceColor;
-//    }
-//
-//    public Tile getEnPassantTile() {
-//        return enPassantTile;
-//    }
-//
-//    @Override
-//    public boolean canMove() {
-//        return possibleMoves.size() != 0;
-//    }
-//
-//    @Override
-//    public boolean hasMoved() {
-//        return false;
-//    }
-//
-//    @Override
-//    public Piece getLastPieceEaten() {
-//        if (capturedPieces.size() == 0) return null;
-//        return capturedPieces.peek();
-//    }
-//
-//    @Override
-//    public Object clone() throws CloneNotSupportedException {
-//        return super.clone();
-//    }
-//
-//    @Override
-//    public boolean equals(Piece piece) {
-//        return currentTile.getRow() == piece.getCurrentTile().getRow() &&
-//                currentTile.getCol() == piece.getCurrentTile().getCol() &&
-//                (name + pieceCounter).equals(piece.getName() + pieceCounter);
-//    }
-//
-//    @Override
-//    public Stack<Piece> getCapturedPieces() {
-//        return capturedPieces;
-//    }
-//
-//    @Override
-//    public Tile getLastTile() {
-//        return lastTile;
-//    }
-//
-//    @Override
-//    public void setLastTile(Tile lastTile) {
-//        this.lastTile = lastTile;
-//    }
-//
-//    @Override
-//    public PieceType getPieceType() {
-//        return pieceType;
-//    }
-//
-//    @Override
-//    public void setPieceType(PieceType pieceType) {
-//        this.pieceType = pieceType;
-//    }
-//
-//    @Override
-//    public void setPlayer(Player player)  {
-//        this.player = player;
-//    }
-//
-//    @Override
-//    public Set<Move> getMoves() {
-//        return moves;
-//    }
-//
-//    @Override
-//    public void reset() {
-//        if (possibleMoves.size() != 0) {
-//            possibleMoves.clear();
-//        }
-//        if (piecesUnderThreat.size() != 0) {
-//            piecesUnderThreat.clear();
-//        }
-//        if (moves.size() != 0) {
-//            moves.clear();
-//        }
-//    }
+        if (enPassantTile != null) {
+            if (!executedEnPassant) {
+                newPawn.setExecutedEnPassant(false);
+                newPawn.setEnPassantTile(enPassantTile);
+            }
+        }
+        newPawn.setPieceIndex(pieceIndex);
+        return newPawn;
+    }
 }

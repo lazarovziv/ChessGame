@@ -6,6 +6,7 @@ import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
+import org.javatuples.Triplet;
 
 import java.io.*;
 import java.util.*;
@@ -388,6 +389,16 @@ public class Board implements MyObservable, Serializable {
         List<Move> actualLegalMoves = new ArrayList<>();
 
         for (Move move : new ArrayList<>(player.getMoves())) {
+//            Triplet<Board, Player, Player> triplet = createNewBoard(whitePlayer, blackPlayer, currentPlayer);
+//            Board b = triplet.getValue0();
+//
+//            Move newMove = new Move.Builder()
+//                    .board(b)
+//                    .player(b.getCurrentPlayer())
+//                    .movingPiece(b.getCurrentPlayer().getPieceByIndex(move.getMovingPiece().getPieceIndex()))
+//                    .targetTile(b.getBoard()[move.getTargetTile().getRow()][move.getTargetTile().getCol()])
+//                    .build();
+
             // setting checkBoard argument as false to prevent a StackOverflow error
             boolean successfulMove = move.makeMove(false, true);
             // if the move wasn't successful, try the next move
@@ -559,6 +570,28 @@ public class Board implements MyObservable, Serializable {
         return gameSituation == GameSituation.BLACK_CHECKMATED || gameSituation == GameSituation.WHITE_CHECKMATED;
     }
 
+    public static Triplet<Board, Player, Player> createNewBoard(Player whitePlayer, Player blackPlayer, Player currentPlayer) {
+        Board newBoard = new Board();
+
+        Player newWhite = whitePlayer.clone();
+        Player newBlack = blackPlayer.clone();
+
+        newWhite.setOpponent(newBlack);
+        newBoard.setWhitePlayer(newWhite);
+        newBoard.setBlackPlayer(newBlack);
+
+        newWhite.setBoard(newBoard);
+        newBlack.setBoard(newBoard);
+
+        if (currentPlayer.getColor() == PieceColor.WHITE) newBoard.setCurrentPlayer(newWhite);
+        else newBoard.setCurrentPlayer(newBlack);
+
+        new ArrayList<>(whitePlayer.getAlivePieces()).forEach(piece -> piece.clone(newBoard, newWhite));
+        new ArrayList<>(blackPlayer.getAlivePieces()).forEach(piece -> piece.clone(newBoard, newBlack));
+
+        return Triplet.with(newBoard, newWhite, newBlack);
+    }
+
     public void pushMoveToMatchPlays(Move move) {
         matchPlays.push(move);
     }
@@ -676,10 +709,10 @@ public class Board implements MyObservable, Serializable {
         return boardStates;
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
+//    @Override
+//    protected Object clone() throws CloneNotSupportedException {
+//        return super.clone();
+//    }
 
     public void saveState() {
         try {
