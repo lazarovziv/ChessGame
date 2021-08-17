@@ -88,7 +88,7 @@ public class BoardTest {
 //        board.canKingBeInDanger(player);
 //        if (board.canKingBeInDanger(player)) System.out.println("TRUE");
 
-        Map<Piece, List<Tile>> map = board.calculatePotentialDangerForKing(player);
+        Map<Piece, List<Tile>> map = board.calculatePotentialThreatsForKing(player);
         for (Piece piece : map.keySet()) {
             System.out.println(piece.getName() + ": ");
             map.get(piece).forEach(System.out::println);

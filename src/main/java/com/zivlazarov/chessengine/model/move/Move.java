@@ -180,7 +180,7 @@ public class Move implements Serializable {
 
         if (castlingMove != null) castlingMove.makeMove(false, false);
 
-        player.addTurn();
+        player.incrementTurn();
 
         board.setCurrentPlayer(player.getOpponent());
 

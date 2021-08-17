@@ -91,8 +91,7 @@ public class PipedDeepCopy {
                 // that a the object is set to a flag that indicates
                 // deserialization was not possible.
                 e.printStackTrace();
-            }
-            catch(ClassNotFoundException cnfe) {
+            } catch(ClassNotFoundException cnfe) {
                 // Same here...
                 cnfe.printStackTrace();
             }
@@ -118,8 +117,7 @@ public class PipedDeepCopy {
                         lock.wait();
                     }
                 }
-            }
-            catch(InterruptedException ie) {
+            } catch(InterruptedException ie) {
                 // If we are interrupted we just return null
             }
             return obj;
