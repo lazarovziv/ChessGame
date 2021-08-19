@@ -20,13 +20,8 @@ public class ZobristBoardTest {
 
         ZMove whiteMove = whiteMoves.get(new Random().nextInt(whiteMoves.size()));
         System.out.println(zobristBoard.makeMove(whiteMove));
+        System.out.println(whiteMove);
 
-        zobristBoard.printBoard();
-
-        System.out.println(zobristBoard.unmakeMove(whiteMove));
-        zobristBoard.printBoard();
-
-        System.out.println(zobristBoard.makeMove(whiteMove));
         zobristBoard.printBoard();
 
         List<ZMove> blackMoves = zobristBoard.generateMoves();
@@ -34,10 +29,72 @@ public class ZobristBoardTest {
         ZMove blackMove = blackMoves.get(new Random().nextInt(blackMoves.size()));
 
         System.out.println(zobristBoard.makeMove(blackMove));
+        System.out.println(blackMove);
+
         zobristBoard.printBoard();
 
-        System.out.println(zobristBoard.unmakeMove(blackMove));
+        whiteMoves = zobristBoard.generateMoves();
+
+        whiteMove = whiteMoves.get(new Random().nextInt(whiteMoves.size()));
+        System.out.println(zobristBoard.makeMove(whiteMove));
+        System.out.println(whiteMove);
+
         zobristBoard.printBoard();
 
+        blackMoves = zobristBoard.generateMoves();
+
+        blackMove = blackMoves.get(new Random().nextInt(blackMoves.size()));
+        System.out.println(zobristBoard.makeMove(blackMove));
+        System.out.println(blackMove);
+
+        zobristBoard.printBoard();
+
+        whiteMoves = zobristBoard.generateMoves();
+
+        whiteMove = whiteMoves.get(new Random().nextInt(whiteMoves.size()));
+        System.out.println(zobristBoard.makeMove(whiteMove));
+        System.out.println(whiteMove);
+
+        zobristBoard.printBoard();
+
+        blackMoves = zobristBoard.generateMoves();
+
+        blackMove = blackMoves.get(new Random().nextInt(blackMoves.size()));
+        System.out.println(zobristBoard.makeMove(blackMove));
+        System.out.println(blackMove);
+
+        zobristBoard.printBoard();
+
+        whiteMoves = zobristBoard.generateMoves();
+
+        whiteMove = whiteMoves.get(new Random().nextInt(whiteMoves.size()));
+        System.out.println(zobristBoard.makeMove(whiteMove));
+        System.out.println(whiteMove);
+
+        zobristBoard.printBoard();
+
+        blackMoves = zobristBoard.generateMoves();
+
+        blackMove = blackMoves.get(new Random().nextInt(blackMoves.size()));
+        System.out.println(zobristBoard.makeMove(blackMove));
+        System.out.println(blackMove);
+
+        zobristBoard.printBoard();
+
+        whiteMoves = zobristBoard.generateMoves();
+
+        whiteMove = whiteMoves.get(new Random().nextInt(whiteMoves.size()));
+        System.out.println(zobristBoard.makeMove(whiteMove));
+        System.out.println(whiteMove);
+
+        zobristBoard.printBoard();
+
+        blackMoves = zobristBoard.generateMoves();
+
+        blackMove = blackMoves.get(new Random().nextInt(blackMoves.size()));
+        System.out.println(zobristBoard.makeMove(blackMove));
+        System.out.println(blackMove);
+
+        zobristBoard.printBoard();
     }
 }

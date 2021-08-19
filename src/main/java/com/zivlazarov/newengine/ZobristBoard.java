@@ -15,7 +15,7 @@ public class ZobristBoard {
 
     private final SecureRandom random;
 
-    public final Map<Long, long[][][]> transpositionTable = new HashMap<>();
+    public static final Map<Long, long[][][]> transpositionTable = new HashMap<>();
 
     private final List<ZMove> moves;
     private int currentPlayer = 0;
@@ -123,6 +123,8 @@ public class ZobristBoard {
             }
         }
 
+        blackToMove = random.nextLong();
+
         int wPawnsIndex = 0;
         int wKnightsIndex = 0;
         int wBishopsIndex = 0;
@@ -203,7 +205,7 @@ public class ZobristBoard {
         calculateZobristHash();
         transpositionTable.put(zobristHash, board);
 
-        System.out.println("Init board hash: " + zobristHash);
+        System.out.println(zobristHash + "\n");
     }
 
     public long makeMove(ZMove move) {
@@ -217,16 +219,21 @@ public class ZobristBoard {
         displayBoard[move.getSourceRow()][move.getSourceCol()] = '-';
         zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
 
-        // moving the piece
-        displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
-        zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
-
         // TODO: add capture, en passant, castling, pawn promotion
+        if (isEmpty(move.getTargetRow(), move.getTargetCol())) {
+            // moving the piece
+            displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+            zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+        }
 
         transpositionTable.put(zobristHash, board);
 
         // changing turns
         currentPlayer *= -1;
+
+        if (currentPlayer == BLACK_PLAYER) {
+            zobristHash ^= blackToMove;
+        }
 
         return zobristHash;
     }
@@ -245,6 +252,10 @@ public class ZobristBoard {
 
         // changing back the turn
         currentPlayer *= -1;
+
+        if (currentPlayer == WHITE_PLAYER) {
+            zobristHash ^= blackToMove;
+        }
 
         return zobristHash;
     }
@@ -436,15 +447,15 @@ public class ZobristBoard {
             if (isEmpty(row + direction, col)) {
                 ZMove move = new ZMove(row, col, row + direction, col);
                 moves.add(move);
-            }
-        }
 
-        // at the first row in the game
-        // no need to check boundaries
-        if (row == pawnsStartRow.get(player)) {
-            if (isEmpty(row + 2*direction, col)) {
-                ZMove move = new ZMove(row, col, row + 2*direction, col);
-                moves.add(move);
+                // at the first row in the game
+                // no need to check boundaries
+                if (row == pawnsStartRow.get(player)) {
+                    if (isEmpty(row + 2*direction, col)) {
+                        ZMove longMove = new ZMove(row, col, row + 2*direction, col);
+                        moves.add(longMove);
+                    }
+                }
             }
         }
 

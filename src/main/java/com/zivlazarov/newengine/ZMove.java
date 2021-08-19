@@ -6,7 +6,6 @@ public class ZMove {
     private int sourceCol;
     private int targetRow;
     private int targetCol;
-    private char piece;
 
     public ZMove(int sourceRow, int sourceCol, int targetRow, int targetCol) {
         this.sourceRow = sourceRow;
