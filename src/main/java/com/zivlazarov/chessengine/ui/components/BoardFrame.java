@@ -190,8 +190,8 @@ public class BoardFrame {
 
         minimax = new Minimax();
 
-        whitePlayer.setName("Ziv");
-        blackPlayer.setName("Guy");
+        whitePlayer.setName("White");
+        blackPlayer.setName("Black");
 
         whitePlayer.setAI(false);
         blackPlayer.setAI(true);
@@ -446,19 +446,19 @@ public class BoardFrame {
                 public void mouseClicked(MouseEvent e) {
                     // first left mouse click
                     if (isLeftMouseButton(e)) {
-                        if (blackPlayer.isCurrentPlayer()) {
-                            minimaxMove = minimax.findBestMove(board, depth, blackPlayer);
-                            minimaxMove.makeMove(true, true);
-
-                            printMoveLabel(minimaxMove);
-                            System.out.println(minimaxMove);
-                            System.out.println(board.evaluateBoard());
-
-                            SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
-                            SwingUtilities.invokeLater(movesSidePanel::drawMoves);
-                            SwingUtilities.invokeLater(capturedPiecesPanel::drawPiece);
-                            return;
-                        }
+//                        if (blackPlayer.isCurrentPlayer()) {
+//                            minimaxMove = minimax.findBestMove(board, depth, blackPlayer);
+//                            minimaxMove.makeMove(true, true);
+//
+//                            printMoveLabel(minimaxMove);
+//                            System.out.println(minimaxMove);
+//                            System.out.println(board.evaluateBoard());
+//
+//                            SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
+//                            SwingUtilities.invokeLater(movesSidePanel::drawMoves);
+//                            SwingUtilities.invokeLater(capturedPiecesPanel::drawPiece);
+//                            return;
+//                        }
 
                         if (sourceTile == null) {
                             sourceTile = tile;

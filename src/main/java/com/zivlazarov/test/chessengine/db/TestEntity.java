@@ -1,4 +1,4 @@
-package com.zivlazarov.test.db;
+package com.zivlazarov.test.chessengine.db;
 
 import javax.persistence.*;
 

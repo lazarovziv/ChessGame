@@ -1,4 +1,4 @@
-package com.zivlazarov.test.db;
+package com.zivlazarov.test.chessengine.db;
 
 import com.zivlazarov.chessengine.db.dao.TileDao;
 import com.zivlazarov.chessengine.model.board.Board;

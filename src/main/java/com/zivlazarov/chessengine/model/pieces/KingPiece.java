@@ -165,7 +165,9 @@ public class KingPiece extends Piece implements Cloneable {
             if (board.getBoard()[x][7].getPiece() == null || hasMoved || isInDanger
                     || board.getBoard()[x][7].getPiece().hasMoved()
                     || board.getBoard()[x][7].isThreatenedByColor(player.getOpponent().getColor())
-                    || player.isInCheck()) return false;
+                    || player.isInCheck()
+                    || player.getKingSideRookPiece() == null
+                    || player.getKingSideRookPiece().hasMoved()) return false;
 
             if (!board.getBoard()[x][y+i].isEmpty()
                     || board.getBoard()[x][y+i].isThreatenedByColor(player.getOpponent().getColor())) return false;
@@ -182,7 +184,9 @@ public class KingPiece extends Piece implements Cloneable {
             if (board.getBoard()[x][0].getPiece() == null || hasMoved || isInDanger
                     || board.getBoard()[x][0].getPiece().hasMoved()
                     || board.getBoard()[x][0].isThreatenedByColor(player.getOpponent().getColor())
-                    || player.isInCheck()) return false;
+                    || player.isInCheck()
+                    || player.getQueenSideRookPiece() == null
+                    || player.getQueenSideRookPiece().hasMoved()) return false;
 
             if (!board.getBoard()[x][y-i].isEmpty()
                     || board.getBoard()[x][y-i].isThreatenedByColor(player.getOpponent().getColor())) return false;

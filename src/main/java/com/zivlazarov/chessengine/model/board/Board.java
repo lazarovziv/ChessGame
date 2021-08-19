@@ -144,7 +144,11 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void checkBoard() {
-//        if (!whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive()) throw new IllegalMoveError("Kings can't be captured!");
+        if (eitherKingNotInGame()) {
+            System.out.println(currentPlayer.getOpponent().getLastMove().keySet() + ": "  + currentPlayer.getOpponent().getLastMove().values());
+            printBoard();
+            throw new IllegalMoveError("Kings can't be captured!");
+        }
         // resetting tiles threatened state before every board check
         resetThreatsOnTiles();
         // update all observers
@@ -841,5 +845,9 @@ public class Board implements MyObservable, Serializable {
     public String toString() {
         printBoard();
         return "\n";
+    }
+
+    public boolean eitherKingNotInGame() {
+        return !whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive();
     }
 }

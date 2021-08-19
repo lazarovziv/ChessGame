@@ -1,4 +1,4 @@
-package com.zivlazarov.test.pieces;
+package com.zivlazarov.test.chessengine.pieces;
 
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;

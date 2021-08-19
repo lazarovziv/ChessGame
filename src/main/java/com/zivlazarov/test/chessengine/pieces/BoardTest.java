@@ -1,4 +1,4 @@
-package com.zivlazarov.test.pieces;
+package com.zivlazarov.test.chessengine.pieces;
 
 import com.google.gson.Gson;
 import com.zivlazarov.chessengine.model.board.Board;
@@ -472,20 +472,6 @@ public class BoardTest {
         List<Move> moves = new ArrayList<>(board.getCurrentPlayer().getMoves());
 
         for (Move move : moves) {
-            if (!move.getTargetTile().isEmpty()) {
-                if (move.getTargetTile().getPiece() instanceof KingPiece) {
-                    System.out.println(move);
-                }
-            }
-            if (move.getMovingPiece() instanceof PawnPiece pawn) {
-                try {
-                    if (pawn.getCurrentTile() == null) {
-                        board.printBoard();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
             move.makeMove(true, true);
             numOfPositions += generatedMove(board, depth - 1);
             move.unmakeMove(false);

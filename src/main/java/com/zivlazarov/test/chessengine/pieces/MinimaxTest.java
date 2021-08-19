@@ -1,11 +1,10 @@
-package com.zivlazarov.test.pieces;
+package com.zivlazarov.test.chessengine.pieces;
 
 import com.zivlazarov.chessengine.model.ai.Minimax;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.player.Player;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class MinimaxTest {

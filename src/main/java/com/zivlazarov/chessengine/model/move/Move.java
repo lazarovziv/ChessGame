@@ -116,11 +116,13 @@ public class Move implements Serializable {
 
             // king side castle
             if (targetTile.equals(((KingPiece) movingPiece).getKingSideCastleTile()) &&
-            player.getKingSideRookPiece() != null && !((KingPiece) movingPiece).hasExecutedKingSideCastle()) {
+            player.getKingSideRookPiece() != null && !((KingPiece) movingPiece).hasExecutedKingSideCastle()
+                    && player.getKingSideRookPiece().getCurrentTile() != null) {
                 RookPiece kingSideRook = player.getKingSideRookPiece();
-                kingSideRook.setLastTile(kingSideRook.getCurrentTile());
-                kingSideRook.setCurrentTile(kingSideRook.getKingSideCastlingTile());
-                kingSideRook.setHasMoved(true);
+//                kingSideRook.setLastTile(kingSideRook.getCurrentTile());
+//                kingSideRook.setCurrentTile(kingSideRook.getKingSideCastlingTile());
+//                kingSideRook.setHasMoved(true);
+                castlingMove = new Move(board, player, kingSideRook, kingSideRook.getKingSideCastlingTile());
                 ((KingPiece) movingPiece).setExecutedKingSideCastle(true);
 
                 label = MoveLabel.KING_SIDE_CASTLE;
@@ -130,11 +132,13 @@ public class Move implements Serializable {
             // if not king side castling, maybe queen side so isSpecialMove has to be false
             if (!isSpecialMove) {
                 if (targetTile.equals(((KingPiece) movingPiece).getQueenSideCastleTile()) &&
-                player.getQueenSideRookPiece() != null && !((KingPiece) movingPiece).hasExecutedQueenSideCastle()) {
+                player.getQueenSideRookPiece() != null && !((KingPiece) movingPiece).hasExecutedQueenSideCastle()
+                        && player.getQueenSideRookPiece().getCurrentTile() != null) {
                     RookPiece queenSideRook = player.getQueenSideRookPiece();
-                    queenSideRook.setLastTile(queenSideRook.getCurrentTile());
-                    queenSideRook.setCurrentTile(queenSideRook.getQueenSideCastlingTile());
-                    queenSideRook.setHasMoved(true);
+//                    queenSideRook.setLastTile(queenSideRook.getCurrentTile());
+//                    queenSideRook.setCurrentTile(queenSideRook.getQueenSideCastlingTile());
+//                    queenSideRook.setHasMoved(true);
+                    castlingMove = new Move(board, player, queenSideRook, queenSideRook.getQueenSideCastlingTile());
                     ((KingPiece) movingPiece).setExecutedQueenSideCastle(true);
 
                     label = MoveLabel.QUEEN_SIDE_CASTLE;
@@ -162,11 +166,12 @@ public class Move implements Serializable {
         if (addToHistory) {
             board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
             board.pushMoveToMatchPlays(this);
+            player.incrementTurn();
         }
 
         player.getLastMove().put(movingPiece, new Pair<>(currentTile, targetTile));
 
-        player.incrementTurn();
+        if (castlingMove != null) castlingMove.makeMove(false, false);
 
         board.setCurrentPlayer(player.getOpponent());
 
@@ -190,8 +195,8 @@ public class Move implements Serializable {
                 // if it was their first move, revert their hasMoved field to false
                 if (movingPiece.getHistoryMoves().size() <= 1) {
                     if (movingPiece instanceof PawnPiece) movingPiece.setHasMoved(false);
-//            else if (movingPiece instanceof RookPiece) movingPiece.setHasMoved(false);
-//            else if (movingPiece instanceof KingPiece) movingPiece.setHasMoved(false);
+                    else if (movingPiece instanceof RookPiece) movingPiece.setHasMoved(false);
+                    else if (movingPiece instanceof KingPiece) movingPiece.setHasMoved(false);
                 }
             }
             case PAWN_PROMOTION -> {
@@ -270,6 +275,10 @@ public class Move implements Serializable {
 
     public Piece getMovingPiece() {
         return movingPiece;
+    }
+
+    public Tile getSourceTile() {
+        return sourceTile;
     }
 
     public Tile getTargetTile() {

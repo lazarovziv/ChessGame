@@ -90,14 +90,6 @@ public class BishopPiece extends Piece implements Cloneable {
                 } else if (targetTile.getPiece().getPieceColor() != pieceColor) {
                     possibleMoves.add(targetTile);
                     piecesUnderThreat.add(targetTile.getPiece());
-//                    Move simpleMove = new Move.Builder()
-//                            .player(player)
-//                            .movingPiece(this)
-//                            .targetRow(x+r*i)
-//                            .targetCol(x+c*i)
-//                            .build();
-//                    moves.add(simpleMove);
-//                    break;
                     Move move = new Move.Builder()
                             .board(board)
                             .player(player)
