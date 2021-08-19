@@ -1,5 +1,7 @@
 package com.zivlazarov.newengine;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -21,10 +23,12 @@ public class ZobristBoard {
     private int currentPlayer = 0;
 
     private final Map<Character, Integer> piecesTypeValuesMap = new HashMap<>();
+
     private final Map<Integer, Integer> pawnsStartRow = Map.of(
             WHITE_PLAYER, 1,
             BLACK_PLAYER, 6
     );
+
     private final Map<Integer, Integer> enPassantRows = Map.of(
             WHITE_PLAYER, 4,
             BLACK_PLAYER, 3
@@ -83,6 +87,8 @@ public class ZobristBoard {
     public static final int QUEEN = 5;
     public static final int KING = 6;
 
+    public static final Map<Character, String> piecesImagesMap = new HashMap<>();
+
     public ZobristBoard() {
         board = new long[12][8][8]; // 12 types of pieces (2 players * 6 types) and 8 rows of * 8 tiles
         displayBoard = new char[8][8];
@@ -104,6 +110,19 @@ public class ZobristBoard {
         piecesTypeValuesMap.put('r', 9);
         piecesTypeValuesMap.put('q', 10);
         piecesTypeValuesMap.put('k', 11);
+
+        piecesImagesMap.put('P', currentPath + "/src/main/java/" + "whitePawn.png");
+        piecesImagesMap.put('N', currentPath + "/src/main/java/" + "whiteKnight.png");
+        piecesImagesMap.put('B', currentPath + "/src/main/java/" + "whiteBishop.png");
+        piecesImagesMap.put('R', currentPath + "/src/main/java/" + "whiteRook.png");
+        piecesImagesMap.put('Q', currentPath + "/src/main/java/" + "whiteQueen.png");
+        piecesImagesMap.put('K', currentPath + "/src/main/java/" + "whiteKing.png");
+        piecesImagesMap.put('p', currentPath + "/src/main/java/" + "blackPawn.png");
+        piecesImagesMap.put('n', currentPath + "/src/main/java/" + "blackKnight.png");
+        piecesImagesMap.put('b', currentPath + "/src/main/java/" + "blackBishop.png");
+        piecesImagesMap.put('r', currentPath + "/src/main/java/" + "blackRook.png");
+        piecesImagesMap.put('q', currentPath + "/src/main/java/" + "blackQueen.png");
+        piecesImagesMap.put('k', currentPath + "/src/main/java/" + "blackKing.png");
 
         displayBoard = new char[][] {
                 {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
@@ -662,5 +681,12 @@ public class ZobristBoard {
             System.out.println();
         }
         System.out.println();
+    }
+
+    private static final Path path = Paths.get("");
+    private static final String currentPath = path.toAbsolutePath().toString();
+
+    public char[][] getDisplayBoard() {
+        return displayBoard;
     }
 }
