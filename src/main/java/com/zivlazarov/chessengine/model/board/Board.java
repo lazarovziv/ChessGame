@@ -1,6 +1,5 @@
 package com.zivlazarov.chessengine.model.board;
 
-import com.google.gson.JsonArray;
 import com.zivlazarov.chessengine.errors.IllegalMoveError;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
@@ -47,7 +46,7 @@ public class Board implements MyObservable, Serializable {
     private final Map<Player, RookPiece> queenSideRooksMap;
 
     private GameSituation gameSituation;
-    private boolean canContinueGame;
+    private boolean isGameOver;
 
     private static final char[] letters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
     private static final int[] nums = {1, 2, 3, 4, 5, 6, 7, 8};
@@ -95,7 +94,7 @@ public class Board implements MyObservable, Serializable {
 //                simulatedInstance.getBoard()[r][c] = new Tile(r, c, currentTileColor);
             }
         }
-        canContinueGame = true;
+        isGameOver = false;
         gameSituation = GameSituation.NORMAL;
     }
 
@@ -163,7 +162,7 @@ public class Board implements MyObservable, Serializable {
 
             if (piece instanceof BishopPiece) {
                 gameSituation = GameSituation.DRAW;
-                canContinueGame = false;
+                isGameOver = true;
                 evaluateBoard();
                 return;
             }
@@ -171,7 +170,7 @@ public class Board implements MyObservable, Serializable {
             // two kings left (allegedly)
         } else if (currentPlayer.getAlivePieces().size() == 1 && currentPlayer.getOpponent().getAlivePieces().size() == 1) {
             gameSituation = GameSituation.DRAW;
-            canContinueGame = false;
+            isGameOver = true;
             evaluateBoard();
             return;
         }
@@ -186,7 +185,7 @@ public class Board implements MyObservable, Serializable {
             // not in check but can't move is a stalemate (/draw)
         } else if (!currentPlayer.isInCheck() && currentPlayer.getMoves().size() == 0) {
             gameSituation = GameSituation.STALEMATE;
-            canContinueGame = false;
+            isGameOver = true;
             evaluateBoard();
             return;
 
@@ -356,62 +355,6 @@ public class Board implements MyObservable, Serializable {
         return allDirections;
     }
 
-    public void searchForPotentialThreats(Player player) {
-        KingPiece kingPiece = player.getKing();
-
-        // can have multiple of the same piece
-        Set<Piece> canInterferePieces = new HashSet<>();
-
-        int startIndex = 0;
-
-        for (Tile tile : player.getOpponent().getLegalMoves()) {
-            if (tile.equals(kingPiece.getCurrentTile())) {
-                player.setIsInCheck(true);
-            }
-
-            boolean containsOneOfOpponentTiles = player.getLegalMoves().stream().anyMatch(t -> t.equals(tile));
-
-            if (containsOneOfOpponentTiles) {
-                canInterferePieces.addAll(player.getAlivePieces().stream().filter
-                        (piece -> piece.getPossibleMoves().contains(tile)).toList());
-
-                for (int i = startIndex; i < canInterferePieces.size(); i++) {
-                    Board board = new Board();
-                    board.setWhitePlayer(whitePlayer);
-                    board.setBlackPlayer(blackPlayer);
-                    board.setCurrentPlayer(player);
-
-                    // setting each piece's tile on simulated board
-                    // TODO: revert back each piece's tile to original board
-                    for (Piece p : board.getWhitePlayer().getAlivePieces()) {
-                        p.setCurrentTile(board.getBoard()[p.getRow()][p.getCol()]);
-                    }
-
-                    for (Piece p : board.getBlackPlayer().getAlivePieces()) {
-                        p.setCurrentTile(board.getBoard()[p.getRow()][p.getCol()]);
-                    }
-
-                    Move move = new Move.Builder()
-                            .board(board)
-                            .player(player)
-                            .movingPiece((Piece) canInterferePieces.toArray()[i])
-                            .targetTile(tile)
-                            .build();
-                    move.makeMove(false, true);
-
-                    // if player is still in check
-                    if (player.isInCheck()) {
-                        move.unmakeMove(false);
-                        // remove all moves that don't prevent the check
-                        player.getMoves().removeIf(m -> m.getTargetTile().equals(tile));
-                        player.getAlivePieces().forEach(p -> p.getPossibleMoves().removeIf(t -> t.equals(tile)));
-                    }
-                    startIndex++;
-                }
-            }
-        }
-    }
-
     public GameSituation generateMovesWhenInCheck(Player player) {
         List<Move> actualLegalMoves = new ArrayList<>();
 
@@ -469,13 +412,6 @@ public class Board implements MyObservable, Serializable {
                 tile.setThreatenedByWhite(false);
                 tile.setThreatenedByBlack(false);
             }
-        }
-    }
-
-    public void markEndangeredPiecesFromPlayer(Player player) {
-        for (Move move : player.getMoves()) {
-            Tile tile = move.getTargetTile();
-            tile.setThreatenedByColor(player.getColor(), true);
         }
     }
 
@@ -612,10 +548,6 @@ public class Board implements MyObservable, Serializable {
         System.out.println();
     }
 
-    public boolean isCheckmate() {
-        return gameSituation == GameSituation.BLACK_CHECKMATED || gameSituation == GameSituation.WHITE_CHECKMATED;
-    }
-
     public static Triplet<Board, Player, Player> createNewBoard(Player whitePlayer, Player blackPlayer, Player currentPlayer) {
         Board newBoard = new Board();
 
@@ -697,10 +629,6 @@ public class Board implements MyObservable, Serializable {
         return tile;
     }
 
-    public int getNumberTo63ByTile(Tile tile) {
-        return tile.getRow() * 8 + tile.getCol();
-    }
-
     public double evaluateBoard() {
         return blackPlayer.evaluatePlayerScore() + whitePlayer.evaluatePlayerScore();
 //        return perspective * (currentPlayer.getPlayerScore() - currentPlayer.getOpponentPlayer().getPlayerScore());
@@ -720,16 +648,9 @@ public class Board implements MyObservable, Serializable {
         return matchPlays;
     }
 
-    public boolean canContinueGame() {
-        if (!whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive()) return false;
-        return canContinueGame;
-    }
-
-    public String getLastMoveToString() {
-        if (matchPlays.lastElement() != null) {
-            return matchPlays.lastElement().getPlayer() + " played " + matchPlays.lastElement();
-        }
-        return "No plays played.";
+    public boolean isGameOver() {
+        if (!whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive()) return true;
+        return isGameOver;
     }
 
     public Map<Player, KingPiece> getKingsMap() {
@@ -747,11 +668,6 @@ public class Board implements MyObservable, Serializable {
     public Stack<Tile[][]> getBoardStates() {
         return boardStates;
     }
-
-//    @Override
-//    protected Object clone() throws CloneNotSupportedException {
-//        return super.clone();
-//    }
 
     public void saveState() {
         try {

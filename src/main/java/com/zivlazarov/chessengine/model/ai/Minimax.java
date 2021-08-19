@@ -3,9 +3,6 @@ package com.zivlazarov.chessengine.model.ai;
 import com.zivlazarov.chessengine.model.board.Board;
 import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.move.Move;
-import com.zivlazarov.chessengine.model.move.MoveGenerator;
-import com.zivlazarov.chessengine.model.pieces.KingPiece;
-import com.zivlazarov.chessengine.model.pieces.PieceType;
 import com.zivlazarov.chessengine.model.player.Player;
 
 import java.util.List;
@@ -13,7 +10,7 @@ import java.util.List;
 public class Minimax {
 
     public double search(Board board, int depth,double alpha, double beta, boolean isMaximizing) {
-        if (depth == 0 || !board.canContinueGame()) return board.evaluateBoard();
+        if (depth == 0 || !board.isGameOver()) return board.evaluateBoard();
 
         // white
         double bestValue;
