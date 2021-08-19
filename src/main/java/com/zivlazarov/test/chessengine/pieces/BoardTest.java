@@ -9,6 +9,7 @@ import com.zivlazarov.chessengine.model.pieces.*;
 import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.Converter;
 import com.zivlazarov.chessengine.model.utils.PipedDeepCopy;
+import com.zivlazarov.chessengine.ui.components.BoardFrame;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,8 @@ public class BoardTest {
     private static Player opponent;
     private static RookPiece rookPiece;
     private static RookPiece rookPiece1;
+
+    private static BoardFrame frame;
 
     @BeforeAll
     public static void setup() {
@@ -310,6 +313,9 @@ public class BoardTest {
 
         board.setCurrentPlayer(player);
 
+        frame = new BoardFrame();
+
+
         Piece whiteKing = new KingPiece(player, board, board.getBoard()[4][2]);
         Piece whitePawn = new PawnPiece(player, board, board.getBoard()[3][3], 0);
         Piece blackPawn = new PawnPiece(opponent, board, board.getBoard()[6][4], 0);
@@ -478,36 +484,6 @@ public class BoardTest {
         }
 
         return numOfPositions;
-    }
-
-    @Test
-    public void testSearchForPotentialThreats() {
-        Board board = new Board();
-        Player player = new Player(board, PieceColor.WHITE);
-        Player opponent = new Player(board, PieceColor.BLACK);
-        player.setOpponent(opponent);
-        board.setWhitePlayer(player);
-        board.setBlackPlayer(opponent);
-
-        board.setCurrentPlayer(player);
-
-        Piece whiteKing = new KingPiece(player, board, board.getBoard()[4][2]);
-        Piece whitePawn = new PawnPiece(player, board, board.getBoard()[3][3], 0);
-        Piece blackPawn = new PawnPiece(opponent, board, board.getBoard()[6][4], 0);
-        Piece blackRook = new RookPiece(opponent, board, board.getBoard()[4][6], 0);
-        Piece blackKing = new KingPiece(opponent, board, board.getBoard()[7][7]);
-
-        board.printBoard();
-
-        blackRook.refresh();
-        whitePawn.refresh();
-        whiteKing.refresh();
-
-        board.searchForPotentialThreats(player);
-
-        player.getMoves().forEach(System.out::println);
-
-//        board.checkBoard();
     }
 
     @Test
