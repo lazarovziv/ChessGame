@@ -1,0 +1,6 @@
+package com.zivlazarov.newengine.ui;
+
+public enum ZMoveLabel {
+
+    REGULAR, CAPTURE, EN_PASSANT, KING_SIDE_CASTLE, QUEEN_SIDE_CASTLE, PAWN_PROMOTION_REGULAR, PAWN_PROMOTION_CAPTURE
+}

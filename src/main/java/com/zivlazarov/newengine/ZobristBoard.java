@@ -1,5 +1,7 @@
 package com.zivlazarov.newengine;
 
+import com.zivlazarov.newengine.ui.ZMoveLabel;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
@@ -20,6 +22,10 @@ public class ZobristBoard {
     public static final Map<Long, long[][][]> transpositionTable = new HashMap<>();
 
     private final List<ZMove> moves;
+
+    private final Map<Character, ZMove> historyMoves = new HashMap<>();
+    private final Stack<Map<Character, ZMove>> historyPlays = new Stack<>();
+
     private int currentPlayer = 0;
 
     private final Map<Character, Integer> piecesTypeValuesMap = new HashMap<>();
@@ -27,6 +33,11 @@ public class ZobristBoard {
     private final Map<Integer, Integer> pawnsStartRow = Map.of(
             WHITE_PLAYER, 1,
             BLACK_PLAYER, 6
+    );
+
+    private final Map<Integer, Integer> pawnsLastRow = Map.of(
+            WHITE_PLAYER, 7,
+            BLACK_PLAYER, 0
     );
 
     private final Map<Integer, Integer> enPassantRows = Map.of(
@@ -126,13 +137,13 @@ public class ZobristBoard {
 
         displayBoard = new char[][] {
                 {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
-                {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
+                {'P', 'P', 'P', 'P', 'P', 'P', '-', 'P'},
                 {'-', '-', '-', '-', '-', '-', '-', '-'},
                 {'-', '-', '-', '-', '-', '-', '-', '-'},
                 {'-', '-', '-', '-', '-', '-', '-', '-'},
                 {'-', '-', '-', '-', '-', '-', '-', '-'},
-                {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'},
-                {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'}};
+                {'p', 'p', 'p', 'p', 'p', 'p', 'P', 'p'},
+                {'r', 'n', 'b', 'q', 'k', 'b', '-', 'r'}};
 
         for (int pieceType = 0; pieceType < 12; pieceType++) {
             for (int row = 0; row < 8; row++) {
@@ -154,6 +165,7 @@ public class ZobristBoard {
         int bBishopsIndex = 0;
         int bRooksIndex = 0;
 
+        // setting initial pieces' positions in board to their respective locations' arrays
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 if (!isEmpty(row, col)) {
@@ -233,48 +245,322 @@ public class ZobristBoard {
         char piece = displayBoard[move.getSourceRow()][move.getSourceCol()];
         int pieceBoardIndex = piecesTypeValuesMap.get(piece);
 
-        // regular move
-        // setting tile empty
+        // first, emptying piece's source tile
         displayBoard[move.getSourceRow()][move.getSourceCol()] = '-';
         zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
 
-        // TODO: add capture, en passant, castling, pawn promotion
-        if (isEmpty(move.getTargetRow(), move.getTargetCol())) {
-            // moving the piece
-            displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
-            zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
-        }
+        switch (move.getMoveLabel()) {
+            case REGULAR -> {
+                // setting piece in target tile and hashing
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+            }
+            case CAPTURE -> {
+                char capturedPiece = displayBoard[move.getTargetRow()][move.getTargetCol()];
+                int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
+                move.setCapturedPiece(capturedPiece);
+                // emptying target tile and hashing
+                displayBoard[move.getSourceRow()][move.getSourceCol()] = '-';
+                zobristHash ^= board[capturedPieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                // setting piece in target tile and hashing
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+            }
+            case EN_PASSANT -> {
+                if (currentPlayer == WHITE_PLAYER) {
+                    char capturedPiece = displayBoard[move.getTargetRow() - 1][move.getTargetCol()];
+                    int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
+                    move.setCapturedPiece(capturedPiece);
 
+                    // emptying the captured piece's tile and hashing
+                    // -1 is the tile "behind" piece
+                    displayBoard[move.getSourceRow() - 1][move.getSourceCol()] = '-';
+                    zobristHash ^= board[capturedPieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                    // setting piece in target tile and hashing
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+                    zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    char capturedPiece = displayBoard[move.getTargetRow() + 1][move.getTargetCol()];
+                    int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
+                    move.setCapturedPiece(capturedPiece);
+
+                    // emptying the captured piece's tile and hashing
+                    // +1 is the tile "behind" piece
+                    displayBoard[move.getSourceRow() + 1][move.getSourceCol()] = '-';
+                    zobristHash ^= board[capturedPieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                    // setting piece in target tile and hashing
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+                    zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                }
+            }
+            case KING_SIDE_CASTLE -> {
+                // setting piece in target tile and hashing
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                if (currentPlayer == WHITE_PLAYER) {
+                    int rookBoardIndex = piecesTypeValuesMap.get('R');
+                    // emptying rook tile and hashing
+                    displayBoard[0][7] = '-';
+                    zobristHash ^= board[rookBoardIndex][0][7];
+                    // setting rook in castle tile and hashing
+                    displayBoard[0][4] = 'R';
+                    zobristHash ^= board[rookBoardIndex][0][4];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    int rookBoardIndex = piecesTypeValuesMap.get('r');
+                    // emptying rook tile and hashing
+                    displayBoard[7][7] = '-';
+                    zobristHash ^= board[rookBoardIndex][7][7];
+                    // setting rook in castle tile and hashing
+                    displayBoard[7][4] = 'r';
+                    zobristHash ^= board[rookBoardIndex][7][4];
+                }
+            }
+            case QUEEN_SIDE_CASTLE -> {
+                // setting piece in target tile and hashing
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                if (currentPlayer == WHITE_PLAYER) {
+                    int rookBoardIndex = piecesTypeValuesMap.get('R');
+                    // emptying rook tile and hashing
+                    displayBoard[0][0] = '-';
+                    zobristHash ^= board[rookBoardIndex][0][7];
+                    // setting rook in castle tile and hashing
+                    displayBoard[0][3] = 'R';
+                    zobristHash ^= board[rookBoardIndex][0][4];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    int rookBoardIndex = piecesTypeValuesMap.get('r');
+                    // emptying rook tile and hashing
+                    displayBoard[7][0] = '-';
+                    zobristHash ^= board[rookBoardIndex][7][0];
+                    // setting rook in castle tile and hashing
+                    displayBoard[7][3] = 'r';
+                    zobristHash ^= board[rookBoardIndex][7][3];
+                }
+            }
+            case PAWN_PROMOTION_REGULAR -> {
+                if (currentPlayer == WHITE_PLAYER) {
+                    int queenBoardIndex = piecesTypeValuesMap.get('Q');
+                    // setting piece in target tile and hashing
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = 'Q';
+                    zobristHash ^= board[queenBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    int queenBoardIndex = piecesTypeValuesMap.get('q');
+                    // setting piece in target tile and hashing
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = 'q';
+                    zobristHash ^= board[queenBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                }
+            }
+            case PAWN_PROMOTION_CAPTURE -> {
+                char capturedPiece = displayBoard[move.getTargetRow()][move.getTargetCol()];
+                int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
+                // emptying captured piece's tile and hashing
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+
+                if (currentPlayer == WHITE_PLAYER) {
+                    int queenBoardIndex = piecesTypeValuesMap.get('Q');
+                    // setting piece in target tile and changing piece's type and hashing
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = 'Q';
+                    zobristHash ^= board[queenBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    int queenBoardIndex = piecesTypeValuesMap.get('q');
+                    // setting piece in target tile and changing piece's type and hashing
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = 'q';
+                    zobristHash ^= board[queenBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                }
+            }
+
+        }
+//        // setting piece in target tile and hashing
+//        displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+//        zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+
+        // adding current board to the transposition table
         transpositionTable.put(zobristHash, board);
 
         // changing turns
         currentPlayer *= -1;
 
+        // hashing if it's black's turn to move
         if (currentPlayer == BLACK_PLAYER) {
             zobristHash ^= blackToMove;
         }
+
+        // adding move to historyPlays
+        Map<Character, ZMove> map = Map.of(displayBoard[move.getSourceRow()][move.getSourceCol()], move);
+        historyPlays.push(map);
 
         return zobristHash;
     }
 
     public long unmakeMove(ZMove move) {
-        char piece = displayBoard[move.getTargetRow()][move.getTargetCol()];
-        int pieceBoardIndex = piecesTypeValuesMap.get(piece);
-
-        // setting tile empty
-        displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
-        zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
-
-        // moving the piece
-        displayBoard[move.getSourceRow()][move.getSourceCol()] = piece;
-        zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
-
         // changing back the turn
         currentPlayer *= -1;
-
+        // if it was supposed to be black's turn, we hashed him, so now we need to hash him back to return to previous hash
         if (currentPlayer == WHITE_PLAYER) {
             zobristHash ^= blackToMove;
         }
+
+        char piece = displayBoard[move.getTargetRow()][move.getTargetCol()];
+        int pieceBoardIndex = piecesTypeValuesMap.get(piece);
+
+        switch (move.getMoveLabel()) {
+            case REGULAR -> {
+                // setting target tile empty
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                // moving the piece back
+                displayBoard[move.getSourceRow()][move.getSourceCol()] = piece;
+                zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+            }
+            case CAPTURE -> {
+                char capturedPiece = move.getCapturedPiece();
+                int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
+                // setting target tile empty
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                // setting captured piece in move's target tile and hashing
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = capturedPiece;
+                zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                // moving the piece back
+                displayBoard[move.getSourceRow()][move.getSourceCol()] = piece;
+                zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+            }
+            case EN_PASSANT -> {
+                char capturedPiece = move.getCapturedPiece();
+                int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
+                // setting target tile empty
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                // black piece was captured because changing back turns is performed at the end of the method
+                if (currentPlayer == WHITE_PLAYER) {
+                    // setting captured pawn at its previous tile and hashing
+                    displayBoard[move.getTargetRow() - 1][move.getTargetCol()] = capturedPiece;
+                    zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow() - 1][move.getTargetCol()];
+                    // moving the piece back
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = piece;
+                    zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                    // white piece was captured
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    // setting captured pawn at its previous tile and hashing
+                    displayBoard[move.getTargetRow() + 1][move.getTargetCol()] = capturedPiece;
+                    zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow() + 1][move.getTargetCol()];
+                    // moving the piece back
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = piece;
+                    zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                }
+            }
+            case KING_SIDE_CASTLE -> {
+                // setting target tile empty
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                if (currentPlayer == WHITE_PLAYER) {
+                    int rookBoardIndex = piecesTypeValuesMap.get('R');
+                    // emptying king side castle move
+                    displayBoard[0][4] = '-';
+                    zobristHash ^= board[rookBoardIndex][0][4];
+                    // setting king side rook to original tile
+                    displayBoard[0][7] = 'R';
+                    zobristHash ^= board[rookBoardIndex][0][7];
+                    // setting king in source tile
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = 'K';
+                    zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    int rookBoardIndex = piecesTypeValuesMap.get('r');
+                    // emptying king side castle move
+                    displayBoard[7][4] = '-';
+                    zobristHash ^= board[rookBoardIndex][7][4];
+                    // setting king side rook to original tile
+                    displayBoard[7][7] = 'r';
+                    zobristHash ^= board[rookBoardIndex][7][7];
+                    // setting king in source tile
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = 'k';
+                    zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                }
+            }
+            case QUEEN_SIDE_CASTLE -> {
+                // setting target tile empty
+                displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                if (currentPlayer == WHITE_PLAYER) {
+                    int rookBoardIndex = piecesTypeValuesMap.get('R');
+                    // emptying queen side castle move
+                    displayBoard[0][3] = '-';
+                    zobristHash ^= board[rookBoardIndex][0][3];
+                    // setting queen side rook to original tile
+                    displayBoard[0][0] = 'r';
+                    zobristHash ^= board[rookBoardIndex][0][0];
+                    // setting king in source tile
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = 'K';
+                    zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    int rookBoardIndex = piecesTypeValuesMap.get('r');
+                    // emptying queen side castle move
+                    displayBoard[7][3] = '-';
+                    zobristHash ^= board[rookBoardIndex][7][3];
+                    // setting queen side rook to original tile
+                    displayBoard[7][0] = 'r';
+                    zobristHash ^= board[rookBoardIndex][7][0];
+                    // setting king in source tile
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = 'k';
+                    zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                }
+            }
+            case PAWN_PROMOTION_REGULAR -> {
+                if (currentPlayer == WHITE_PLAYER) {
+                    int queenBoardIndex = piecesTypeValuesMap.get('Q');
+                    int pawnBoardIndex = piecesTypeValuesMap.get('P');
+                    // emptying target tile and hashing with queen's table
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                    zobristHash ^= board[queenBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                    // setting pawn back
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = 'P';
+                    zobristHash ^= board[pawnBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    int queenBoardIndex = piecesTypeValuesMap.get('q');
+                    int pawnBoardIndex = piecesTypeValuesMap.get('p');
+                    // emptying target tile and hashing with queen's table
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                    zobristHash ^= board[queenBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                    // setting pawn back
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = 'p';
+                    zobristHash ^= board[pawnBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                }
+            }
+            case PAWN_PROMOTION_CAPTURE -> {
+                char capturedPiece = move.getCapturedPiece();
+                int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
+                if (currentPlayer == WHITE_PLAYER) {
+                    int queenBoardIndex = piecesTypeValuesMap.get('Q');
+                    int pawnBoardIndex = piecesTypeValuesMap.get('P');
+                    // emptying target tile and hashing with queen's table
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                    zobristHash ^= board[queenBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                    zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                    // setting captured piece back in tile
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+                    zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                    // setting pawn back in source tile
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = 'P';
+                    zobristHash ^= board[pawnBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                } else if (currentPlayer == BLACK_PLAYER) {
+                    int queenBoardIndex = piecesTypeValuesMap.get('q');
+                    int pawnBoardIndex = piecesTypeValuesMap.get('p');
+                    // emptying target tile and hashing with queen's table
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
+                    zobristHash ^= board[queenBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                    zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                    // setting captured piece back in tile
+                    displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
+                    zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
+                    // setting pawn back in source tile
+                    displayBoard[move.getSourceRow()][move.getSourceCol()] = 'p';
+                    zobristHash ^= board[pawnBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                }
+            }
+        }
+
+        historyPlays.remove(historyPlays.lastElement());
 
         return zobristHash;
     }
@@ -454,9 +740,9 @@ public class ZobristBoard {
         boolean isPawnWhite = isWhitePiece(displayBoard[row][col]);
         boolean isPawnBlack = isBlackPiece(displayBoard[row][col]);
 
-        int player = 0;
+        int player = -1;
         if (isPawnWhite) player = WHITE_PLAYER;
-        else if (isPawnBlack) player = BLACK_PLAYER;
+//        else if (isPawnBlack) player = BLACK_PLAYER;
 
         int direction = 0;
         if (isPawnWhite) direction = 1;
@@ -465,6 +751,10 @@ public class ZobristBoard {
         if (row + direction < 8 && row + direction >= 0) {
             if (isEmpty(row + direction, col)) {
                 ZMove move = new ZMove(row, col, row + direction, col);
+                // checking if reached last row for promotion
+                if (row + direction == pawnsLastRow.get(player)) {
+                    move.setMoveLabel(ZMoveLabel.PAWN_PROMOTION_REGULAR);
+                } else move.setMoveLabel(ZMoveLabel.REGULAR);
                 moves.add(move);
 
                 // at the first row in the game
@@ -472,6 +762,7 @@ public class ZobristBoard {
                 if (row == pawnsStartRow.get(player)) {
                     if (isEmpty(row + 2*direction, col)) {
                         ZMove longMove = new ZMove(row, col, row + 2*direction, col);
+                        move.setMoveLabel(ZMoveLabel.REGULAR);
                         moves.add(longMove);
                     }
                 }
@@ -486,28 +777,48 @@ public class ZobristBoard {
                 if (isEmpty(row + direction, col + d)) whiteThreateningTiles[row + direction][col + d] = true;
                 else if (isBlackPiece(displayBoard[row + direction][col + d])) {
                     ZMove move = new ZMove(row, col, row + direction, col + d);
+                    // checking if reached last row for promotion
+                    if (row + direction == pawnsLastRow.get(player)) {
+                        move.setMoveLabel(ZMoveLabel.PAWN_PROMOTION_CAPTURE);
+                    } else move.setMoveLabel(ZMoveLabel.CAPTURE);
                     moves.add(move);
                     whiteThreateningTiles[row + direction][col + d] = true;
                 }
                 // en passant
                 if (displayBoard[row][col + d] == 'p' && row == enPassantRows.get(player) && isEmpty(row + direction, col + d)) {
-                    ZMove move = new ZMove(row, col, row + direction, col + d);
-                    moves.add(move);
-                    whiteThreateningTiles[row + direction][col + d] = true;
+                    // checking if last pawn's move was from the starting row
+                    if (historyPlays.lastElement().containsKey('p') &&
+                            historyPlays.lastElement().get('p').getSourceRow() == pawnsStartRow.get(BLACK_PLAYER)) {
+                        ZMove move = new ZMove(row, col, row + direction, col + d);
+                        move.setMoveLabel(ZMoveLabel.EN_PASSANT);
+                        moves.add(move);
+                        whiteThreateningTiles[row + direction][col + d] = true;
+                    }
                 }
-            } else if (isBlackPiece(displayBoard[row][col])) {
+            } else if (isPawnBlack) {
                 if (isEmpty(row + direction, col + d)) blackThreateningTiles[row + direction][col + d] = true;
                 else if (isWhitePiece(displayBoard[row + direction][col + d])) {
                     ZMove move = new ZMove(row, col, row + direction, col + d);
+                    // checking if reached last row for promotion
+                    if (row + direction == pawnsLastRow.get(player)) {
+                        move.setMoveLabel(ZMoveLabel.PAWN_PROMOTION_CAPTURE);
+                    } else move.setMoveLabel(ZMoveLabel.CAPTURE);
                     moves.add(move);
                     blackThreateningTiles[row + direction][col + d] = true;
                 }
+                // en passant
                 if (displayBoard[row][col + d] == 'P' && row == enPassantRows.get(player) && isEmpty(row + direction, col + d)) {
-                    ZMove move = new ZMove(row, col, row + direction, col + d);
-                    moves.add(move);
-                    blackThreateningTiles[row + direction][col + d] = true;
+                    // checking if last pawn's move was from the starting row
+                    if (historyPlays.lastElement().containsKey('P') &&
+                            historyPlays.lastElement().get('P').getSourceRow() == pawnsStartRow.get(WHITE_PLAYER)) {
+                        ZMove move = new ZMove(row, col, row + direction, col + d);
+                        move.setMoveLabel(ZMoveLabel.EN_PASSANT);
+                        moves.add(move);
+                        blackThreateningTiles[row + direction][col + d] = true;
+                    }
                 }
             }
+
         }
         return moves;
     }
@@ -537,17 +848,20 @@ public class ZobristBoard {
 
             if (isEmpty(row + r, col + c)) {
                 ZMove move = new ZMove(row, col, row + r, col + c);
+                move.setMoveLabel(ZMoveLabel.REGULAR);
                 moves.add(move);
             }
             if (isKnightWhite) {
                 if (isBlackPiece(displayBoard[row + r][col + c])) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
+                    move.setMoveLabel(ZMoveLabel.CAPTURE);
                     moves.add(move);
                     whiteThreateningTiles[row + r][col + c] = true;
                 }
             } else if (isKnightBlack) {
                 if (isWhitePiece(displayBoard[row + r][col + c])) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
+                    move.setMoveLabel(ZMoveLabel.CAPTURE);
                     moves.add(move);
                     blackThreateningTiles[row + r][col + c] = true;
                 }
@@ -573,6 +887,7 @@ public class ZobristBoard {
                 // empty
                 if (isEmpty(row + r*i, col + c*i)) {
                     ZMove move = new ZMove(row, col, row + r*i, col + c*i);
+                    move.setMoveLabel(ZMoveLabel.REGULAR);
                     moves.add(move);
                     if (isSlidingPieceWhite) whiteThreateningTiles[row + r*i][col + c*i] = true;
                     else blackThreateningTiles[row + r*i][col + c*i] = true;
@@ -582,12 +897,14 @@ public class ZobristBoard {
                     if (isWhitePiece(displayBoard[row + r*i][col + c*i])) {
                         if (isSlidingPieceBlack) {
                             ZMove move = new ZMove(row, col, row + r*i, col + c*i);
+                            move.setMoveLabel(ZMoveLabel.CAPTURE);
                             moves.add(move);
                         }
                         // black piece
                     } else if (isBlackPiece(displayBoard[row + r*i][col + c*i])) {
                         if (isSlidingPieceWhite) {
                             ZMove move = new ZMove(row, col, row + r*i, col + c*i);
+                            move.setMoveLabel(ZMoveLabel.CAPTURE);
                             moves.add(move);
                         }
                     }
@@ -606,10 +923,94 @@ public class ZobristBoard {
     }
 
     private List<ZMove> generateKingMoves(int row, int col) {
+        // suggestion: before generating, generate all other pieces' moves (?)
+
         List<ZMove> moves = new ArrayList<>();
 
         boolean isKingWhite = isWhitePiece(displayBoard[row][col]);
         boolean isKingBlack = isBlackPiece(displayBoard[row][col]);
+
+        boolean kingSideClear = true;
+        boolean queenSideClear = true;
+
+        // white castling
+        if (isKingWhite) {
+            if (row == 0 && col == 4) {
+                // king side castle
+                for (int i = 1; i < 3; i++) {
+                    // if tiles between king and rooks are empty and aren't threatened
+                    if (!isEmpty(row, col + i) || blackThreateningTiles[row][col + i]) {
+                        kingSideClear = false;
+                        break;
+                    }
+                }
+                if (kingSideClear) {
+                    // if no white king or white king side rook moves were made
+                    if (historyPlays.stream().noneMatch(map -> map.containsKey('K')) ||
+                    historyPlays.stream().noneMatch(map -> map.get('R').getSourceCol() == 7)) {
+                        ZMove move = new ZMove(row, col, row, col + 2);
+                        move.setMoveLabel(ZMoveLabel.KING_SIDE_CASTLE);
+                        moves.add(move);
+                    }
+                }
+
+                // queen side castle
+                for (int i = 1; i < 4; i++) {
+                    if (!isEmpty(row, col - i) || blackThreateningTiles[row][col - i]) {
+                        queenSideClear = false;
+                        break;
+                    }
+                }
+                if (queenSideClear) {
+                    // if no white king or white queen side rook moves were made
+                    if (historyPlays.stream().noneMatch(map -> map.containsKey('K')) ||
+                            historyPlays.stream().noneMatch(map -> map.get('R').getSourceCol() == 0)) {
+                        ZMove move = new ZMove(row, col, row, col - 2);
+                        move.setMoveLabel(ZMoveLabel.QUEEN_SIDE_CASTLE);
+                        moves.add(move);
+                    }
+                }
+            }
+            // black castling
+        } else if (isKingBlack) {
+            if (row == 7 && col == 4) {
+                // king side castle
+                for (int i = 1; i < 3; i++) {
+                    // if tiles between king and rooks are empty and aren't threatened
+                    if (!isEmpty(row, col + i) || whiteThreateningTiles[row][col + i]) {
+                        kingSideClear = false;
+                        break;
+                    }
+                }
+                if (kingSideClear) {
+                    // if no black king or black king side black rook moves were made
+                    if (historyPlays.stream().noneMatch(map -> map.containsKey('k')) ||
+                            historyPlays.stream().noneMatch(map -> map.get('r').getSourceCol() == 7)) {
+                        // king side castling
+                        ZMove move = new ZMove(row, col, row, col - 2);
+                        move.setMoveLabel(ZMoveLabel.KING_SIDE_CASTLE);
+                        moves.add(move);
+                    }
+                }
+
+                // queen side castle
+                for (int i = 1; i < 4; i++) {
+                    if (!isEmpty(row, col - i) || whiteThreateningTiles[row][col - i]) {
+                        queenSideClear = false;
+                        break;
+                    }
+                }
+                if (queenSideClear) {
+                    // if no black king or black queen side black rook moves were made
+                    if (historyPlays.stream().noneMatch(map -> map.containsKey('k')) ||
+                            historyPlays.stream().noneMatch(map -> map.get('r').getSourceCol() == 0)) {
+                        ZMove move = new ZMove(row, col, row, col - 2);
+                        move.setMoveLabel(ZMoveLabel.QUEEN_SIDE_CASTLE);
+                        moves.add(move);
+                    }
+                }
+            }
+        }
 
         // king's directions are just like queen's but it's not sliding
         for (int[] direction : queenDirections) {
@@ -625,14 +1026,15 @@ public class ZobristBoard {
                 }
                 if (isEmpty(row + r, col + c)) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
+                    move.setMoveLabel(ZMoveLabel.REGULAR);
                     moves.add(move);
                     whiteThreateningTiles[row + r][col + c] = true;
                 } else if (isWhitePiece(displayBoard[row + r][col + c])) {
                     whiteThreateningTiles[row + r][col + c] = true;
                     continue;
-                }
-                else if (isBlackPiece(displayBoard[row + r][col + c])) {
+                } else if (isBlackPiece(displayBoard[row + r][col + c])) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
+                    move.setMoveLabel(ZMoveLabel.CAPTURE);
                     moves.add(move);
                     whiteThreateningTiles[row + r][col + c] = true;
                 }
@@ -643,20 +1045,20 @@ public class ZobristBoard {
                 }
                 if (isEmpty(row + r, col + c)) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
+                    move.setMoveLabel(ZMoveLabel.REGULAR);
                     moves.add(move);
                     blackThreateningTiles[row + r][col + c] = true;
                 } else if (isWhitePiece(displayBoard[row + r][col + c])) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
+                    move.setMoveLabel(ZMoveLabel.CAPTURE);
                     moves.add(move);
                     blackThreateningTiles[row + r][col + c] = true;
                     continue;
-                }
-                else if (isBlackPiece(displayBoard[row + r][col + c])) {
+                } else if (isBlackPiece(displayBoard[row + r][col + c])) {
                     blackThreateningTiles[row + r][col + c] = true;
                 }
             }
         }
-        // TODO: add castling
 
         return moves;
     }
@@ -688,5 +1090,9 @@ public class ZobristBoard {
 
     public char[][] getDisplayBoard() {
         return displayBoard;
+    }
+
+    public long getHash() {
+        return zobristHash;
     }
 }
