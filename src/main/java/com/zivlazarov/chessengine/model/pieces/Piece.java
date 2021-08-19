@@ -176,7 +176,7 @@ public abstract class Piece implements Cloneable, Serializable {
 
     public void setCurrentTile(Tile currentTile) {
         this.currentTile = currentTile;
-        if (currentTile == null) return;
+        if (currentTile == null) return; /*throw new NullPointerException("Tile in null"); */
         currentTile.setPiece(this);
         currentRow = currentTile.getRow();
         currentCol = currentTile.getCol();

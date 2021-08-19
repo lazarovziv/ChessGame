@@ -14,17 +14,17 @@ public class ChessGame {
 
     public static void main(String[] args) {
 //        Board board = new Board();
-//        Player player = new Player(board, PieceColor.WHITE);
-//        Player opponent = new Player(board, PieceColor.BLACK);
-//        player.setOpponent(opponent);
+//        Player white = new Player(board, PieceColor.WHITE);
+//        Player black = new Player(board, PieceColor.BLACK);
+//        white.setOpponent(black);
 //
-//        board.setWhitePlayer(player);
-//        board.setBlackPlayer(opponent);
+//        board.setWhitePlayer(white);
+//        board.setBlackPlayer(black);
 //
-//        player.setBoard(board);
-//        opponent.setBoard(board);
+//        white.setBoard(board);
+//        black.setBoard(board);
 //
-//        board.setCurrentPlayer(player);
+//        board.setCurrentPlayer(white);
 //
 //        board.initBoard();
 //        board.checkBoard();
