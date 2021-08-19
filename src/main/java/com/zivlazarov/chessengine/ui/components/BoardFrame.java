@@ -10,7 +10,6 @@ import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.move.MoveLabel;
 import com.zivlazarov.chessengine.model.pieces.Piece;
 import com.zivlazarov.chessengine.model.player.Player;
-import com.zivlazarov.chessengine.ui.game.ChessGame;
 import com.zivlazarov.chessengine.ui.utils.Utilities;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -24,8 +23,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
 import static com.zivlazarov.chessengine.model.move.MoveLabel.EN_PASSANT;
 import static com.zivlazarov.chessengine.ui.utils.Utilities.createImageIcon;
@@ -41,12 +42,11 @@ public class BoardFrame {
     private final SidePanel movesSidePanel;
     private final SidePanel capturedPiecesPanel;
 
-    private Move minimaxMove;
-    private final int depth = 4;
-
     private final Map<Player, SidePanel> playerSidePanelMap;
 
-    private static Board board;
+    public Board board;
+
+    boolean playVsMinimax;
 
     private static final Map<PieceColor, GameSituation> checkSituations = Map.of(
             PieceColor.WHITE, GameSituation.WHITE_IN_CHECK,
@@ -57,8 +57,8 @@ public class BoardFrame {
             PieceColor.BLACK, GameSituation.BLACK_CHECKMATED
     );
 
-    private static Player whitePlayer;
-    private static Player blackPlayer;
+    private Player whitePlayer;
+    private Player blackPlayer;
 
     private static Minimax minimax;
 
@@ -68,6 +68,9 @@ public class BoardFrame {
 
     public BoardFrame() {
         initGame();
+
+//        whitePlayer = board.getWhitePlayer();
+//        blackPlayer = board.getBlackPlayer();
 
         PlayerDao playerDao = new PlayerDao();
         MoveDao moveDao = new MoveDao();
@@ -94,6 +97,13 @@ public class BoardFrame {
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Options");
+        JMenuBar playBar = new JMenuBar();
+        JMenu playMenu = new JMenu("Opponent");
+
+        JMenuItem minimaxMenuItem = new JMenuItem("MiniMax");
+        minimaxMenuItem.addActionListener((event) -> playVsMinimax = true);
+        JMenuItem regularMenuItem = new JMenuItem("Regular");
+        regularMenuItem.addActionListener((event) -> playVsMinimax = false);
 
         JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.addActionListener((event) -> System.exit(1));
@@ -156,14 +166,16 @@ public class BoardFrame {
         menu.add(restartGameItem);
         menu.add(exitMenuItem);
 
+        playMenu.add(regularMenuItem);
+        playMenu.add(minimaxMenuItem);
+
         menuBar.add(menu);
+        menuBar.add(playMenu);
 
         gameFrame.setJMenuBar(menuBar);
 
         gameFrame.setSize(850, 600);
         gameFrame.add(boardPanel, BorderLayout.CENTER);
-//        gameFrame.add(whiteSidePanel, BorderLayout.WEST);
-//        gameFrame.add(blackSidePanel, BorderLayout.EAST);
         gameFrame.add(movesSidePanel, BorderLayout.WEST);
         gameFrame.add(capturedPiecesPanel, BorderLayout.EAST);
         gameFrame.setVisible(true);
@@ -171,20 +183,9 @@ public class BoardFrame {
         // setting window in center
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         gameFrame.setLocation(dim.width / 2 - gameFrame.getSize().width / 2, dim.height / 2 - gameFrame.getSize().height / 2);
-
-        /*  depth 3: 8902
-
-            depth 4: 197281
-
-            depth 5: 4865609  */
-
-//        System.out.println(ChessGame.generatedMove(board, 4));
-
-//        playRandomly(100);
-//        playMinimax();
     }
 
-    public static void initGame() {
+    public void initGame() {
         whitePlayer = new Player(PieceColor.WHITE);
         blackPlayer = new Player(PieceColor.BLACK);
 
@@ -194,7 +195,7 @@ public class BoardFrame {
         blackPlayer.setName("Black");
 
         whitePlayer.setAI(false);
-        blackPlayer.setAI(true);
+        blackPlayer.setAI(false);
 
         minimax = new Minimax();
 
@@ -214,75 +215,23 @@ public class BoardFrame {
         board.checkBoard();
     }
 
-    public void playMinimax() {
-        while (board.canContinueGame()) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            Move move = minimax.findBestMove(board, 3, blackPlayer);
-            move.makeMove(true, true);
-
-            SwingUtilities.invokeLater(() -> boardPanel.drawBoard(false));
-        }
-    }
-
-    public void playRandomly(long milliseconds) {
-        while (board.canContinueGame()) {
-            try {
-                Thread.sleep(milliseconds);
-
-                Iterator<Move> iterator = board.getCurrentPlayer().getMoves().iterator();
-                Move move = iterator.next();
-
-                move.makeMove(true, true);
-
-                System.out.println(board.evaluateBoard());
-                System.out.println(board.getGameSituation());
-
-                if (!board.canContinueGame()) {
-                    board.printBoard();
-                        Thread.currentThread().interrupt();
-                        ImageIcon icon = null;
-                        try {
-                            BufferedImage image = ImageIO.read(new File(Utilities.currentPath +
-                                    "/src/" + whitePlayer.getKing().getImageName()));
-                            icon = new ImageIcon(image);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        String[] options = { "No", "Yes" };
-                        int answer = JOptionPane.showOptionDialog(gameFrame, "Checkmate! Restart game? ", "End Game",
-                                JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, icon, options, options[1]);
-                        if (answer == 1) {
-                            restartGame();
-                        } else System.exit(1);
-                    break;
-                };
-
-                SwingUtilities.invokeLater(() -> boardPanel.drawBoard(false));
-//                SwingUtilities.invokeLater(boardPanel::drawBoard);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private void restartGame() {
         gameFrame.dispose();
 //        board.resetBoard();
         new BoardFrame();
     }
 
+    public void addMouseListener(MouseListener mouseListener) {
+
+    }
+
+    public void markTile(TilePanel panel) {
+        panel.setBackground(Color.LIGHT_GRAY);
+    }
+
     private class SidePanel extends JPanel {
 
         SidePanel() {
-//            super(new GridLayout(50, 1));
-
-//            setBackground(Color.BLACK);
-
             setPreferredSize(new Dimension(125, 350));
             validate();
         }
@@ -387,9 +336,7 @@ public class BoardFrame {
                 int answer = JOptionPane.showOptionDialog(gameFrame, "Checkmate! Restart game? ", "End Game",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, icon, options, options[1]);
                 if (answer == 1) {
-                    gameFrame.dispose();
-//                    board.resetBoard();
-                    new BoardFrame();
+                    restartGame();
                 } else System.exit(1);
             } else if (board.getGameSituation() == GameSituation.BLACK_IN_CHECK ||
                     board.getGameSituation() == GameSituation.WHITE_IN_CHECK) {
@@ -414,7 +361,7 @@ public class BoardFrame {
         }
     }
 
-    private class TilePanel extends JPanel {
+    public class TilePanel extends JPanel {
 
         private final Tile tile;
 
@@ -446,19 +393,21 @@ public class BoardFrame {
                 public void mouseClicked(MouseEvent e) {
                     // first left mouse click
                     if (isLeftMouseButton(e)) {
-//                        if (blackPlayer.isCurrentPlayer()) {
-//                            minimaxMove = minimax.findBestMove(board, depth, blackPlayer);
-//                            minimaxMove.makeMove(true, true);
-//
-//                            printMoveLabel(minimaxMove);
-//                            System.out.println(minimaxMove);
-//                            System.out.println(board.evaluateBoard());
-//
-//                            SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
-//                            SwingUtilities.invokeLater(movesSidePanel::drawMoves);
-//                            SwingUtilities.invokeLater(capturedPiecesPanel::drawPiece);
-//                            return;
-//                        }
+                        if (playVsMinimax) {
+                            if (blackPlayer.isCurrentPlayer()) {
+                                Move minimaxMove = minimax.findBestMove(board, 4, blackPlayer);
+                                minimaxMove.makeMove(true, true);
+
+                                printMoveLabel(minimaxMove);
+                                System.out.println(minimaxMove);
+                                System.out.println(board.evaluateBoard());
+
+                                SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
+                                SwingUtilities.invokeLater(movesSidePanel::drawMoves);
+                                SwingUtilities.invokeLater(capturedPiecesPanel::drawPiece);
+                                return;
+                            }
+                        }
 
                         if (sourceTile == null) {
                             sourceTile = tile;
