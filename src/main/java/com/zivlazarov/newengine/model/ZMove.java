@@ -1,6 +1,4 @@
-package com.zivlazarov.newengine;
-
-import com.zivlazarov.newengine.ui.ZMoveLabel;
+package com.zivlazarov.newengine.model;
 
 public class ZMove {
 

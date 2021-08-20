@@ -480,7 +480,7 @@ public class BoardTest {
         for (Move move : moves) {
             move.makeMove(true, true);
             numOfPositions += generatedMove(board, depth - 1);
-            move.unmakeMove(false);
+            move.unmakeMove(true);
         }
 
         return numOfPositions;

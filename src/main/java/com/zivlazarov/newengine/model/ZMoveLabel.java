@@ -1,4 +1,4 @@
-package com.zivlazarov.newengine.ui;
+package com.zivlazarov.newengine.model;
 
 public enum ZMoveLabel {
 

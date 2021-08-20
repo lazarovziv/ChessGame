@@ -1,7 +1,7 @@
 package com.zivlazarov.newengine.ui;
 
 import com.zivlazarov.chessengine.model.board.Tile;
-import com.zivlazarov.newengine.ZobristBoard;
+import com.zivlazarov.newengine.model.ZobristBoard;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

@@ -163,11 +163,10 @@ public class Move implements Serializable {
 
         // adding the move to piece's and game log
         movingPiece.getHistoryMoves().push(targetTile);
-        if (addToHistory) {
-            board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
-            board.pushMoveToMatchPlays(this);
-            player.incrementTurn();
-        }
+
+        board.getGameHistoryMoves().push(new Pair<>(movingPiece, targetTile));
+        board.pushMoveToMatchPlays(this);
+        player.incrementTurn();
 
         player.getLastMove().put(movingPiece, new Pair<>(currentTile, targetTile));
 
