@@ -1,4 +1,4 @@
-package com.zivlazarov.newengine;
+package com.zivlazarov.newengine.model;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,32 +70,108 @@ public class ZobristBoard {
     private final boolean[][] whiteThreateningTiles = new boolean[8][8];
     private final boolean[][] blackThreateningTiles = new boolean[8][8];
 
-//    // first indexes are white's pieces
-    private final int[][] wPawnsLocations = new int[8][8];
-    private final int[][] wKnightsLocations = new int[2][2];
-    private final int[][] wBishopsLocations = new int[2][2];;
-    private final int[][] wRooksLocations = new int[2][2];;
-    private final int[][] wQueenLocations = new int[9][2];;
-    private final int[][] wKingLocation = new int[1][2];;
+    private static boolean hasWhiteKingCastled = false;
+    private static boolean addedScoreForWK = false;
+    private static boolean hasWhiteQueenCastled = false;
+    private static boolean addedScoreForWQ = false;
+    private static boolean hasBlackKingCastled = false;
+    private static boolean addedScoreForBK = false;
+    private static boolean hasBlackQueenCastled = false;
+    private static boolean addedScoreForBQ = false;
 
-    private final int[][] bPawnsLocations = new int[8][8];
-    private final int[][] bKnightsLocations = new int[2][2];
-    private final int[][] bBishopsLocations = new int[2][2];;
-    private final int[][] bRooksLocations = new int[2][2];;
+    private static boolean canWhiteKingCastle = false;
+    private static boolean canWhiteQueenCastle = false;
+    private static boolean canBlackKingCastle = false;
+    private static boolean canBlackQueenCastle = false;
+
+    private final int[][] wPawnsLocations = new int[16][8];
+    private final int[][] wKnightsLocations = new int[16][2];
+    private final int[][] wBishopsLocations = new int[16][2];;
+    private final int[][] wRooksLocations = new int[16][2];;
+    private final int[][] wQueenLocations = new int[9][2];;
+    private final int[] wKingLocation = new int[2];;
+
+    private final int[][] bPawnsLocations = new int[16][8];
+    private final int[][] bKnightsLocations = new int[16][2];
+    private final int[][] bBishopsLocations = new int[16][2];;
+    private final int[][] bRooksLocations = new int[16][2];;
     private final int[][] bQueenLocations = new int[9][2];;
-    private final int[][] bKingLocation = new int[1][2];;
+    private final int[] bKingLocation = new int[2];;
 
     private static final int WHITE_PLAYER = 1;
     private static final int BLACK_PLAYER = -1;
 
-    public static final int PAWN = 1;
-    public static final int KNIGHT = 2;
-    public static final int BISHOP = 3;
-    public static final int ROOK = 4;
-    public static final int QUEEN = 5;
-    public static final int KING = 6;
+    private static final double[][] wPawnStrongTiles = new double[][] {
+            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+            {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+            {1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0},
+            {0.5, 0.5, 1.0, 2.5, 2.5, 1.0, 0.5, 0.5},
+            {0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 0.0},
+            {0.5, -0.5, -1.0, 0.0, 0.0, -1.0, -0.5, 0.5},
+            {0.5, 1.0, 1.0, -2.0, -2.0, 1.0, 1.0, 0.5},
+            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}
+    };
+    private static final double[][] wKnightStrongTiles = new double[][] {
+            {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0},
+            {-4.0, -2.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0},
+            {-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0},
+            {-3.0, 0.5, 1.5, 2.0, 2.0, 1.5, 0.5, -3.0},
+            {-3.0, 0.0, 1.5, 2.0, 2.0, 1.5, 0.0, -3.0},
+            {-3.0, 0.5, 1.0, 1.5, 1.5, 1.0, 0.5, -3.0},
+            {-4.0, -2.0, 0.0, 0.5, 0.5, 0.0, -2.0, -4.0},
+            {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}
+    };
+    private static final double[][] wBishopStrongTiles = new double[][] {
+            {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0},
+            {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
+            {-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0, -1.0},
+            {-1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0},
+            {-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.0},
+            {-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0},
+            {-1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, -1.0},
+            {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}
+    };
+    private static final double[][] wRookStrongTiles = new double[][] {
+            {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+            {0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5},
+            {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+            {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+            {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+            {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+            {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+            {0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0}
+    };
+    private static final double[][] wQueenStrongTiles = new double[][] {
+            {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0},
+            {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
+            {-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0},
+            {-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5},
+            {0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5},
+            {-1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0},
+            {-1.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, -1.0},
+            {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}
+    };
+    private static final double[][] wKingStrongTiles = new double[][] {
+            {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+            {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+            {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+            {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+            {-2.0, -3.0, -3.0, -4.0 ,-4.0, -3.0, -3.0, -2.0},
+            {-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0},
+            {2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0},
+            {2.0, 3.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0}
+    };
+
+    private static final double[][] bPawnStrongTiles = revertStrongTiles(wPawnStrongTiles);
+    private static final double[][] bKnightStrongTiles = revertStrongTiles(wKnightStrongTiles);
+    private static final double[][] bBishopStrongTiles = revertStrongTiles(wBishopStrongTiles);
+    private static final double[][] bRookStrongTiles = revertStrongTiles(wRookStrongTiles);
+    private static final double[][] bQueenStrongTiles = revertStrongTiles(wQueenStrongTiles);
+    private static final double[][] bKingStrongTiles = revertStrongTiles(wKingStrongTiles);
 
     public static final Map<Character, String> piecesImagesMap = new HashMap<>();
+    private static final Path path = Paths.get("");
+    private static final String currentPath = path.toAbsolutePath().toString();
 
     public ZobristBoard() {
         board = new long[12][8][8]; // 12 types of pieces (2 players * 6 types) and 8 rows of * 8 tiles
@@ -192,8 +268,8 @@ public class ZobristBoard {
                             wQueenLocations[0][1] = col;
                         }
                         case 'K' -> {
-                            wKingLocation[0][0] = row;
-                            wKingLocation[0][1] = col;
+                            wKingLocation[0] = row;
+                            wKingLocation[1] = col;
                         }
                         case 'p' -> {
                             bPawnsLocations[bPawnsIndex][0] = row;
@@ -220,8 +296,8 @@ public class ZobristBoard {
                             bQueenLocations[0][1] = col;
                         }
                         case 'k' -> {
-                            bKingLocation[0][0] = row;
-                            bKingLocation[0][1] = col;
+                            bKingLocation[0] = row;
+                            bKingLocation[1] = col;
                         }
                     }
                 }
@@ -240,6 +316,7 @@ public class ZobristBoard {
         if (!moves.contains(move)) return zobristHash;
 
         char piece = displayBoard[move.getSourceRow()][move.getSourceCol()];
+        if (piece == '-') return 0L;
         int pieceBoardIndex = piecesTypeValuesMap.get(piece);
 
         // first, emptying piece's source tile
@@ -253,9 +330,8 @@ public class ZobristBoard {
                 zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
             }
             case CAPTURE -> {
-                char capturedPiece = displayBoard[move.getTargetRow()][move.getTargetCol()];
+                char capturedPiece = move.getCapturedPiece();
                 int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
-                move.setCapturedPiece(capturedPiece);
                 // emptying target tile and hashing
                 displayBoard[move.getTargetRow()][move.getTargetRow()] = '-';
                 zobristHash ^= board[capturedPieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
@@ -265,9 +341,9 @@ public class ZobristBoard {
             }
             case EN_PASSANT -> {
                 if (currentPlayer == WHITE_PLAYER) {
-                    char capturedPiece = displayBoard[move.getTargetRow() - 1][move.getTargetCol()];
+//                    char capturedPiece = displayBoard[move.getTargetRow() - 1][move.getTargetCol()];
+                    char capturedPiece = move.getCapturedPiece();
                     int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
-                    move.setCapturedPiece(capturedPiece);
                     // emptying the captured piece's tile and hashing
                     // -1 is the tile "behind" piece
                     displayBoard[move.getTargetRow() - 1][move.getTargetCol()] = '-';
@@ -276,9 +352,9 @@ public class ZobristBoard {
                     displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
                     zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
                 } else if (currentPlayer == BLACK_PLAYER) {
-                    char capturedPiece = displayBoard[move.getTargetRow() + 1][move.getTargetCol()];
+//                    char capturedPiece = displayBoard[move.getTargetRow() + 1][move.getTargetCol()];
+                    char capturedPiece = move.getCapturedPiece();
                     int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
-                    move.setCapturedPiece(capturedPiece);
 
                     // emptying the captured piece's tile and hashing
                     // +1 is the tile "behind" piece
@@ -301,6 +377,7 @@ public class ZobristBoard {
                     // setting rook in castle tile and hashing
                     displayBoard[0][5] = 'R';
                     zobristHash ^= board[rookBoardIndex][0][5];
+                    if (!hasWhiteKingCastled) hasWhiteKingCastled = true;
                 } else if (currentPlayer == BLACK_PLAYER) {
                     int rookBoardIndex = piecesTypeValuesMap.get('r');
                     // emptying rook tile and hashing
@@ -309,6 +386,7 @@ public class ZobristBoard {
                     // setting rook in castle tile and hashing
                     displayBoard[7][5] = 'r';
                     zobristHash ^= board[rookBoardIndex][7][5];
+                    if (!hasBlackKingCastled) hasBlackKingCastled = true;
                 }
             }
             case QUEEN_SIDE_CASTLE -> {
@@ -323,6 +401,7 @@ public class ZobristBoard {
                     // setting rook in castle tile and hashing
                     displayBoard[0][3] = 'R';
                     zobristHash ^= board[rookBoardIndex][0][4];
+                    if (!hasWhiteQueenCastled) hasWhiteQueenCastled = true;
                 } else if (currentPlayer == BLACK_PLAYER) {
                     int rookBoardIndex = piecesTypeValuesMap.get('r');
                     // emptying rook tile and hashing
@@ -331,6 +410,7 @@ public class ZobristBoard {
                     // setting rook in castle tile and hashing
                     displayBoard[7][3] = 'r';
                     zobristHash ^= board[rookBoardIndex][7][3];
+                    if (!hasBlackQueenCastled) hasBlackQueenCastled = true;
                 }
             }
             case PAWN_PROMOTION_REGULAR -> {
@@ -347,7 +427,7 @@ public class ZobristBoard {
                 }
             }
             case PAWN_PROMOTION_CAPTURE -> {
-                char capturedPiece = displayBoard[move.getTargetRow()][move.getTargetCol()];
+                char capturedPiece = move.getCapturedPiece();
                 int capturedPieceBoardIndex = piecesTypeValuesMap.get(capturedPiece);
                 // emptying captured piece's tile and hashing
                 displayBoard[move.getTargetRow()][move.getTargetCol()] = '-';
@@ -367,9 +447,6 @@ public class ZobristBoard {
             }
 
         }
-//        // setting piece in target tile and hashing
-//        displayBoard[move.getTargetRow()][move.getTargetCol()] = piece;
-//        zobristHash ^= board[pieceBoardIndex][move.getTargetRow()][move.getTargetCol()];
 
         // adding current board to the transposition table
         transpositionTable.put(zobristHash, board);
@@ -398,6 +475,7 @@ public class ZobristBoard {
         currentPlayer *= -1;
 
         char piece = displayBoard[move.getTargetRow()][move.getTargetCol()];
+        if (piece == '-') return 0L;
         int pieceBoardIndex = piecesTypeValuesMap.get(piece);
 
         switch (move.getMoveLabel()) {
@@ -458,6 +536,7 @@ public class ZobristBoard {
                     // setting king in source tile
                     displayBoard[move.getSourceRow()][move.getSourceCol()] = 'K';
                     zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                    if (hasWhiteKingCastled) hasWhiteKingCastled = false;
                 } else if (currentPlayer == BLACK_PLAYER) {
                     int rookBoardIndex = piecesTypeValuesMap.get('r');
                     // emptying king side castle move
@@ -469,6 +548,7 @@ public class ZobristBoard {
                     // setting king in source tile
                     displayBoard[move.getSourceRow()][move.getSourceCol()] = 'k';
                     zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                    if (hasBlackKingCastled) hasBlackKingCastled = false;
                 }
             }
             case QUEEN_SIDE_CASTLE -> {
@@ -486,6 +566,7 @@ public class ZobristBoard {
                     // setting king in source tile
                     displayBoard[move.getSourceRow()][move.getSourceCol()] = 'K';
                     zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                    if (hasWhiteQueenCastled) hasWhiteQueenCastled = false;
                 } else if (currentPlayer == BLACK_PLAYER) {
                     int rookBoardIndex = piecesTypeValuesMap.get('r');
                     // emptying queen side castle move
@@ -497,6 +578,7 @@ public class ZobristBoard {
                     // setting king in source tile
                     displayBoard[move.getSourceRow()][move.getSourceCol()] = 'k';
                     zobristHash ^= board[pieceBoardIndex][move.getSourceRow()][move.getSourceCol()];
+                    if (hasBlackQueenCastled) hasBlackQueenCastled = false;
                 }
             }
             case PAWN_PROMOTION_REGULAR -> {
@@ -553,7 +635,7 @@ public class ZobristBoard {
             }
         }
 
-        historyPlays.remove(historyPlays.lastElement());
+        if (historyPlays.size() > 0) historyPlays.remove(historyPlays.lastElement());
 
         return zobristHash;
     }
@@ -562,6 +644,17 @@ public class ZobristBoard {
     public List<ZMove> generateMoves() {
         // clear previous moves from last turn
         moves.clear();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                whiteThreateningTiles[i][j] = false;
+                blackThreateningTiles[i][j] = false;
+            }
+        }
+
+        canWhiteKingCastle = false;
+        canWhiteQueenCastle = false;
+        canBlackKingCastle = false;
+        canBlackQueenCastle = false;
 
         int pawnsIndex = 0;
         int knightsIndex = 0;
@@ -605,8 +698,8 @@ public class ZobristBoard {
                             }
                             case 'k' -> {
                                 generateKingMoves(row, col);
-                                bKingLocation[0][0] = row;
-                                bKingLocation[0][1] = col;
+                                bKingLocation[0] = row;
+                                bKingLocation[1] = col;
                             }
                         }
                         // let whites generate moves
@@ -643,8 +736,8 @@ public class ZobristBoard {
                             }
                             case 'K' -> {
                                 generateKingMoves(row, col);
-                                wKingLocation[0][0] = row;
-                                wKingLocation[0][1] = col;
+                                wKingLocation[0] = row;
+                                wKingLocation[1] = col;
                             }
                         }
                     }
@@ -680,8 +773,8 @@ public class ZobristBoard {
                 moves.addAll(generateSlidingPiecesMoves(queenRow, queenCol, queenDirections));
             }
 
-            int kingRow = wKingLocation[0][0];
-            int kingCol = wKingLocation[0][1];
+            int kingRow = wKingLocation[0];
+            int kingCol = wKingLocation[1];
             moves.addAll(generateKingMoves(kingRow, kingCol));
         } else if (currentPlayer == BLACK_PLAYER) {
             for (int i = 0; i < bPawnsLocations.length; i++) {
@@ -710,8 +803,8 @@ public class ZobristBoard {
                 moves.addAll(generateSlidingPiecesMoves(queenRow, queenCol, queenDirections));
             }
 
-            int kingRow = bKingLocation[0][0];
-            int kingCol = bKingLocation[0][1];
+            int kingRow = bKingLocation[0];
+            int kingCol = bKingLocation[1];
             moves.addAll(generateKingMoves(kingRow, kingCol));
         }
 
@@ -731,6 +824,8 @@ public class ZobristBoard {
 
     private List<ZMove> generatePawnMoves(int row, int col) {
         List<ZMove> moves = new ArrayList<>();
+
+        if (isEmpty(row, col)) return moves;
 
         int[] captureDirections = new int[] {-1, 1};
 
@@ -777,6 +872,7 @@ public class ZobristBoard {
                     // checking if reached last row for promotion
                     if (row + direction == pawnsLastRow.get(player)) {
                         move.setMoveLabel(ZMoveLabel.PAWN_PROMOTION_CAPTURE);
+                        move.setCapturedPiece(displayBoard[row + direction][col + d]);
                     } else move.setMoveLabel(ZMoveLabel.CAPTURE);
                     moves.add(move);
                     whiteThreateningTiles[row + direction][col + d] = true;
@@ -789,6 +885,7 @@ public class ZobristBoard {
                             historyPlays.lastElement().get('p').getSourceCol() == col + d) {
                         ZMove move = new ZMove(row, col, row + direction, col + d);
                         move.setMoveLabel(ZMoveLabel.EN_PASSANT);
+                        move.setCapturedPiece(displayBoard[row][col + d]);
                         moves.add(move);
                         whiteThreateningTiles[row + direction][col + d] = true;
                     }
@@ -800,6 +897,7 @@ public class ZobristBoard {
                     // checking if reached last row for promotion
                     if (row + direction == pawnsLastRow.get(player)) {
                         move.setMoveLabel(ZMoveLabel.PAWN_PROMOTION_CAPTURE);
+                        move.setCapturedPiece(displayBoard[row + direction][col + d]);
                     } else move.setMoveLabel(ZMoveLabel.CAPTURE);
                     moves.add(move);
                     blackThreateningTiles[row + direction][col + d] = true;
@@ -812,6 +910,7 @@ public class ZobristBoard {
                             historyPlays.lastElement().get('P').getSourceCol() == col + d) {
                         ZMove move = new ZMove(row, col, row + direction, col + d);
                         move.setMoveLabel(ZMoveLabel.EN_PASSANT);
+                        move.setCapturedPiece(displayBoard[row][col + d]);
                         moves.add(move);
                         blackThreateningTiles[row + direction][col + d] = true;
                     }
@@ -824,6 +923,8 @@ public class ZobristBoard {
 
     private List<ZMove> generateKnightMoves(int row, int col) {
         List<ZMove> moves = new ArrayList<>();
+
+        if (isEmpty(row, col)) return moves;
 
         boolean isKnightWhite = isWhitePiece(displayBoard[row][col]);
         boolean isKnightBlack = isBlackPiece(displayBoard[row][col]);
@@ -854,6 +955,7 @@ public class ZobristBoard {
                 if (isBlackPiece(displayBoard[row + r][col + c])) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
                     move.setMoveLabel(ZMoveLabel.CAPTURE);
+                    move.setCapturedPiece(displayBoard[row + r][col + c]);
                     moves.add(move);
                     whiteThreateningTiles[row + r][col + c] = true;
                 }
@@ -861,6 +963,7 @@ public class ZobristBoard {
                 if (isWhitePiece(displayBoard[row + r][col + c])) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
                     move.setMoveLabel(ZMoveLabel.CAPTURE);
+                    move.setCapturedPiece(displayBoard[row + r][col + c]);
                     moves.add(move);
                     blackThreateningTiles[row + r][col + c] = true;
                 }
@@ -871,6 +974,8 @@ public class ZobristBoard {
 
     private List<ZMove> generateSlidingPiecesMoves(int row, int col, int[][] directions) {
         List<ZMove> moves = new ArrayList<>();
+
+        if (isEmpty(row, col)) return moves;
 
         boolean isSlidingPieceWhite = isWhitePiece(displayBoard[row][col]);
         boolean isSlidingPieceBlack = isBlackPiece(displayBoard[row][col]);
@@ -897,6 +1002,7 @@ public class ZobristBoard {
                         if (isSlidingPieceBlack) {
                             ZMove move = new ZMove(row, col, row + r*i, col + c*i);
                             move.setMoveLabel(ZMoveLabel.CAPTURE);
+                            move.setCapturedPiece(displayBoard[row + r*i][col + c*i]);
                             moves.add(move);
                         }
                         // black piece
@@ -904,6 +1010,7 @@ public class ZobristBoard {
                         if (isSlidingPieceWhite) {
                             ZMove move = new ZMove(row, col, row + r*i, col + c*i);
                             move.setMoveLabel(ZMoveLabel.CAPTURE);
+                            move.setCapturedPiece(displayBoard[row + r*i][col + c*i]);
                             moves.add(move);
                         }
                     }
@@ -923,8 +1030,9 @@ public class ZobristBoard {
 
     private List<ZMove> generateKingMoves(int row, int col) {
         // suggestion: before generating, generate all other pieces' moves (?)
-
         List<ZMove> moves = new ArrayList<>();
+
+        if (isEmpty(row, col)) return moves;
 
         boolean isKingWhite = isWhitePiece(displayBoard[row][col]);
         boolean isKingBlack = isBlackPiece(displayBoard[row][col]);
@@ -947,9 +1055,12 @@ public class ZobristBoard {
                     // if no white king or white king side rook moves were made
                     if (historyPlays.stream().noneMatch(map -> map.containsKey('K')) ||
                     historyPlays.stream().noneMatch(map -> map.get('R').getSourceCol() == 7)) {
-                        ZMove move = new ZMove(row, col, row, col + 2);
-                        move.setMoveLabel(ZMoveLabel.KING_SIDE_CASTLE);
-                        moves.add(move);
+                        if (displayBoard[0][7] == 'R' && !hasWhiteKingCastled) {
+                            ZMove move = new ZMove(row, col, row, col + 2);
+                            move.setMoveLabel(ZMoveLabel.KING_SIDE_CASTLE);
+                            moves.add(move);
+                            canWhiteKingCastle = true;
+                        }
                     }
                 }
 
@@ -964,9 +1075,12 @@ public class ZobristBoard {
                     // if no white king or white queen side rook moves were made
                     if (historyPlays.stream().noneMatch(map -> map.containsKey('K')) ||
                             historyPlays.stream().noneMatch(map -> map.get('R').getSourceCol() == 0)) {
-                        ZMove move = new ZMove(row, col, row, col - 2);
-                        move.setMoveLabel(ZMoveLabel.QUEEN_SIDE_CASTLE);
-                        moves.add(move);
+                        if (displayBoard[0][0] == 'R' && !hasWhiteQueenCastled) {
+                            ZMove move = new ZMove(row, col, row, col - 2);
+                            move.setMoveLabel(ZMoveLabel.QUEEN_SIDE_CASTLE);
+                            moves.add(move);
+                            canWhiteQueenCastle = true;
+                        }
                     }
                 }
             }
@@ -985,10 +1099,13 @@ public class ZobristBoard {
                     // if no black king or black king side black rook moves were made
                     if (historyPlays.stream().noneMatch(map -> map.containsKey('k')) ||
                             historyPlays.stream().noneMatch(map -> map.get('r').getSourceCol() == 7)) {
-                        // king side castling
-                        ZMove move = new ZMove(row, col, row, col - 2);
-                        move.setMoveLabel(ZMoveLabel.KING_SIDE_CASTLE);
-                        moves.add(move);
+                        if (displayBoard[7][7] == 'r' && !hasBlackKingCastled) {
+                            // king side castling
+                            ZMove move = new ZMove(row, col, row, col - 2);
+                            move.setMoveLabel(ZMoveLabel.KING_SIDE_CASTLE);
+                            moves.add(move);
+                            canBlackKingCastle = true;
+                        }
                     }
                 }
 
@@ -1003,9 +1120,12 @@ public class ZobristBoard {
                     // if no black king or black queen side black rook moves were made
                     if (historyPlays.stream().noneMatch(map -> map.containsKey('k')) ||
                             historyPlays.stream().noneMatch(map -> map.get('r').getSourceCol() == 0)) {
-                        ZMove move = new ZMove(row, col, row, col - 2);
-                        move.setMoveLabel(ZMoveLabel.QUEEN_SIDE_CASTLE);
-                        moves.add(move);
+                        if (displayBoard[7][0] == 'r' && !hasBlackQueenCastled) {
+                            ZMove move = new ZMove(row, col, row, col - 2);
+                            move.setMoveLabel(ZMoveLabel.QUEEN_SIDE_CASTLE);
+                            moves.add(move);
+                            canBlackQueenCastle = true;
+                        }
                     }
                 }
             }
@@ -1034,6 +1154,7 @@ public class ZobristBoard {
                 } else if (isBlackPiece(displayBoard[row + r][col + c])) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
                     move.setMoveLabel(ZMoveLabel.CAPTURE);
+                    move.setCapturedPiece(displayBoard[row + r][col + c]);
                     moves.add(move);
                     whiteThreateningTiles[row + r][col + c] = true;
                 }
@@ -1050,6 +1171,7 @@ public class ZobristBoard {
                 } else if (isWhitePiece(displayBoard[row + r][col + c])) {
                     ZMove move = new ZMove(row, col, row + r, col + c);
                     move.setMoveLabel(ZMoveLabel.CAPTURE);
+                    move.setCapturedPiece(displayBoard[row + r][col + c]);
                     moves.add(move);
                     blackThreateningTiles[row + r][col + c] = true;
                     continue;
@@ -1060,6 +1182,13 @@ public class ZobristBoard {
         }
 
         return moves;
+    }
+
+    public boolean isPlayerInCheck(int player) {
+
+        if (player == WHITE_PLAYER) {
+            return blackThreateningTiles[wKingLocation[0]][wKingLocation[1]];
+        } else return whiteThreateningTiles[bKingLocation[0]][bKingLocation[1]];
     }
 
     private boolean isWhitePiece(char piece) {
@@ -1083,9 +1212,6 @@ public class ZobristBoard {
         }
         System.out.println();
     }
-
-    private static final Path path = Paths.get("");
-    private static final String currentPath = path.toAbsolutePath().toString();
 
     public char[][] getDisplayBoard() {
         return displayBoard;
@@ -1144,8 +1270,8 @@ public class ZobristBoard {
                             wQueenLocations[0][1] = col;
                         }
                         case 'K' -> {
-                            wKingLocation[0][0] = row;
-                            wKingLocation[0][1] = col;
+                            wKingLocation[0] = row;
+                            wKingLocation[1] = col;
                         }
                         case 'p' -> {
                             bPawnsLocations[bPawnsIndex][0] = row;
@@ -1172,8 +1298,8 @@ public class ZobristBoard {
                             bQueenLocations[0][1] = col;
                         }
                         case 'k' -> {
-                            bKingLocation[0][0] = row;
-                            bKingLocation[0][1] = col;
+                            bKingLocation[0] = row;
+                            bKingLocation[1] = col;
                         }
                     }
                 }
@@ -1188,7 +1314,136 @@ public class ZobristBoard {
         System.out.println(zobristHash + "\n");
     }
 
-    public long getHash() {
+    public long getZobristHash() {
         return zobristHash;
+    }
+
+    public double evaluateBoard() {
+        double score = 0.0;
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (!isEmpty(row, col)) {
+                    char piece = displayBoard[row][col];
+                    switch (piece) {
+                        case 'P' -> {
+                            score += 10;
+                            if (blackThreateningTiles[row][col]) score -= 0.12 * 10;
+                            score += wPawnStrongTiles[row][col];
+                        }
+                        case 'N' -> {
+                            score += 30;
+                            if (blackThreateningTiles[row][col]) score -= 0.12 * 30;
+                            score += wKnightStrongTiles[row][col];
+                        }
+                        case 'B' -> {
+                            score += 30;
+                            if (blackThreateningTiles[row][col]) score -= 0.12 * 30;
+                            score += wBishopStrongTiles[row][col];
+                        }
+                        case 'R' -> {
+                            score += 50;
+                            if (blackThreateningTiles[row][col]) score -= 0.12 * 50;
+                            score += wRookStrongTiles[row][col];
+                        }
+                        case 'Q' -> {
+                            score += 90;
+                            if (blackThreateningTiles[row][col]) score -= 0.12 * 90;
+                            score += wQueenStrongTiles[row][col];
+                        }
+                        case 'K' -> {
+                            // irrelevant but adding it for debugging purposes
+                            score += 900;
+                            if (blackThreateningTiles[row][col]) score += 0.12 * 900;
+                            // relevant for board evaluation
+                            score += wKingStrongTiles[row][col];
+                        }
+                        case 'p' -> {
+                            score -= 10;
+                            if (whiteThreateningTiles[row][col]) score -= 0.12 * 10;
+                            score += bPawnStrongTiles[row][col];
+                        }
+                        case 'n' -> {
+                            score -= 30;
+                            if (whiteThreateningTiles[row][col]) score -= 0.12 * 30;
+                            score += bKnightStrongTiles[row][col];
+                        }
+                        case 'b' -> {
+                            score -= 30;
+                            if (whiteThreateningTiles[row][col]) score -= 0.12 * 30;
+                            score += bBishopStrongTiles[row][col];
+                        }
+                        case 'r' -> {
+                            score -= 50;
+                            if (whiteThreateningTiles[row][col]) score -= 0.12 * 50;
+                            score += bRookStrongTiles[row][col];
+                        }
+                        case 'q' -> {
+                            score -= 90;
+                            if (whiteThreateningTiles[row][col]) score -= 0.12 * 90;
+                            score += bQueenStrongTiles[row][col];
+                        }
+                        case 'k' -> {
+                            // irrelevant but adding it for debugging purposes
+                            score -= 900;
+                            if (whiteThreateningTiles[row][col]) score -= 0.12 * 900;
+                            // relevant for board evaluation
+                            score += bKingStrongTiles[row][col];
+                        }
+                    }
+                }
+            }
+        }
+
+        if (canWhiteKingCastle || canWhiteQueenCastle) score += 30;
+        if (canBlackKingCastle || canBlackQueenCastle) score -= 30;
+
+        if (hasWhiteKingCastled) {
+            if (!addedScoreForWK) {
+                score += 70;
+                addedScoreForWK = true;
+            }
+        }
+        if (hasWhiteQueenCastled) {
+            if (!addedScoreForWQ) {
+                score += 65;
+                addedScoreForWQ = true;
+            }
+        }
+        if (hasBlackKingCastled) {
+            if (!addedScoreForBK) {
+                score -= 70;
+                addedScoreForBK = true;
+            }
+        }
+        if (hasBlackQueenCastled) {
+            if (!addedScoreForBQ) {
+                score -= 65;
+                addedScoreForBQ = true;
+            }
+        }
+
+        if (isPlayerInCheck(WHITE_PLAYER)) score -= 35;
+        else if (isPlayerInCheck(BLACK_PLAYER)) score += 35;
+
+        return score;
+    }
+
+    public void setCurrentPlayer(int player) {
+        currentPlayer = player;
+    }
+
+    private static double[][] revertStrongTiles(double[][] tiles) {
+        double[][] newTiles = new double[8][8];
+
+        int rowIndex = 0;
+
+        for (int r = tiles.length - 1; r >= 0; r--) {
+            for (int c = 0; c < tiles.length; c++) {
+                newTiles[rowIndex][c] = -1 * tiles[r][c];
+            }
+            rowIndex++;
+        }
+        return newTiles;
     }
 }
