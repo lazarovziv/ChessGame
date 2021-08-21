@@ -1,6 +1,5 @@
 package com.zivlazarov.newengine.ui;
 
-import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.newengine.model.ZobristBoard;
 
 import javax.imageio.ImageIO;
@@ -91,7 +90,7 @@ public class Frame {
                 1, blackTileColor
         );
 
-        private static ArrayList<Tile> markedTiles;
+        private static ArrayList<Integer> markedTiles;
 
         TilePanel(BoardPanel boardPanel, char[][] board, int row, int col) {
             super(new GridBagLayout());

@@ -6,12 +6,11 @@ import com.zivlazarov.newengine.model.ZobristBoard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ZMinimax {
 
     public double search(ZobristBoard board, int depth, double alpha, double beta, boolean isMaximizing) {
-        if (depth == 0) {
+        if (depth == 0 || board.isGameOver()) {
             return board.evaluateBoard();
         }
 
