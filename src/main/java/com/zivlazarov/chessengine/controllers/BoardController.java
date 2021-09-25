@@ -7,6 +7,8 @@ import com.zivlazarov.chessengine.model.player.Player;
 
 public class BoardController {
 
+    //
+
     private Board board;
     private Player whitePlayer;
     private Player blackPlayer;
