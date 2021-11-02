@@ -1,9 +1,5 @@
 package com.zivlazarov.chessengine.ui.components;
 
-import com.zivlazarov.chessengine.db.dao.MoveDao;
-import com.zivlazarov.chessengine.db.dao.PieceDao;
-import com.zivlazarov.chessengine.db.dao.PlayerDao;
-import com.zivlazarov.chessengine.db.dao.TileDao;
 import com.zivlazarov.chessengine.model.ai.Minimax;
 import com.zivlazarov.chessengine.model.board.*;
 import com.zivlazarov.chessengine.model.move.Move;
@@ -22,7 +18,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,14 +64,6 @@ public class BoardFrame {
     public BoardFrame() {
         initGame();
 
-//        whitePlayer = board.getWhitePlayer();
-//        blackPlayer = board.getBlackPlayer();
-
-        PlayerDao playerDao = new PlayerDao();
-        MoveDao moveDao = new MoveDao();
-        PieceDao pieceDao = new PieceDao();
-        TileDao tileDao = new TileDao();
-
         gameFrame = new JFrame("Chess");
         gameFrame.setUndecorated(true);
         gameFrame.setLayout(new BorderLayout());
@@ -114,44 +101,6 @@ public class BoardFrame {
 
         JMenuItem saveGameItem = new JMenuItem("Save Game");
         saveGameItem.addActionListener((event) -> {
-            try {
-                // saving tiles
-                for (Tile[] tiles : board.getBoard()) {
-                    for (Tile tile : tiles) {
-                        tileDao.insertTile(tile);
-                    }
-                }
-
-                // saving players
-                playerDao.insertPlayer(whitePlayer);
-                playerDao.insertPlayer(blackPlayer);
-
-                // saving pieces
-                for (Piece piece : whitePlayer.getAlivePieces()) {
-                    pieceDao.insertPiece(piece);
-                }
-                for (Piece piece : whitePlayer.getDeadPieces()) {
-                    pieceDao.insertPiece(piece);
-                }
-                for (Piece piece : blackPlayer.getAlivePieces()) {
-                    pieceDao.insertPiece(piece);
-                }
-
-                for (Piece piece : blackPlayer.getDeadPieces()) {
-                    pieceDao.insertPiece(piece);
-                }
-
-                // saving moves
-                for (Move move : whitePlayer.getMoves()) {
-                    moveDao.insertMove(move);
-                }
-                for (Move move : blackPlayer.getMoves()) {
-                    moveDao.insertMove(move);
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         });
 
         JMenuItem loadGameItem = new JMenuItem("Load Game");
@@ -406,6 +355,17 @@ public class BoardFrame {
                                 SwingUtilities.invokeLater(movesSidePanel::drawMoves);
                                 SwingUtilities.invokeLater(capturedPiecesPanel::drawPiece);
                                 return;
+                            } else if (whitePlayer.isCurrentPlayer()) {
+                                Move minimaxMove = minimax.findBestMove(board, 4, whitePlayer);
+                                minimaxMove.makeMove(true, true);
+
+                                printMoveLabel(minimaxMove);
+                                System.out.println(minimaxMove);
+                                System.out.println(board.evaluateBoard());
+
+                                SwingUtilities.invokeLater(() -> boardPanel.drawBoard(true));
+                                SwingUtilities.invokeLater(movesSidePanel::drawMoves);
+                                SwingUtilities.invokeLater(capturedPiecesPanel::drawPiece);
                             }
                         }
 

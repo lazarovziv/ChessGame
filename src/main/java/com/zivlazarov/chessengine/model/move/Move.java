@@ -52,12 +52,6 @@ public class Move implements Serializable {
     }
 
     public boolean makeMove(boolean checkBoard, boolean addToHistory) throws IllegalMoveError {
-//        if (player.getMoves().size() == 0) return false; /*throw new IllegalMoveError("No Moves Available!");*/
-//        if (player.getMoves().stream().noneMatch(move -> move.equals(this))) return false; /*throw new IllegalMoveError("Illegal Move!");*/
-//        if (!movingPiece.getPossibleMoves().contains(targetTile)) return false;
-//        if (!player.getLegalMoves().contains(targetTile)) return false;
-//        if (!player.getMoves().contains(this)) return false;
-
         player.getLastMove().clear();
 
         Tile currentTile = movingPiece.getCurrentTile();
@@ -180,6 +174,12 @@ public class Move implements Serializable {
 
         if (checkBoard) {
             board.checkBoard();
+            if (label == MoveLabel.EN_PASSANT) {
+                if (player.isInCheck()) {
+                    unmakeMove(true);
+                    player.getMoves().remove(this);
+                }
+            }
         }
 
         return true;

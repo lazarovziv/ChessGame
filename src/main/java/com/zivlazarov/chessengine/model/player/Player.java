@@ -5,7 +5,6 @@ import com.zivlazarov.chessengine.model.board.PieceColor;
 import com.zivlazarov.chessengine.model.board.Tile;
 import com.zivlazarov.chessengine.model.move.Move;
 import com.zivlazarov.chessengine.model.pieces.*;
-import com.zivlazarov.chessengine.model.utils.Memento;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
@@ -126,6 +125,19 @@ public class Player implements MyObserver, Serializable {
         moves = new HashSet<>();
     }
 
+    public Player(Board b, Player player) {
+        board = b;
+        playerColor = player.getColor();
+        alivePieces = player.getAlivePieces();
+        deadPieces = player.getDeadPieces();
+        legalMoves = player.getLegalMoves();
+        lastMove = player.getLastMove();
+
+        moves = new HashSet<>();
+        playerDirection = player.getPlayerDirection();
+        board.addObserver(this);
+    }
+
     public void refreshPieces() {
         if (legalMoves.size() != 0) legalMoves.clear();
         if (moves.size() != 0) moves.clear();
@@ -199,9 +211,10 @@ public class Player implements MyObserver, Serializable {
     }
 
     public void clearPieceFromTile(Tile tile) {
-        if (tile != null) {
-            tile.setPiece(null);
-        }
+//        if (tile != null) {
+//            tile.setPiece(null);
+//        }
+        tile.getPiece().getCurrentTile().setPiece(null);
     }
 
     public KingPiece getKing() {
@@ -396,14 +409,6 @@ public class Player implements MyObserver, Serializable {
 //        Player newPlayer = new Player(playerColor);
 //        newPlayer.setBoard(newBoard);
         return new Player(playerColor);
-    }
-
-    public Memento<Player> saveToMemento() {
-        return new Memento<Player>(this);
-    }
-
-    public void restoreFromMemento(Memento<Board> memento) {
-        board = memento.getSavedState();
     }
 
     @Override

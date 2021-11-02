@@ -98,6 +98,45 @@ public class Board implements MyObservable, Serializable {
         gameSituation = GameSituation.NORMAL;
     }
 
+    public Board(Board copyBoard) {
+        board = copyBoard.getBoard();
+        observers = new ArrayList<>();
+        gameHistoryMoves = new Stack<>();
+
+        matchPlays = new Stack<>();
+
+        states = new Stack<>();
+        boardStates = new Stack<>();
+
+        kingsMap = new HashMap<>();
+        kingSideRooksMap = new HashMap<>();
+        queenSideRooksMap = new HashMap<>();
+
+        checkSituations.put(PieceColor.WHITE, GameSituation.WHITE_IN_CHECK);
+        checkSituations.put(PieceColor.BLACK, GameSituation.BLACK_IN_CHECK);
+
+        checkmateSituations.put(PieceColor.WHITE, GameSituation.WHITE_CHECKMATED);
+        checkmateSituations.put(PieceColor.BLACK, GameSituation.BLACK_CHECKMATED);
+
+        TileColor[] colors = {TileColor.WHITE, TileColor.BLACK};
+
+        for (int r = 0; r < board.length; r++) {
+            for (int c = 0; c < board.length; c++) {
+                TileColor currentTileColor = colors[(r + c) % colors.length];
+                board[r][c] = new Tile(r, c, currentTileColor);
+//                simulatedInstance.getBoard()[r][c] = new Tile(r, c, currentTileColor);
+            }
+        }
+
+        isGameOver = false;
+
+        gameSituation = copyBoard.getGameSituation();
+
+        whitePlayer = new Player(this, copyBoard.getWhitePlayer());
+        blackPlayer = new Player(this, copyBoard.getBlackPlayer());
+        currentPlayer = copyBoard.getCurrentPlayer().getColor() == PieceColor.WHITE ? whitePlayer : blackPlayer;
+    }
+
     public void initBoard() {
         Piece whiteRookKingSide = new RookPiece(whitePlayer, this, board[0][7], 0);
         Piece whiteRookQueenSide = new RookPiece(whitePlayer, this, board[0][0], 1);
@@ -701,7 +740,12 @@ public class Board implements MyObservable, Serializable {
         for (Piece piece : whitePlayer.getAlivePieces()) piece.setIsInDanger(false);
         for (Piece piece : blackPlayer.getAlivePieces()) piece.setIsInDanger(false);
 
+        Tile kingTile = currentPlayer.getKing().getCurrentTile();
+
+//        currentPlayer.getKing().setCurrentTile(null);
+
         currentPlayer.getOpponent().update();
+//        currentPlayer.getKing().setCurrentTile(kingTile);
         currentPlayer.update();
 
         states.add(this);
