@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 @Entity
 public class QueenPiece extends Piece implements Cloneable {
 
-    int[][] directions = {
+    private static final int[][] directions = {
             {1, 0},
             {-1, 0},
             {0, 1},

@@ -16,7 +16,7 @@ public class RookPiece extends Piece implements Cloneable {
     private final boolean isKingSide;
     private final boolean isQueenSide;
 
-    private int[][] directions = {
+    private static final int[][] directions = {
             {1, 0},
             {-1, 0},
             {0, 1},

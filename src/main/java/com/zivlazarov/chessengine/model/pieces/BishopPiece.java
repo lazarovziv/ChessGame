@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 @Entity
 public class BishopPiece extends Piece implements Cloneable {
 
-    private int[][] directions = {
+    private static final int[][] directions = {
             {1, 1},
             {1, -1},
             {-1, -1},

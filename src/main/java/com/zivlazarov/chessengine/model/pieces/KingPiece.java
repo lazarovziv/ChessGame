@@ -16,7 +16,7 @@ public class KingPiece extends Piece implements Cloneable {
     private boolean executedKingSideCastle = false;
     private boolean executedQueenSideCastle = false;
 
-    private int[][] directions = {
+    private static final int[][] directions = {
             {1,0},
             {1,1},
             {1,-1},
