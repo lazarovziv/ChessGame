@@ -107,8 +107,18 @@ public class Tile implements Serializable {
 	}
 
 	public void setPiece(Piece p) {
-		piece = p;
-		isEmpty = piece == null; /*|| piece.isAlive();*/
+		if (p == null) {
+			isEmpty = true;
+			piece = null;
+		} else {
+			if (p.isAlive()) {
+				piece = p;
+				isEmpty = false; /*|| piece.isAlive();*/
+			} else {
+				isEmpty = true;
+				piece = null;
+			}
+		}
 	}
 
 	public void setThreatenedByWhite(boolean threatenedByWhite) {

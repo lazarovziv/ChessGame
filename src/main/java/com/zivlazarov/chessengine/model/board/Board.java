@@ -7,7 +7,6 @@ import com.zivlazarov.chessengine.model.player.Player;
 import com.zivlazarov.chessengine.model.utils.MyObservable;
 import com.zivlazarov.chessengine.model.utils.MyObserver;
 import com.zivlazarov.chessengine.model.utils.Pair;
-import org.javatuples.Triplet;
 
 import java.io.*;
 import java.util.*;
@@ -91,7 +90,6 @@ public class Board implements MyObservable, Serializable {
             for (int c = 0; c < board.length; c++) {
                 TileColor currentTileColor = colors[(r + c) % colors.length];
                 board[r][c] = new Tile(r, c, currentTileColor);
-//                simulatedInstance.getBoard()[r][c] = new Tile(r, c, currentTileColor);
             }
         }
         isGameOver = false;
@@ -124,7 +122,6 @@ public class Board implements MyObservable, Serializable {
             for (int c = 0; c < board.length; c++) {
                 TileColor currentTileColor = colors[(r + c) % colors.length];
                 board[r][c] = new Tile(r, c, currentTileColor);
-//                simulatedInstance.getBoard()[r][c] = new Tile(r, c, currentTileColor);
             }
         }
 
@@ -182,7 +179,7 @@ public class Board implements MyObservable, Serializable {
     }
 
     public void checkBoard() {
-        if (eitherKingNotInGame()) {
+        if (neitherKingInGame()) {
             System.out.println(currentPlayer.getOpponent().getLastMove().keySet() + ": "  + currentPlayer.getOpponent().getLastMove().values());
             printBoard();
             throw new IllegalMoveError("Kings can't be captured!");
@@ -396,18 +393,9 @@ public class Board implements MyObservable, Serializable {
 
     public GameSituation generateMovesWhenInCheck(Player player) {
         List<Move> actualLegalMoves = new ArrayList<>();
+        Board copyBoard = new Board(this);
 
         for (Move move : new ArrayList<>(player.getMoves())) {
-//            Triplet<Board, Player, Player> triplet = createNewBoard(whitePlayer, blackPlayer, currentPlayer);
-//            Board b = triplet.getValue0();
-//
-//            Move newMove = new Move.Builder()
-//                    .board(b)
-//                    .player(b.getCurrentPlayer())
-//                    .movingPiece(b.getCurrentPlayer().getPieceByIndex(move.getMovingPiece().getPieceIndex()))
-//                    .targetTile(b.getBoard()[move.getTargetTile().getRow()][move.getTargetTile().getCol()])
-//                    .build();
-
             // setting checkBoard argument as false to prevent a StackOverflow error
             boolean successfulMove = move.makeMove(false, true);
             // if the move wasn't successful, try the next move
@@ -418,7 +406,7 @@ public class Board implements MyObservable, Serializable {
             // if the move prevented the check, it is legal
             if (!player.isInCheck()) actualLegalMoves.add(move);
 
-            // setting checkBoard argument to false to prevent a StackOverflow error
+            // setting checkBoard argument as false to prevent a StackOverflow error
             // unmake the move and make all pieces generate moves
             move.unmakeMove(false);
             updateObservers();
@@ -455,9 +443,6 @@ public class Board implements MyObservable, Serializable {
     }
 
     public int distanceBetweenPieces(Piece first, Piece second) {
-        // |x2 - x1| + |y2 - y1| manhattan distance
-//        int distance = Math.abs(first.getCurrentTile().getCol() - second.getCurrentTile().getCol()) +
-//                Math.abs(first.getCurrentTile().getRow() - second.getCurrentTile().getRow());
         int distance = 0;
 
         int firstCol = first.getCurrentTile().getCol();
@@ -469,18 +454,16 @@ public class Board implements MyObservable, Serializable {
         // same col
         if (Math.abs(firstCol - secondCol) == 0) {
             distance = Math.abs(firstRow - secondRow);
-            return distance;
             // same row
         } else if (Math.abs(firstRow - secondRow) == 0) {
             distance = Math.abs(firstCol - secondCol);
-            return distance;
             // different col and row
         } else {
             // can be both
             // distance = Math.abs(firstCol - secondCol);
             distance = Math.abs(firstRow - secondRow);
-            return distance;
         }
+        return distance;
     }
 
     public void removePieceFromBoard(Piece piece) {
@@ -585,28 +568,6 @@ public class Board implements MyObservable, Serializable {
         }
         System.out.println();
         System.out.println();
-    }
-
-    public static Triplet<Board, Player, Player> createNewBoard(Player whitePlayer, Player blackPlayer, Player currentPlayer) {
-        Board newBoard = new Board();
-
-        Player newWhite = whitePlayer.clone();
-        Player newBlack = blackPlayer.clone();
-
-        newWhite.setOpponent(newBlack);
-        newBoard.setWhitePlayer(newWhite);
-        newBoard.setBlackPlayer(newBlack);
-
-        newWhite.setBoard(newBoard);
-        newBlack.setBoard(newBoard);
-
-        if (currentPlayer.getColor() == PieceColor.WHITE) newBoard.setCurrentPlayer(newWhite);
-        else newBoard.setCurrentPlayer(newBlack);
-
-        new ArrayList<>(whitePlayer.getAlivePieces()).forEach(piece -> piece.clone(newBoard, newWhite));
-        new ArrayList<>(blackPlayer.getAlivePieces()).forEach(piece -> piece.clone(newBoard, newBlack));
-
-        return Triplet.with(newBoard, newWhite, newBlack);
     }
 
     public void pushMoveToMatchPlays(Move move) {
@@ -807,7 +768,7 @@ public class Board implements MyObservable, Serializable {
         return "\n";
     }
 
-    public boolean eitherKingNotInGame() {
+    public boolean neitherKingInGame() {
         return !whitePlayer.getKing().isAlive() || !blackPlayer.getKing().isAlive();
     }
 }
