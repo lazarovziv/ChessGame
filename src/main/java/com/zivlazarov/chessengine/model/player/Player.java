@@ -306,7 +306,7 @@ public class Player implements MyObserver, Serializable {
             }
 
             // adding
-            playerScore += playerDirection * piece.getStrongTiles()[piece.getRow()][piece.getCol()];
+            playerScore += 0.5 * playerDirection * piece.getStrongTiles()[piece.getRow()][piece.getCol()];
 
             if (piece.isInDanger()) {
                 if (piece instanceof KingPiece) continue;
