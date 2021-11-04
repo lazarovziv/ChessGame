@@ -201,14 +201,14 @@ public class Move implements Serializable {
             case PAWN_PROMOTION -> {
                 player.clearPieceFromTile(targetTile);
                 player.addPieceToDead(movingPiece);
-                movingPiece = player.getDeadPieces().get(player.getDeadPieces().size() - 2);
+                movingPiece = player.getCapturedPieces().get(player.getCapturedPieces().size() - 2);
                 movingPiece.setCurrentTile(sourceTile);
                 player.addPieceToAlive(movingPiece);
             }
             case EN_PASSANT -> {
                 player.clearPieceFromTile(targetTile);
-                if (player.getOpponent().getDeadPieces().size() > 0) {
-                    Piece opponentPiece = player.getOpponent().getDeadPieces().get(player.getOpponent().getDeadPieces().size() - 1);
+                if (player.getOpponent().getCapturedPieces().size() > 0) {
+                    Piece opponentPiece = player.getOpponent().getCapturedPieces().get(player.getOpponent().getCapturedPieces().size() - 1);
                     movingPiece.getCapturedPieces().remove(opponentPiece);
                     player.getOpponent().addPieceToAlive(opponentPiece);
                     opponentPiece.setCurrentTile(board.getBoard()[targetTile.getRow() - player.getPlayerDirection()][targetTile.getCol()]);
@@ -217,9 +217,9 @@ public class Move implements Serializable {
             }
             case CAPTURE -> {
                 player.clearPieceFromTile(targetTile);
-                if (player.getOpponent().getDeadPieces().size() > 0) {
+                if (player.getOpponent().getCapturedPieces().size() > 0) {
                     movingPiece.setCurrentTile(sourceTile);
-                    Piece opponentPiece = player.getOpponent().getDeadPieces().get(player.getOpponent().getDeadPieces().size() - 1);
+                    Piece opponentPiece = player.getOpponent().getCapturedPieces().get(player.getOpponent().getCapturedPieces().size() - 1);
                     movingPiece.getCapturedPieces().remove(opponentPiece);
                     player.getOpponent().addPieceToAlive(opponentPiece);
                     opponentPiece.setCurrentTile(targetTile);

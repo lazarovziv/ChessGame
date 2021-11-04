@@ -391,9 +391,14 @@ public class Board implements MyObservable, Serializable {
         return allDirections;
     }
 
+    private void generateMovesWhenInCheckInParallel(Player player) {
+        List<Move> actualLegalMoves = new ArrayList<>();
+        Board copy = new Board(this);
+
+    }
+
     public GameSituation generateMovesWhenInCheck(Player player) {
         List<Move> actualLegalMoves = new ArrayList<>();
-        Board copyBoard = new Board(this);
 
         for (Move move : new ArrayList<>(player.getMoves())) {
             // setting checkBoard argument as false to prevent a StackOverflow error

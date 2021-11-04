@@ -213,10 +213,10 @@ public class BoardFrame {
             List<JLabel> whiteLabels = new ArrayList<>();
             List<JLabel> blackLabels = new ArrayList<>();
 
-            for (Piece piece : board.getWhitePlayer().getDeadPieces()) {
+            for (Piece piece : board.getWhitePlayer().getCapturedPieces()) {
                 whiteLabels.add(new JLabel(createImageIcon(piece)));
             }
-            for (Piece piece : board.getBlackPlayer().getDeadPieces()) {
+            for (Piece piece : board.getBlackPlayer().getCapturedPieces()) {
                 blackLabels.add(new JLabel(createImageIcon(piece)));
             }
 

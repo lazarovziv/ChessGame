@@ -49,7 +49,7 @@ public class Player implements MyObserver, Serializable {
 
 //    @OneToMany(targetEntity = Piece.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
     @OneToMany(targetEntity = Piece.class, mappedBy = "player")
-    private final List<Piece> deadPieces;
+    private final List<Piece> capturedPieces;
 
     private int turnsPlayed = 0;
 
@@ -76,7 +76,7 @@ public class Player implements MyObserver, Serializable {
     public Player(PieceColor pieceColor) {
         playerColor = pieceColor;
         alivePieces = new ArrayList<>();
-        deadPieces = new ArrayList<>();
+        capturedPieces = new ArrayList<>();
         legalMoves = new ArrayList<>();
         lastMove = new HashMap<>();
 
@@ -84,7 +84,7 @@ public class Player implements MyObserver, Serializable {
 
         ObservableSet<Move> oMoves = FXCollections.observableSet(moves);
         ObservableList<Piece> oAlivePieces = FXCollections.observableList(alivePieces);
-        ObservableList<Piece> oCapturedPieces = FXCollections.observableList(deadPieces);
+        ObservableList<Piece> oCapturedPieces = FXCollections.observableList(capturedPieces);
         ObservableMap<Piece, Pair<Tile, Tile>> oLastMove = FXCollections.observableMap(lastMove);
         ObservableList<Tile> oLegalMoves = FXCollections.observableList(legalMoves);
 
@@ -102,7 +102,7 @@ public class Player implements MyObserver, Serializable {
         board = b;
         playerColor = pc;
         alivePieces = new ArrayList<>();
-        deadPieces = new ArrayList<>();
+        capturedPieces = new ArrayList<>();
         legalMoves = new ArrayList<>();
         lastMove = new HashMap<>();
 
@@ -118,7 +118,7 @@ public class Player implements MyObserver, Serializable {
 
     public Player() {
         alivePieces = new ArrayList<>();
-        deadPieces = new ArrayList<>();
+        capturedPieces = new ArrayList<>();
         legalMoves = new ArrayList<>();
         lastMove = new HashMap<>();
 
@@ -128,12 +128,37 @@ public class Player implements MyObserver, Serializable {
     public Player(Board b, Player player) {
         board = b;
         playerColor = player.getColor();
-        alivePieces = player.getAlivePieces();
-        deadPieces = player.getDeadPieces();
-        legalMoves = player.getLegalMoves();
-        lastMove = player.getLastMove();
+        alivePieces = new ArrayList<>();
+        capturedPieces = new ArrayList<>();
+        legalMoves = new ArrayList<>();
 
         moves = new HashSet<>();
+
+        for (Piece piece : player.alivePieces) {
+            if (piece instanceof BishopPiece) alivePieces.add(new BishopPiece(b, (BishopPiece) piece));
+            if (piece instanceof KingPiece) alivePieces.add(new KingPiece(b, (KingPiece) piece));
+            if (piece instanceof KnightPiece) alivePieces.add(new KnightPiece(b, (KnightPiece) piece));
+            if (piece instanceof PawnPiece) alivePieces.add(new PawnPiece(b, (PawnPiece) piece));
+            if (piece instanceof QueenPiece) alivePieces.add(new QueenPiece(b, (QueenPiece) piece));
+            if (piece instanceof RookPiece) alivePieces.add(new RookPiece(b, (RookPiece) piece));
+        }
+
+        for (Piece piece : player.capturedPieces) {
+            if (piece instanceof BishopPiece) capturedPieces.add(new BishopPiece(b, (BishopPiece) piece));
+            if (piece instanceof KingPiece) capturedPieces.add(new KingPiece(b, (KingPiece) piece));
+            if (piece instanceof KnightPiece) capturedPieces.add(new KnightPiece(b, (KnightPiece) piece));
+            if (piece instanceof PawnPiece) capturedPieces.add(new PawnPiece(b, (PawnPiece) piece));
+            if (piece instanceof QueenPiece) capturedPieces.add(new QueenPiece(b, (QueenPiece) piece));
+            if (piece instanceof RookPiece) capturedPieces.add(new RookPiece(b, (RookPiece) piece));
+        }
+
+        for (Tile tile : player.legalMoves) {
+            legalMoves.add(board.getBoard()[tile.getRow()][tile.getCol()]);
+        }
+
+//        lastMove = new HashMap<>();
+        lastMove = player.getLastMove();
+
         playerDirection = player.getPlayerDirection();
         board.addObserver(this);
     }
@@ -185,7 +210,7 @@ public class Player implements MyObserver, Serializable {
     public void addPieceToAlive(Piece piece) {
         if (piece.getPieceColor() == playerColor) {
             alivePieces.add(piece);
-            deadPieces.remove(piece);
+            capturedPieces.remove(piece);
             piece.setIsAlive(true);
             piece.setIsInDanger(false);
 //            piece.setCurrentTile(piece.getCurrentTile());
@@ -195,7 +220,7 @@ public class Player implements MyObserver, Serializable {
     public void addPieceToDead(Piece piece) {
         if (piece == null) return;
         if (piece.getPieceColor() == playerColor) {
-            deadPieces.add(piece);
+            capturedPieces.add(piece);
             alivePieces.remove(piece);
             piece.setLastTile(piece.getCurrentTile());
             clearPieceFromTile(piece.getCurrentTile());
@@ -229,8 +254,8 @@ public class Player implements MyObserver, Serializable {
         return alivePieces;
     }
 
-    public List<Piece> getDeadPieces() {
-        return deadPieces;
+    public List<Piece> getCapturedPieces() {
+        return capturedPieces;
     }
 
     public String getName() {
@@ -324,7 +349,7 @@ public class Player implements MyObserver, Serializable {
                 }
             }
         }
-        for (Piece piece : deadPieces) {
+        for (Piece piece : capturedPieces) {
             playerScore -= playerDirection * piece.getValue();
         }
         if (opponent.isInCheck()) playerScore += playerDirection * 35;
