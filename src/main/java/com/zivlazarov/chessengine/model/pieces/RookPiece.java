@@ -77,6 +77,62 @@ public class RookPiece extends Piece implements Cloneable {
         pieceIndex = player.getAlivePieces().size() - 1;
     }
 
+    public RookPiece(Board copyBoard, RookPiece piece) {
+        super();
+
+        this.board = copyBoard;
+        this.pieceColor = piece.player.getColor();
+        this.player = pieceColor == PieceColor.WHITE ? board.getWhitePlayer() : board.getBlackPlayer();
+        this.currentTile = board.getBoard()[piece.currentTile.getRow()][piece.currentTile.getCol()];
+        this.lastTile = board.getBoard()[piece.lastTile.getRow()][piece.getLastTile().getCol()];
+        this.pieceCounter = piece.pieceCounter;
+
+        this.value = 50;
+
+        if (this.pieceColor == PieceColor.BLACK) {
+            this.name = "bR";
+            this.imageName = "blackRook.png";
+        }
+        if (this.pieceColor == PieceColor.WHITE) {
+            this.name = "wR";
+            this.imageName = "whiteRook.png";
+        }
+
+        this.player.addPieceToAlive(this);
+        this.currentTile.setPiece(this);
+        this.pieceType = PieceType.ROOK;
+
+        isKingSide = piece.isKingSide;
+        isQueenSide = !isKingSide;
+
+        hasMoved = piece.hasMoved;
+
+        if (isKingSide) {
+            kingSideCastlingTile = board.getBoard()[currentTile.getRow()][5];
+            board.getKingSideRooksMap().put(player, this);
+        } else {
+            queenSideCastlingTile = board.getBoard()[currentTile.getRow()][3];
+            board.getQueenSideRooksMap().put(player, this);
+        }
+
+        strongTiles = new double[][] {
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+                {0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0}
+        };
+
+        if (pieceColor == PieceColor.BLACK) {
+            strongTiles = revertStrongTiles(strongTiles);
+        }
+
+        pieceIndex = player.getAlivePieces().size() - 1;
+    }
+
     @Override
     public void generateMoves() {
         if (!isAlive) return;

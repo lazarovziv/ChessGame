@@ -62,6 +62,50 @@ public class BishopPiece extends Piece implements Cloneable {
         pieceIndex = player.getAlivePieces().size() - 1;
     }
 
+    public BishopPiece(Board copyBoard, BishopPiece piece) {
+        super();
+
+        this.board = copyBoard;
+        this.pieceColor = piece.player.getColor();
+        this.player = pieceColor == PieceColor.WHITE ? board.getWhitePlayer() : board.getBlackPlayer();
+        this.currentTile = board.getBoard()[piece.currentTile.getRow()][piece.currentTile.getCol()];
+        this.lastTile = board.getBoard()[piece.lastTile.getRow()][piece.getLastTile().getCol()];
+        this.pieceCounter = piece.pieceCounter;
+
+        this.value = 30;
+
+        if (this.pieceColor == PieceColor.BLACK) {
+            this.name = "bB";
+            this.imageName = "blackBishop.png";
+        }
+        if (this.pieceColor == PieceColor.WHITE) {
+            this.name = "wB";
+            this.imageName = "whiteBishop.png";
+        }
+
+        this.player.addPieceToAlive(this);
+        this.currentTile.setPiece(this);
+        this.pieceType = PieceType.BISHOP;
+
+        // for white and black because white maximizes and black minimizes
+        strongTiles = new double[][] {
+                {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0},
+                {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
+                {-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0, -1.0},
+                {-1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0},
+                {-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.0},
+                {-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0},
+                {-1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, -1.0},
+                {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}
+        };
+
+        if (pieceColor == PieceColor.BLACK) {
+            strongTiles = revertStrongTiles(strongTiles);
+        }
+
+        pieceIndex = player.getAlivePieces().size() - 1;
+    }
+
     @Override
     public void generateMoves() {
         if (!isAlive) return;
